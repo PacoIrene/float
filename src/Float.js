@@ -9,10 +9,10 @@ YUI.add("float", function(Y) {
 	Y.extend(Float, Y.Base, {
 		initializer: function(cfg) {
 			var element = Y.one(cfg.element);
-			console.log(element);
+			element.setContent("First try!");
 		}
 	});
 
 	Y.namespace("vb");
 	Y.vb.Float = Float;
-}, "1.0.0", {requires: ['node', 'Base']});
+}, "1.0.0", {requires: ['node', 'base']});
