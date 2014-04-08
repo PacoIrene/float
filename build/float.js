@@ -1,7 +1,10 @@
-/*
- * The outer float.js
- */
-
+YUI({modules: {
+	"float": {
+		fullpath: "../src/Float.js"
+	}}}).use("float", function(Y){
+	Float = Y.vb.Float;
+	var graph = new Float({element:"#node"});
+});
 YUI.add("float", function(Y) {
 	function Float(cfg) {
 		Float.superclass.constructor.apply(this, arguments);

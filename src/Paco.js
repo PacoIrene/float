@@ -1,3 +1,6 @@
+/*
+ * The main use in float
+ */
 YUI({modules: {
 	"float": {
 		fullpath: "../src/Float.js"
