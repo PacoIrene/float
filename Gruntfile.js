@@ -3,7 +3,7 @@ module.exports = function(grunt) {
 		pkg: grunt.file.readJSON("package.json"),
 		concat: {
 			domop: {
-				src:['', ''],
+				src:['src/Paco.js', 'src/Float.js'],
 				dest: 'build/float.js'
 			}
 		},
