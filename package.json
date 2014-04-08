@@ -1,0 +1,11 @@
+{
+	"name": "Float.js",
+	"version": "0.1.0",
+	"private": true,
+	"dependencies": {
+    "grunt": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-concat": "*"
+  }
+}
