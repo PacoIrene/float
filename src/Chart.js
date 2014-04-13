@@ -16,11 +16,11 @@ YUI.add("chart", function(Y) {
 		type: {
 			value: 0
 		},
-		parentNode: {
-			value: null
-		},
 		series: {
 			value: []
+		},
+		contentNode: {
+			value: null
 		}
 	};
 	Y.extend(Chart, Y.Widget, {
@@ -30,13 +30,16 @@ YUI.add("chart", function(Y) {
 		 * 
 		 */
 		initializer: function() {
-			this._contentNode = Y.Node.create("<svg></svg>");
-			this._contentNode.addClass("float_content");
+			this.set("contentNode", Y.Node.create("<svg></svg>"));
+			var contentNode = this.getContentNode();
+			contentNode.addClass("float_content");
+			contentNode.setAttribute("height", this.getHeight());
+			contentNode.setAttribute("width", this.getWidth());
 			this._titleNode = Y.Node.create("<div></div>");
 			this._titleNode.setContent(this.getTitle());
 			this._titleNode.addClass("float_title");
-			this.getParentNode().append(this._contentNode);
-			this.getParentNode().append(this._titleNode);
+			this.get("contentBox").append(this.getContentNode());
+			this.get("contentBox").append(this._titleNode);
 		},
 		renderUI: function() {
 
@@ -56,11 +59,11 @@ YUI.add("chart", function(Y) {
 		getType: function() {
 			return this.get("type");
 		},
-		getParentNode: function() {
-			return this.get("parentNode");
-		},
 		getSeries: function() {
-			return thid.get("series");
+			return this.get("series");
+		},
+		getContentNode: function() {
+			return this.get("contentNode");
 		}
 	});
 

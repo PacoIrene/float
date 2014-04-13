@@ -11,19 +11,32 @@ YUI.add("float", function(Y) {
 	Float.ATTRS = {
 
 	};
-	Y.extend(Float, Y.Widget, {
+	Y.extend(Float, Y.Base, {
 		initializer: function(cfg) {
 			this._parent = Y.one(cfg.element);
 			this._title = cfg.title;
+			this._width = cfg.width;
+			this._height = cfg.height;
+			this._series = cfg.series;
+			this._content = Y.Node.create("<div></div>");
+			this._parent.append(this._content);
 		},
-		renderUI: function() {
-			new Column({parentNode: this._parent, title: this._title}).render();
+		render: function() {
+			new Column({
+				parentNode: this._parent, 
+				title: this._title, 
+				width: this._width, 
+				height: this._height, 
+				boundingBox: this._parent, 
+				contentBox: this._content,
+				series: this._series
+			}).render();
 		},
-		bindUI: function() {
+		_bindUI: function() {
 
 		}
 	});
 
 	Y.namespace("vb");
 	Y.vb.Float = Float;
-}, "1.0.0", {requires: ['node', 'widget', 'column']});
+}, "1.0.0", {requires: ['node', 'base', 'column']});

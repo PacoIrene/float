@@ -17,6 +17,17 @@ YUI.GlobalConfig = {
 };
 YUI().use("float", function(Y){
 	Float = Y.vb.Float;
-	var graph = new Float({element:"#node", title: "Column Chart on XX"});
+	var graph = new Float({
+        element:"#node", 
+        title: "Column Chart on XX", 
+        width: 300, 
+        height: 300,
+        series: [{
+            color: "red",
+            x: 0,
+            y: 10
+        }]
+
+    });
 	graph.render();
 });
