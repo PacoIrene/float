@@ -3,6 +3,7 @@
  */
 
 YUI.add("float", function(Y) {
+	var Column = Y.vb.Column;
 	function Float(cfg) {
 		Float.superclass.constructor.apply(this, arguments);
 	}
@@ -10,13 +11,19 @@ YUI.add("float", function(Y) {
 	Float.ATTRS = {
 
 	};
-	Y.extend(Float, Y.Base, {
+	Y.extend(Float, Y.Widget, {
 		initializer: function(cfg) {
-			var element = Y.one(cfg.element);
-			element.setContent("First try!");
+			this._parent = Y.one(cfg.element);
+			this._title = cfg.title;
+		},
+		renderUI: function() {
+			new Column({parentNode: this._parent, title: this._title}).render();
+		},
+		bindUI: function() {
+
 		}
 	});
 
 	Y.namespace("vb");
 	Y.vb.Float = Float;
-}, "1.0.0", {requires: ['node', 'base']});
+}, "1.0.0", {requires: ['node', 'widget', 'column']});

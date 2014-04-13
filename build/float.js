@@ -1,10 +1,24 @@
-YUI({modules: {
-	"float": {
-		fullpath: "../src/Float.js"
-	}}}).use("float", function(Y){
+/*
+ * The main use in float
+ */
+YUI.GlobalConfig = {
+    modules: {
+        float: '/Float.js'
+        // module2: '/path/to/my/module2.js',
+        // module3: {
+        //     fullpath: '/path/to/my/module3.js',
+        //     requires: [ 'node', 'event', 'dd', 'yql']
+        // }
+    }
+};
+YUI().use("float", function(Y){
 	Float = Y.vb.Float;
 	var graph = new Float({element:"#node"});
 });
+/*
+ * The outer float.js
+ */
+
 YUI.add("float", function(Y) {
 	function Float(cfg) {
 		Float.superclass.constructor.apply(this, arguments);
