@@ -42,7 +42,7 @@ YUI.add("chart", function(Y) {
 			this.get("contentBox").append(this._titleNode);
 		},
 		renderUI: function() {
-
+			
 		},
 		bindUI: function() {
 
