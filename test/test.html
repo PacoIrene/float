@@ -7,7 +7,10 @@
 	<body>
 		<div id="node"></div>
 		<script type="text/javascript" src="../lib/d3.v3.min.js"></script>
-		<script type="text/javascript" src="../lib/yui-min.js"></script>
-		<script type="text/javascript" src="../src/Frost.js" charset="utf-8"></script>
+		<script type="text/javascript" src="../build/frost.js" charset="utf-8"></script>
+		<script type="text/javascript">
+			var frost = new Frost.XAxis({width:300});
+			frost.render("#node");
+		</script>
 	</body>
 </html>

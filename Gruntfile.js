@@ -3,8 +3,8 @@ module.exports = function(grunt) {
 		pkg: grunt.file.readJSON("package.json"),
 		concat: {
 			domop: {
-				src:['src/Paco.js', 'src/Float.js', 'src/Chart.js', 'src/Column.js'],
-				dest: 'build/float.js'
+				src:['src/Frost.js', 'src/Frost.Title.js', 'src/Frost.XAxis.js'],
+				dest: 'build/frost.js'
 			}
 		},
 		uglify: {
@@ -12,8 +12,8 @@ module.exports = function(grunt) {
 				banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
 			}, 
 			build: {
-				src: 'build/float.js',
-				dest: 'build/float.min.js'
+				src: 'build/frost.js',
+				dest: 'build/frost.min.js'
 			}
 		}
 	});
