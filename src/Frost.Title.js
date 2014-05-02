@@ -11,20 +11,50 @@ Frost.namespace("Frost.Title");
 
 /**
  * Title Class
- * @attr {String} name title string
+ * @attr {object} cfg own title and parent node
  */
-function Title(title) {
-	this.name = title;
+function Title(cfg) {
+	this.name = cfg.title;
+	this._container = cfg.container; 
 }
+/**
+ * get the name of Frost Title.
+ * @method Title.getName
+ */
+Title.prototype.getName = function() {
+	return this.name;
+};
+/**
+ * set the name of Frost Title.
+ * @method Title.setName
+ * @param {String} data The String of the Title name.
+ */
+Title.prototype.setName = function(data) {
+	this.name = data;
+};
+/**
+ * get the parent node of Frost Title.
+ * @method Title.getContainer
+ */
+Title.prototype.getContainer = function() {
+	return this._container;
+};
+/**
+ * set the parent node of Frost Title.
+ * @method Title.setContainer
+ * @param {Node} data The parent node.
+ */
+Title.prototype.setContainer = function(data) {
+	this._container = data;
+};
 /**
  * render the title node to the parent node.
  * @method Title.render
- * @param {String} element The String of the parent node.
  */
-Title.prototype.render = function(element) {
-	d3.select(element).append("div")
-					  .attr("class", "frost_title")
-					  .html(this.name);
+Title.prototype.render = function() {
+	this._container.append("div")
+				  .attr("class", "frost_title")
+				  .html(this.name);
 };
 
 Frost.Title = Title;

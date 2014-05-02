@@ -107,20 +107,50 @@ Frost.namespace("Frost.Title");
 
 /**
  * Title Class
- * @attr {String} name title string
+ * @attr {object} cfg own title and parent node
  */
-function Title(title) {
-	this.name = title;
+function Title(cfg) {
+	this.name = cfg.title;
+	this._container = cfg.container; 
 }
+/**
+ * get the name of Frost Title.
+ * @method Title.getName
+ */
+Title.prototype.getName = function() {
+	return this.name;
+};
+/**
+ * set the name of Frost Title.
+ * @method Title.setName
+ * @param {String} data The String of the Title name.
+ */
+Title.prototype.setName = function(data) {
+	this.name = data;
+};
+/**
+ * get the parent node of Frost Title.
+ * @method Title.getContainer
+ */
+Title.prototype.getContainer = function() {
+	return this._container;
+};
+/**
+ * set the parent node of Frost Title.
+ * @method Title.setContainer
+ * @param {Node} data The parent node.
+ */
+Title.prototype.setContainer = function(data) {
+	this._container = data;
+};
 /**
  * render the title node to the parent node.
  * @method Title.render
- * @param {String} element The String of the parent node.
  */
-Title.prototype.render = function(element) {
-	d3.select(element).append("div")
-					  .attr("class", "frost_title")
-					  .html(this.name);
+Title.prototype.render = function() {
+	this._container.append("div")
+				  .attr("class", "frost_title")
+				  .html(this.name);
 };
 
 Frost.Title = Title;
@@ -158,3 +188,237 @@ XAxis.prototype.render = function(element) {
 };
 
 Frost.XAxis = XAxis;
+Frost.namespace("Frost.Column");
+
+function Column(cfg) {
+	this.x = cfg.x;
+	this.y = cfg.y;
+	this.height = cfg.height;
+	this.width = cfg.width;
+	this.color = cfg.color;
+	this.name = cfg.name;
+	this._container = cfg.container;
+}
+
+Column.prototype.getX = function() {
+	return this.x;
+};
+
+Column.prototype.setX = function(data) {
+	this.x = data;
+};
+
+Column.prototype.getY = function() {
+	return this.y;
+};
+
+Column.prototype.setY = function(data) {
+	this.y = data;
+};
+
+Column.prototype.getHeight = function() {
+	return this.height;
+};
+
+Column.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+Column.prototype.getWidth = function() {
+	return this.width;
+};
+
+Column.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+
+Column.prototype.getColor = function() {
+	return this.color;
+};
+
+Column.prototype.setColor = function(data) {
+	this.color = data;
+};
+
+Column.prototype.getName = function() {
+	return this.name;
+};
+
+Column.prototype.setName = function(data) {
+	this.name = data;
+};
+
+Column.prototype.getContainer = function() {
+	return this._container;
+};
+
+Column.prototype.setContainer = function(data) {
+	this._container = data;
+};
+
+Column.prototype.render = function() {
+	this._rectNode = this._container.append("rect")
+				  					.attr("x", this.getX())
+								  	.attr("y", this.getY())
+								  	.attr("width", this.getWidth())
+								  	.attr("height", this.getHeight())
+								  	.attr("fill", this.getColor());
+	this._bindUI();
+	return this;
+};
+
+Column.prototype._bindUI = function() {
+	this._rectNode.on("mouseover", function(e) {
+		console.log(this.getName());
+	}.bind(this));
+};
+Frost.Column = Column;
+Frost.namespace("Frost.Columns");
+
+function Columns(cfg) {
+	this.x = cfg.x;
+	this.y = cfg.y;
+	this.series = cfg.series;
+	this._container = cfg.container;
+	this.columnList = [];
+}
+Columns.prototype.getX = function() {
+	return this.x;
+};
+
+Columns.prototype.setX = function(data) {
+	this.x = data;
+};
+
+Columns.prototype.getY = function() {
+	return this.y;
+};
+
+Columns.prototype.setY = function(data) {
+	this.y = data;
+};
+
+Columns.prototype.getSeries = function() {
+	return this.series;
+};
+Columns.prototype.setSeries = function(data) {
+	this.series = data;
+};
+Columns.prototype.getContainer = function() {
+	return this._container;
+};
+
+Columns.prototype.setContainer = function(data) {
+	this._container = data;
+};
+
+Columns.prototype.getGap = function() {
+	return this.getSingleWidth() / 2;
+};
+Columns.prototype.getSingleWidth = function() {
+	var number = this.getSeries().length * 2 + 1;
+	var singleWidth = this.getX() / number;
+	return singleWidth;
+};
+Columns.prototype.getSingleHeight = function(actualHeight) {
+	return actualHeight / this.getMaxSerie() * this.getY();
+};
+Columns.prototype.getMaxSerie = function() {
+	var max = this.getSeries()[0].y;
+	for(var i = 0; i != this.getSeries().length; i++) {
+		if(this.getSeries()[i].y > max) {
+			max = this.getSeries()[i].y;
+		}
+	}	
+	return max;
+};
+Columns.prototype.render = function() {
+	var groupContainer = this._container.append("g");
+	for(var i = 0; i != this.getSeries().length; i++) {
+		var column = new Frost.Column({
+			x: this.getGap() * (i+1) + this.getSingleWidth() * i,
+			y: this.getY() - this.getSingleHeight(this.getSeries()[i].y),
+			width: this.getSingleWidth(),
+			height: this.getSingleHeight(this.getSeries()[i].y),
+			color: this.getSeries()[i].color,
+			name: this.getSeries()[i].name,
+			container: groupContainer
+		});
+		this.columnList.push(column.render());
+	}
+	return this;
+};
+Frost.Columns = Columns;
+Frost.namespace("Frost.Graph");
+
+function Graph(cfg) {
+	this.node = cfg.element || "body";
+	this.series = cfg.series;
+	this.type = cfg.type;
+	this.width = cfg.width;
+	this.height = cfg.height;
+	this.chartObject = null;
+}
+
+Graph.prototype.getNode = function() {
+	return this.node;
+};
+Graph.prototype.setNode = function(data) {
+	this.node = data;
+};
+
+Graph.prototype.getSeries = function() {
+	return this.series;
+};
+Graph.prototype.setSeries = function(data) {
+	this.series = data;
+};
+
+Graph.prototype.getType = function() {
+	return this.type;
+};
+Graph.prototype.setType = function(data) {
+	this.type = data;
+};
+
+Graph.prototype.getWidth = function() {
+	return this.width;
+};
+Graph.prototype.setWidth = function(data) {
+	this.width = data;
+};
+
+Graph.prototype.getHeight = function() {
+	return this.height;
+};
+Graph.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+Graph.prototype.getChartObject = function() {
+	return this.chartObject;
+};
+Graph.prototype.setChartObject = function(data) {
+	this.chartObject = data;
+};
+
+/**
+ * Render the Chart.
+ * @method Frost.Graph.render
+ */
+Graph.prototype.render = function() {
+	var container = d3.select(this.node).append("svg")
+								   .attr("width", this.getWidth())
+								   .attr("height", this.getHeight());
+	switch(this.getType().toLowerCase()) {
+		case "column":
+			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight(), series: this.getSeries(), container: container});
+			this.chartObject.render();
+			return this;
+			break;
+		default: 
+			break;
+	}
+};
+
+Frost.Graph = Graph;

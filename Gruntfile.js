@@ -3,13 +3,14 @@ module.exports = function(grunt) {
 		pkg: grunt.file.readJSON("package.json"),
 		concat: {
 			domop: {
-				src:['src/Frost.js', 'src/Frost.Title.js', 'src/Frost.XAxis.js'],
+				src:['src/Frost.js', 'src/Frost.Title.js', 'src/Frost.XAxis.js',
+				'src/Frost.Column.js','src/Frost.Columns.js', 'src/Frost.Graph.js'],
 				dest: 'build/frost.js'
 			}
 		},
 		uglify: {
 			options: {
-				banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+				banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
 			}, 
 			build: {
 				src: 'build/frost.js',
