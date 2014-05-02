@@ -6,6 +6,7 @@ function Columns(cfg) {
 	this.series = cfg.series;
 	this._container = cfg.container;
 	this.columnList = [];
+	this._parent = cfg.parent;
 }
 Columns.prototype.getX = function() {
 	return this.x;
@@ -41,9 +42,9 @@ Columns.prototype.getGap = function() {
 	return this.getSingleWidth() / 2;
 };
 Columns.prototype.getSingleWidth = function() {
-	var number = this.getSeries().length * 2 + 1;
+	var number = this.getSeries().length * 3 + 1;
 	var singleWidth = this.getX() / number;
-	return singleWidth;
+	return singleWidth * 2;
 };
 Columns.prototype.getSingleHeight = function(actualHeight) {
 	return actualHeight / this.getMaxSerie() * this.getY();
@@ -57,6 +58,9 @@ Columns.prototype.getMaxSerie = function() {
 	}	
 	return max;
 };
+Columns.prototype.getParent = function() {
+	return this._parent;
+};
 Columns.prototype.render = function() {
 	var groupContainer = this._container.append("g");
 	for(var i = 0; i != this.getSeries().length; i++) {
@@ -67,7 +71,8 @@ Columns.prototype.render = function() {
 			height: this.getSingleHeight(this.getSeries()[i].y),
 			color: this.getSeries()[i].color,
 			name: this.getSeries()[i].name,
-			container: groupContainer
+			container: groupContainer,
+			parent: this
 		});
 		this.columnList.push(column.render());
 	}

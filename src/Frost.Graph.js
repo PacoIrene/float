@@ -7,6 +7,7 @@ function Graph(cfg) {
 	this.width = cfg.width;
 	this.height = cfg.height;
 	this.chartObject = null;
+	this.detail = null
 }
 
 Graph.prototype.getNode = function() {
@@ -51,17 +52,25 @@ Graph.prototype.setChartObject = function(data) {
 	this.chartObject = data;
 };
 
+Graph.prototype.getDetail = function() {
+	return this.detail;
+};
 /**
  * Render the Chart.
  * @method Frost.Graph.render
  */
 Graph.prototype.render = function() {
-	var container = d3.select(this.node).append("svg")
-								   .attr("width", this.getWidth())
-								   .attr("height", this.getHeight());
+	var rootNode = d3.select(this.node).append("div")
+									   .attr("class", "frost_rootNode")
+									   .style("height", this.getHeight() + "px")
+									   .style("width", this.getWidth() + "px");
+	var container = rootNode.append("svg")
+							.attr("width", this.getWidth())
+							.attr("height", this.getHeight());
+	this.detail = new Frost.Detail({container: rootNode}).render();
 	switch(this.getType().toLowerCase()) {
 		case "column":
-			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight(), series: this.getSeries(), container: container});
+			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight(), series: this.getSeries(), container: container, parent: this});
 			this.chartObject.render();
 			return this;
 			break;

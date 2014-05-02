@@ -188,6 +188,37 @@ XAxis.prototype.render = function(element) {
 };
 
 Frost.XAxis = XAxis;
+Frost.namespace("Frost.Detail");
+
+function Detail(cfg) {
+	this._container = cfg.container;
+	this.detailNode = null;
+}
+Detail.prototype.getContainer = function() {
+	return this._container;
+};
+Detail.prototype.setX = function(x) {
+	this.detailNode.style("left", x + "px");
+};
+Detail.prototype.setY = function(y) {
+	this.detailNode.style("top", y + "px");
+};
+Detail.prototype.setContent = function(content) {
+	this.detailNode.html(content);
+};
+Detail.prototype.show = function() {
+	this.detailNode.style("display", "block");
+}; 
+Detail.prototype.hide = function() {
+	this.detailNode.style("display", "node");
+};
+Detail.prototype.render = function() {
+	this.detailNode = this._container.append("div")
+									 .attr("class", "frost_detail");
+	return this;
+};
+
+Frost.Detail = Detail;
 Frost.namespace("Frost.Column");
 
 function Column(cfg) {
@@ -198,6 +229,7 @@ function Column(cfg) {
 	this.color = cfg.color;
 	this.name = cfg.name;
 	this._container = cfg.container;
+	this._parent = cfg.parent;
 }
 
 Column.prototype.getX = function() {
@@ -255,6 +287,9 @@ Column.prototype.getContainer = function() {
 Column.prototype.setContainer = function(data) {
 	this._container = data;
 };
+Column.prototype.getParent = function() {
+	return this._parent;
+};
 
 Column.prototype.render = function() {
 	this._rectNode = this._container.append("rect")
@@ -268,8 +303,8 @@ Column.prototype.render = function() {
 };
 
 Column.prototype._bindUI = function() {
-	this._rectNode.on("mouseover", function(e) {
-		console.log(this.getName());
+	this._rectNode.on("mouseover", function(e,f) {
+		console.log(f);
 	}.bind(this));
 };
 Frost.Column = Column;
@@ -281,6 +316,7 @@ function Columns(cfg) {
 	this.series = cfg.series;
 	this._container = cfg.container;
 	this.columnList = [];
+	this._parent = cfg.parent;
 }
 Columns.prototype.getX = function() {
 	return this.x;
@@ -316,9 +352,9 @@ Columns.prototype.getGap = function() {
 	return this.getSingleWidth() / 2;
 };
 Columns.prototype.getSingleWidth = function() {
-	var number = this.getSeries().length * 2 + 1;
+	var number = this.getSeries().length * 3 + 1;
 	var singleWidth = this.getX() / number;
-	return singleWidth;
+	return singleWidth * 2;
 };
 Columns.prototype.getSingleHeight = function(actualHeight) {
 	return actualHeight / this.getMaxSerie() * this.getY();
@@ -332,6 +368,9 @@ Columns.prototype.getMaxSerie = function() {
 	}	
 	return max;
 };
+Columns.prototype.getParent = function() {
+	return this._parent;
+};
 Columns.prototype.render = function() {
 	var groupContainer = this._container.append("g");
 	for(var i = 0; i != this.getSeries().length; i++) {
@@ -342,7 +381,8 @@ Columns.prototype.render = function() {
 			height: this.getSingleHeight(this.getSeries()[i].y),
 			color: this.getSeries()[i].color,
 			name: this.getSeries()[i].name,
-			container: groupContainer
+			container: groupContainer,
+			parent: this
 		});
 		this.columnList.push(column.render());
 	}
@@ -358,6 +398,7 @@ function Graph(cfg) {
 	this.width = cfg.width;
 	this.height = cfg.height;
 	this.chartObject = null;
+	this.detail = null
 }
 
 Graph.prototype.getNode = function() {
@@ -402,17 +443,25 @@ Graph.prototype.setChartObject = function(data) {
 	this.chartObject = data;
 };
 
+Graph.prototype.getDetail = function() {
+	return this.detail;
+};
 /**
  * Render the Chart.
  * @method Frost.Graph.render
  */
 Graph.prototype.render = function() {
-	var container = d3.select(this.node).append("svg")
-								   .attr("width", this.getWidth())
-								   .attr("height", this.getHeight());
+	var rootNode = d3.select(this.node).append("div")
+									   .attr("class", "frost_rootNode")
+									   .style("height", this.getHeight() + "px")
+									   .style("width", this.getWidth() + "px");
+	var container = rootNode.append("svg")
+							.attr("width", this.getWidth())
+							.attr("height", this.getHeight());
+	this.detail = new Frost.Detail({container: rootNode}).render();
 	switch(this.getType().toLowerCase()) {
 		case "column":
-			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight(), series: this.getSeries(), container: container});
+			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight(), series: this.getSeries(), container: container, parent: this});
 			this.chartObject.render();
 			return this;
 			break;

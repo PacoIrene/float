@@ -8,6 +8,7 @@ function Column(cfg) {
 	this.color = cfg.color;
 	this.name = cfg.name;
 	this._container = cfg.container;
+	this._parent = cfg.parent;
 }
 
 Column.prototype.getX = function() {
@@ -65,6 +66,9 @@ Column.prototype.getContainer = function() {
 Column.prototype.setContainer = function(data) {
 	this._container = data;
 };
+Column.prototype.getParent = function() {
+	return this._parent;
+};
 
 Column.prototype.render = function() {
 	this._rectNode = this._container.append("rect")
@@ -79,7 +83,7 @@ Column.prototype.render = function() {
 
 Column.prototype._bindUI = function() {
 	this._rectNode.on("mouseover", function(e) {
-		console.log(this.getName());
+		console.log(f);
 	}.bind(this));
 };
 Frost.Column = Column;
