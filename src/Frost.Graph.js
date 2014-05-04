@@ -73,7 +73,7 @@ Graph.prototype.render = function() {
 	this.detail = new Frost.Detail({container: rootNode}).render();
 	switch(this.getType().toLowerCase()) {
 		case "column":
-			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight(), series: this.getSeries(), container: this.container, parent: this});
+			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight() - 25, series: this.getSeries(), container: this.container, parent: this});
 			this.chartObject.render();
 			return this;
 			break;

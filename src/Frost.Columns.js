@@ -65,7 +65,12 @@ Columns.prototype.getParent = function() {
 };
 Columns.prototype.render = function() {
 	this._groupContainer = this._container.append("g");
+	this.xAxisNode = this._container.append("g")
+							  .attr("class", "frost_xAxis")
+							  .attr("transform", "translate(0,"+ this.getY() +")");
+	this.xAxis = new Frost.XAxis({length: this.getSeries().length, width: this.getX(), parent: this, container: this.xAxisNode}).render();
 	for(var i = 0; i != this.getSeries().length; i++) {
+		
 		var column = new Frost.Column({
 			value: this.getSeries()[i].y,
 			x: this.getGap() * (i+1) + this.getSingleWidth() * i,

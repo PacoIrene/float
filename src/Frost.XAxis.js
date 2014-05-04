@@ -1,34 +1,39 @@
 Frost.namespace("Frost.XAxis");
 
-function XAxis(obj) {
-	this.width = obj.width;
-	this.numberArray = obj.numberArray;
+function XAxis(cfg) {
+	this.domainRange = cfg.length;
+	this.width = cfg.width;
+	this._parent = cfg.parent;
+	this._container = cfg.container;
 }
+
+XAxis.prototype.getDomainRange = function() {
+	return this.domainRange;
+};
+
 XAxis.prototype.getWidth = function() {
 	return this.width;
 };
-XAxis.prototype.setWidth = function(data) {
-	this.width = data;
+
+XAxis.prototype.getParent = function() {
+	return this._parent;
 };
-XAxis.prototype.getBase = function() {
-	return this.width / this.numberArray.length;
+
+XAxis.prototype.getContainer = function() {
+	return this._container;
 };
-XAxis.prototype.getMin = function() {
-	return d3.min(this.numberArray);
-};
-XAxis.prototype.getMax = function() {
-	return d3.max(this.numberArray);
-};
-XAxis.prototype.render = function(element) {
-	var XAxisContainer = d3.select(element).append("div")
-					  					   .attr("class", "frost_xAxis")
-					  					   .append("svg")
-					  					   .attr("width", this.getWidth())
-					  					   .attr("height", 100)
-					  					   .append("circle")
-					  					   .attr("cx", 30)
-					  					   .attr("cy", 30)
-					  					   .attr("r", 20);
+
+XAxis.prototype.render = function() {
+	var x = d3.scale.ordinal()
+	    .domain(d3.range(this.getDomainRange()))
+	    .rangeRoundBands([0, this.getWidth()], .38);
+	var xAxis = d3.svg.axis()
+	    .scale(x)
+	    .tickSize(1)
+	    .tickPadding(10)
+	    .orient("bottom");
+	this._container.call(xAxis);
+	return this;
 };
 
 Frost.XAxis = XAxis;
