@@ -1,4 +1,4 @@
 float
 =====
 
-A JavaScript toolkit for creating interactive time series graphs
+A JavaScript toolkit for creating interactive time series graphs depends on d3.js
