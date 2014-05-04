@@ -58,24 +58,38 @@ Columns.prototype.getMaxSerie = function() {
 	}	
 	return max;
 };
+
+//return Graph
 Columns.prototype.getParent = function() {
 	return this._parent;
 };
 Columns.prototype.render = function() {
-	var groupContainer = this._container.append("g");
+	this._groupContainer = this._container.append("g");
 	for(var i = 0; i != this.getSeries().length; i++) {
 		var column = new Frost.Column({
+			value: this.getSeries()[i].y,
 			x: this.getGap() * (i+1) + this.getSingleWidth() * i,
 			y: this.getY() - this.getSingleHeight(this.getSeries()[i].y),
 			width: this.getSingleWidth(),
 			height: this.getSingleHeight(this.getSeries()[i].y),
 			color: this.getSeries()[i].color,
 			name: this.getSeries()[i].name,
-			container: groupContainer,
+			container: this._groupContainer,
 			parent: this
 		});
 		this.columnList.push(column.render());
 	}
+	this.bindUI();
 	return this;
+};
+Columns.prototype.bindUI = function() {
+	var columnList = this.columnList;
+	this.getParent().getContainer().on("click", function() {
+		for(var i = 0; i != columnList.length; i++) {
+			if(columnList[i].isHighLight()) {
+				columnList[i].deleteHighLight();
+			}
+		}
+	});
 };
 Frost.Columns = Columns;

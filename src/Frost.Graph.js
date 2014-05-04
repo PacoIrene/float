@@ -55,6 +55,9 @@ Graph.prototype.setChartObject = function(data) {
 Graph.prototype.getDetail = function() {
 	return this.detail;
 };
+Graph.prototype.getContainer = function() {
+	return this.container;
+}
 /**
  * Render the Chart.
  * @method Frost.Graph.render
@@ -64,13 +67,13 @@ Graph.prototype.render = function() {
 									   .attr("class", "frost_rootNode")
 									   .style("height", this.getHeight() + "px")
 									   .style("width", this.getWidth() + "px");
-	var container = rootNode.append("svg")
+	this.container = rootNode.append("svg")
 							.attr("width", this.getWidth())
 							.attr("height", this.getHeight());
 	this.detail = new Frost.Detail({container: rootNode}).render();
 	switch(this.getType().toLowerCase()) {
 		case "column":
-			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight(), series: this.getSeries(), container: container, parent: this});
+			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight(), series: this.getSeries(), container: this.container, parent: this});
 			this.chartObject.render();
 			return this;
 			break;

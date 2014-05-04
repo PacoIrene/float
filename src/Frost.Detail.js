@@ -16,11 +16,15 @@ Detail.prototype.setY = function(y) {
 Detail.prototype.setContent = function(content) {
 	this.detailNode.html(content);
 };
+Detail.prototype.setPosition = function(cfg) {
+	this.setX(cfg.x);
+	this.setY(cfg.y);
+}
 Detail.prototype.show = function() {
 	this.detailNode.style("display", "block");
 }; 
 Detail.prototype.hide = function() {
-	this.detailNode.style("display", "node");
+	this.detailNode.style("display", "none");
 };
 Detail.prototype.render = function() {
 	this.detailNode = this._container.append("div")

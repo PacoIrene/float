@@ -206,11 +206,15 @@ Detail.prototype.setY = function(y) {
 Detail.prototype.setContent = function(content) {
 	this.detailNode.html(content);
 };
+Detail.prototype.setPosition = function(cfg) {
+	this.setX(cfg.x);
+	this.setY(cfg.y);
+}
 Detail.prototype.show = function() {
 	this.detailNode.style("display", "block");
 }; 
 Detail.prototype.hide = function() {
-	this.detailNode.style("display", "node");
+	this.detailNode.style("display", "none");
 };
 Detail.prototype.render = function() {
 	this.detailNode = this._container.append("div")
@@ -222,15 +226,25 @@ Frost.Detail = Detail;
 Frost.namespace("Frost.Column");
 
 function Column(cfg) {
+	this.value = cfg.value;
 	this.x = cfg.x;
 	this.y = cfg.y;
 	this.height = cfg.height;
 	this.width = cfg.width;
-	this.color = cfg.color;
-	this.name = cfg.name;
+	this.color = cfg.color || "steelblue";
+	this.name = cfg.name || "";
 	this._container = cfg.container;
 	this._parent = cfg.parent;
+	this._isHighLight = false;
 }
+
+Column.prototype.getValue = function() {
+	return this.value;
+};
+
+Column.prototype.setValue = function(data) {
+	this.value = data;
+};
 
 Column.prototype.getX = function() {
 	return this.x;
@@ -287,10 +301,24 @@ Column.prototype.getContainer = function() {
 Column.prototype.setContainer = function(data) {
 	this._container = data;
 };
+//return Columns
 Column.prototype.getParent = function() {
 	return this._parent;
 };
-
+Column.prototype.getRectNode = function() {
+	return this._rectNode;
+};
+Column.prototype.isHighLight = function() {
+	return this._isHighLight;
+}
+Column.prototype.setHighLight = function() {
+	this._isHighLight = true;
+	this.getRectNode().attr("fill", "#0870B4");
+};
+Column.prototype.deleteHighLight = function() {
+	this._isHighLight = false;
+	this.getRectNode().attr("fill", this.getColor());
+};
 Column.prototype.render = function() {
 	this._rectNode = this._container.append("rect")
 				  					.attr("x", this.getX())
@@ -303,9 +331,29 @@ Column.prototype.render = function() {
 };
 
 Column.prototype._bindUI = function() {
-	this._rectNode.on("mouseover", function(e,f) {
-		console.log(f);
-	}.bind(this));
+	var that = this;
+	var detailNode = that.getParent().getParent().getDetail();
+	this._rectNode.on("mouseover", function() {
+		var position = d3.mouse(this);
+		detailNode.setContent(that.getName() + ":" + that.getValue());
+		detailNode.setPosition({x: position[0], y: position[1]});
+		detailNode.show();
+	});
+	this._rectNode.on("mousemove", function() {
+		var position = d3.mouse(this);
+		detailNode.setPosition({x: position[0] + 8, y: position[1]});
+	});
+	this._rectNode.on("mouseleave", function() {
+		detailNode.hide();
+	});
+	this._rectNode.on("click", function() {
+		d3.event.stopPropagation();
+		if(that.isHighLight()) {
+			that.deleteHighLight();
+		} else {
+			that.setHighLight();
+		}
+	});
 };
 Frost.Column = Column;
 Frost.namespace("Frost.Columns");
@@ -368,25 +416,39 @@ Columns.prototype.getMaxSerie = function() {
 	}	
 	return max;
 };
+
+//return Graph
 Columns.prototype.getParent = function() {
 	return this._parent;
 };
 Columns.prototype.render = function() {
-	var groupContainer = this._container.append("g");
+	this._groupContainer = this._container.append("g");
 	for(var i = 0; i != this.getSeries().length; i++) {
 		var column = new Frost.Column({
+			value: this.getSeries()[i].y,
 			x: this.getGap() * (i+1) + this.getSingleWidth() * i,
 			y: this.getY() - this.getSingleHeight(this.getSeries()[i].y),
 			width: this.getSingleWidth(),
 			height: this.getSingleHeight(this.getSeries()[i].y),
 			color: this.getSeries()[i].color,
 			name: this.getSeries()[i].name,
-			container: groupContainer,
+			container: this._groupContainer,
 			parent: this
 		});
 		this.columnList.push(column.render());
 	}
+	this.bindUI();
 	return this;
+};
+Columns.prototype.bindUI = function() {
+	var columnList = this.columnList;
+	this.getParent().getContainer().on("click", function() {
+		for(var i = 0; i != columnList.length; i++) {
+			if(columnList[i].isHighLight()) {
+				columnList[i].deleteHighLight();
+			}
+		}
+	});
 };
 Frost.Columns = Columns;
 Frost.namespace("Frost.Graph");
@@ -446,6 +508,9 @@ Graph.prototype.setChartObject = function(data) {
 Graph.prototype.getDetail = function() {
 	return this.detail;
 };
+Graph.prototype.getContainer = function() {
+	return this.container;
+}
 /**
  * Render the Chart.
  * @method Frost.Graph.render
@@ -455,13 +520,13 @@ Graph.prototype.render = function() {
 									   .attr("class", "frost_rootNode")
 									   .style("height", this.getHeight() + "px")
 									   .style("width", this.getWidth() + "px");
-	var container = rootNode.append("svg")
+	this.container = rootNode.append("svg")
 							.attr("width", this.getWidth())
 							.attr("height", this.getHeight());
 	this.detail = new Frost.Detail({container: rootNode}).render();
 	switch(this.getType().toLowerCase()) {
 		case "column":
-			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight(), series: this.getSeries(), container: container, parent: this});
+			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight(), series: this.getSeries(), container: this.container, parent: this});
 			this.chartObject.render();
 			return this;
 			break;
