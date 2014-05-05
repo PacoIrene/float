@@ -64,13 +64,10 @@ Columns.prototype.getParent = function() {
 	return this._parent;
 };
 Columns.prototype.render = function() {
+	var valueList = [];
 	this._groupContainer = this._container.append("g");
-	this.xAxisNode = this._container.append("g")
-							  .attr("class", "frost_xAxis")
-							  .attr("transform", "translate(0,"+ this.getY() +")");
-	this.xAxis = new Frost.XAxis({length: this.getSeries().length, width: this.getX(), parent: this, container: this.xAxisNode}).render();
 	for(var i = 0; i != this.getSeries().length; i++) {
-		
+		valueList.push(this.getSeries()[i].name);
 		var column = new Frost.Column({
 			value: this.getSeries()[i].y,
 			x: this.getGap() * (i+1) + this.getSingleWidth() * i,
@@ -84,6 +81,17 @@ Columns.prototype.render = function() {
 		});
 		this.columnList.push(column.render());
 	}
+	this.xAxis = new Frost.XAxis({
+		length: this.getSeries().length, 
+		width: this.getX(), 
+		parent: this, 
+		container: this._container, 
+		space: this.getY(), 
+		outerPadding: this.getGap(),
+		padding: this.getGap(),
+		valueList: valueList,
+		step: this.getSingleWidth() + this.getGap()
+	}).render();
 	this.bindUI();
 	return this;
 };

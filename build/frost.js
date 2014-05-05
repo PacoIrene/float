@@ -160,6 +160,11 @@ function XAxis(cfg) {
 	this.domainRange = cfg.length;
 	this.width = cfg.width;
 	this._parent = cfg.parent;
+	this.space = cfg.space;
+	this.valueList = cfg.valueList;
+	this.outerPadding = cfg.outerPadding;
+	this.padding = cfg.padding;
+	this.step = cfg.step;
 	this._container = cfg.container;
 }
 
@@ -167,8 +172,28 @@ XAxis.prototype.getDomainRange = function() {
 	return this.domainRange;
 };
 
+XAxis.prototype.getValueList = function() {
+	return this.valueList;
+};
+
+XAxis.prototype.getOuterPadding = function() {
+	return this.outerPadding;
+};
+
+XAxis.prototype.getStep = function() {
+	return this.step;
+};
+
+XAxis.prototype.getPadding = function() {
+	return this.padding;
+};
+
 XAxis.prototype.getWidth = function() {
 	return this.width;
+};
+
+XAxis.prototype.getSpace = function() {
+	return this.space;
 };
 
 XAxis.prototype.getParent = function() {
@@ -180,15 +205,21 @@ XAxis.prototype.getContainer = function() {
 };
 
 XAxis.prototype.render = function() {
+	var step = this.getStep();
+	var paddingRate = this.getPadding() / step;
+	var outerPaddingRate = this.getOuterPadding() / step;
+	this.xAxisNode = this._container.append("g")
+							  .attr("class", "frost_xAxis")
+							  .attr("transform", "translate(0,"+ this.getSpace() +")");
 	var x = d3.scale.ordinal()
 	    .domain(d3.range(this.getDomainRange()))
-	    .rangeRoundBands([0, this.getWidth()], .38);
+	    .rangeBands([0, this.getWidth()], paddingRate, outerPaddingRate);
 	var xAxis = d3.svg.axis()
 	    .scale(x)
 	    .tickSize(1)
-	    .tickPadding(10)
+	    .tickPadding(4)
 	    .orient("bottom");
-	this._container.call(xAxis);
+	this.xAxisNode.call(xAxis);
 	return this;
 };
 
@@ -427,13 +458,10 @@ Columns.prototype.getParent = function() {
 	return this._parent;
 };
 Columns.prototype.render = function() {
+	var valueList = [];
 	this._groupContainer = this._container.append("g");
-	this.xAxisNode = this._container.append("g")
-							  .attr("class", "frost_xAxis")
-							  .attr("transform", "translate(0,"+ this.getY() +")");
-	this.xAxis = new Frost.XAxis({length: this.getSeries().length, width: this.getX(), parent: this, container: this.xAxisNode}).render();
 	for(var i = 0; i != this.getSeries().length; i++) {
-		
+		valueList.push(this.getSeries()[i].name);
 		var column = new Frost.Column({
 			value: this.getSeries()[i].y,
 			x: this.getGap() * (i+1) + this.getSingleWidth() * i,
@@ -447,6 +475,17 @@ Columns.prototype.render = function() {
 		});
 		this.columnList.push(column.render());
 	}
+	this.xAxis = new Frost.XAxis({
+		length: this.getSeries().length, 
+		width: this.getX(), 
+		parent: this, 
+		container: this._container, 
+		space: this.getY(), 
+		outerPadding: this.getGap(),
+		padding: this.getGap(),
+		valueList: valueList,
+		step: this.getSingleWidth() + this.getGap()
+	}).render();
 	this.bindUI();
 	return this;
 };
