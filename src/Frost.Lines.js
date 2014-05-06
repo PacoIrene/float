@@ -1,56 +1,61 @@
 Frost.namespace("Frost.Lines");
 
-function Lines () {
-	this.x = cfg.x;
-	this.y = cfg.y;
-	this.series = cfg.series;
-	this._container = cfg.container;
-	this._parent = cfg.parent;
-	this.xSpace = 0;
-	this.ySpace = 0;
-	if(this.getParent().IsHasXAxis()) {
-		this.xSpace = this.x * xSpaceRate;
-		this.x = this.x - this.xSpace;
+function Lines (cfg) {
+	Lines.superclass.constructor.apply(this, arguments);
+}
+Frost.extend(Lines, Frost.BaseChart);
+Lines.prototype.getData = function() {
+	var lineData = [];
+	for(var i = 0; i != this.getSeries().length; i++) {
+		var x = this.getGap() * (i+1) + this.getSingleWidth() * i + this.ySpace;
+		var y = this.getY() - this.getSingleHeight(this.getSeries()[i].y);
+		var obj = {"x": x, "y": y};
+		lineData.push(obj);
+	}
+	return lineData;
+}
+
+Lines.prototype.render = function() {
+	this._groupContainer = this._container.append("g");
+	var lineData = this.getData();
+	var lineFunction = d3.svg.line()
+	                        .x(function(d) { return d.x; })
+	                        .y(function(d) { return d.y; })
+	                        .interpolate("linear");
+
+	var lineGraph = this._groupContainer.append("path")
+			                            .attr("d", lineFunction(lineData))
+			                            .attr("stroke", "steelblue")
+			                            .attr("stroke-width", 2)
+			                            .attr("fill", "none");
+
+    if(this.getParent().IsHasXAxis()) {
+		this.xAxis = new Frost.XAxis({
+			length: this.getSeries().length, 
+			width: this.getX(), 
+			parent: this, 
+			container: this._container, 
+			xSpace: this.xSpace,
+			ySpace: this.getY(), 
+			outerPadding: this.getGap(),
+			padding: this.getGap(),
+			// valueList: valueList,
+			step: this.getSingleWidth() + this.getGap()
+		}).render();
 	}
 	if(this.getParent().IsHasYAxis()) {
-		this.ySpace = this.y * ySpaceRate;
-		this.y = this.y - this.ySpace;
+		this.yAxis = new Frost.YAxis({
+			length: parseInt(this.getSeries().length / 3), 
+			height: this.getY(), 
+			parent: this, 
+			container: this._container, 
+			xSpace: this.xSpace,
+			ySpace: 0, 
+			outerPadding: 0,
+			padding: 0,
+			step: 0
+		}).render();
 	}
-}
-Lines.prototype.getX = function() {
-	return this.x;
-};
-
-Lines.prototype.setX = function(data) {
-	this.x = data;
-};
-
-Lines.prototype.getY = function() {
-	return this.y;
-};
-
-Lines.prototype.setY = function(data) {
-	this.y = data;
-};
-
-Lines.prototype.getSeries = function() {
-	return this.series;
-};
-Lines.prototype.setSeries = function(data) {
-	this.series = data;
-};
-Lines.prototype.getContainer = function() {
-	return this._container;
-};
-
-Lines.prototype.setContainer = function(data) {
-	this._container = data;
-};
-Lines.prototype.getParent = function() {
-	return this._parent;
-};
-Lines.prototype.render = function() {
-
 };
 
 Frost.Lines = Lines;

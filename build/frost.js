@@ -57,9 +57,28 @@ var Frost = {
      * @param {Object} SubClass The Object to extend.
      * @param {Object} SuperClass The Object for extend.
      */
-	extend: function(SubClass, SuperClass) {
-		SubClass.prototype = new SuperClass();
-		SubClass.prototype.constructor = SubClass;
+	extend: function(subClz,superClz){
+	    var subClzPrototype = subClz.prototype;
+
+        // add the superclass prototype to the subclass definition
+        subClz.superclass = superClz.prototype;
+
+        // copy prototype
+        var F = function() {
+        };
+        F.prototype = superClz.prototype;
+
+        subClz.prototype = new F();
+        for(var prop in subClzPrototype) {
+            if(subClzPrototype.hasOwnProperty(prop)) {
+                subClz.prototype[prop] = subClzPrototype[prop];
+            }
+        }
+        subClz.prototype.constructor = subClz;
+        if(superClz.prototype.constructor == Object.prototype.constructor) {
+            superClz.prototype.constructor = superClz;
+        }
+        return subClz;
 	},
 	/**
      * Guide is obj a String.
@@ -94,6 +113,91 @@ var Frost = {
 		return Array.isArray(obj);
 	}
 };
+Frost.namespace("Frost.BaseChart");
+
+function BaseChart(cfg) {
+	this.x = cfg.x;
+	this.y = cfg.y;
+	this.series = cfg.series;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.xSpace = 0;
+	this.ySpace = 0;
+	if(this.getParent().IsHasXAxis()) {
+		this.xSpace = this.x * xSpaceRate;
+		this.x = this.x - this.xSpace;
+	}
+	if(this.getParent().IsHasYAxis()) {
+		this.ySpace = this.y * ySpaceRate;
+		this.y = this.y - this.ySpace;
+	}
+}
+
+BaseChart.prototype.getX = function() {
+	return this.x;
+};
+
+BaseChart.prototype.setX = function(data) {
+	this.x = data;
+};
+
+BaseChart.prototype.getY = function() {
+	return this.y;
+};
+
+BaseChart.prototype.setY = function(data) {
+	this.y = data;
+};
+
+BaseChart.prototype.getSeries = function() {
+	return this.series;
+};
+BaseChart.prototype.setSeries = function(data) {
+	this.series = data;
+};
+BaseChart.prototype.getContainer = function() {
+	return this._container;
+};
+
+BaseChart.prototype.setContainer = function(data) {
+	this._container = data;
+};
+BaseChart.prototype.getParent = function() {
+	return this._parent;
+};
+BaseChart.prototype.getGap = function() {
+	return this.getSingleWidth() / 2;
+};
+BaseChart.prototype.getSingleWidth = function() {
+	var number = this.getSeries().length * 3 + 1;
+	var singleWidth = this.getX() / number;
+	return singleWidth * 2;
+};
+BaseChart.prototype.getSingleHeight = function(actualHeight) {
+	return actualHeight / this.getMaxSerie() * this.getY();
+};
+BaseChart.prototype.getMaxSerie = function() {
+	var max = this.getSeries()[0].y;
+	for(var i = 0; i != this.getSeries().length; i++) {
+		if(this.getSeries()[i].y > max) {
+			max = this.getSeries()[i].y;
+		}
+	}	
+	return max;
+};
+
+BaseChart.prototype.getData = function() {
+	var lineData = [];
+	for(var i = 0; i != this.getSeries().length; i++) {
+		var x = this.getGap() * (i+1) + this.getSingleWidth() * i + this.ySpace;
+		var y = this.getY() - this.getSingleHeight(this.getSeries()[i].y);
+		var obj = {"x": x, "y": y};
+		lineData.push(obj);
+	}
+	return lineData;
+};
+
+Frost.BaseChart = BaseChart;
 /**
  * The Frost.Title is the title of the chart
  * There are a attribute and a function in Frost.Title
@@ -334,6 +438,67 @@ YAxis.prototype.render = function() {
 }
 
 Frost.YAxis = YAxis;
+Frost.namespace("Frost.Lines");
+
+function Lines (cfg) {
+	Lines.superclass.constructor.apply(this, arguments);
+}
+Frost.extend(Lines, Frost.BaseChart);
+Lines.prototype.getData = function() {
+	var lineData = [];
+	for(var i = 0; i != this.getSeries().length; i++) {
+		var x = this.getGap() * (i+1) + this.getSingleWidth() * i + this.ySpace;
+		var y = this.getY() - this.getSingleHeight(this.getSeries()[i].y);
+		var obj = {"x": x, "y": y};
+		lineData.push(obj);
+	}
+	return lineData;
+}
+
+Lines.prototype.render = function() {
+	this._groupContainer = this._container.append("g");
+	var lineData = this.getData();
+	var lineFunction = d3.svg.line()
+	                        .x(function(d) { return d.x; })
+	                        .y(function(d) { return d.y; })
+	                        .interpolate("linear");
+
+	var lineGraph = this._groupContainer.append("path")
+			                            .attr("d", lineFunction(lineData))
+			                            .attr("stroke", "steelblue")
+			                            .attr("stroke-width", 2)
+			                            .attr("fill", "none");
+
+    if(this.getParent().IsHasXAxis()) {
+		this.xAxis = new Frost.XAxis({
+			length: this.getSeries().length, 
+			width: this.getX(), 
+			parent: this, 
+			container: this._container, 
+			xSpace: this.xSpace,
+			ySpace: this.getY(), 
+			outerPadding: this.getGap(),
+			padding: this.getGap(),
+			// valueList: valueList,
+			step: this.getSingleWidth() + this.getGap()
+		}).render();
+	}
+	if(this.getParent().IsHasYAxis()) {
+		this.yAxis = new Frost.YAxis({
+			length: parseInt(this.getSeries().length / 3), 
+			height: this.getY(), 
+			parent: this, 
+			container: this._container, 
+			xSpace: this.xSpace,
+			ySpace: 0, 
+			outerPadding: 0,
+			padding: 0,
+			step: 0
+		}).render();
+	}
+};
+
+Frost.Lines = Lines;
 Frost.namespace("Frost.Column");
 
 function Column(cfg) {
@@ -687,6 +852,17 @@ Graph.prototype.render = function() {
 	switch(this.getType().toLowerCase()) {
 		case "column":
 			this.chartObject = new Frost.Columns({
+				x: this.getWidth(), 
+				y: this.getHeight(), 
+				series: this.getSeries(), 
+				container: this.container, 
+				parent: this
+			});
+			this.chartObject.render();
+			return this;
+			break;
+		case "line":
+			this.chartObject = new Frost.Lines({
 				x: this.getWidth(), 
 				y: this.getHeight(), 
 				series: this.getSeries(), 

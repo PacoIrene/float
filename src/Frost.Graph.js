@@ -91,6 +91,17 @@ Graph.prototype.render = function() {
 			this.chartObject.render();
 			return this;
 			break;
+		case "line":
+			this.chartObject = new Frost.Lines({
+				x: this.getWidth(), 
+				y: this.getHeight(), 
+				series: this.getSeries(), 
+				container: this.container, 
+				parent: this
+			});
+			this.chartObject.render();
+			return this;
+			break;
 		default: 
 			break;
 	}

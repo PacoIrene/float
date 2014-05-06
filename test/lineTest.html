@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>关于我爱你</title>
+		<link rel="stylesheet" type="text/css" href="../css/frost.css">
+	</head>
+	<body>
+		<div id="node"></div>
+		<script type="text/javascript" src="../lib/d3.v3.min.js"></script>
+		<script type="text/javascript" src="../build/frost.js" charset="utf-8"></script>
+		<script type="text/javascript">
+			var frost = new Frost.Graph({
+				element: "#node",
+				width: 500,
+				height: 300,
+				type: "line",
+				series: [
+					{x: 0, y: 10,color: "steelblue", name: "王伟"},
+					{x: 1, y: 13,color: "steelblue", name: "李卫"}, 
+					{x: 2, y: 44,color: "steelblue", name: "孙伟"},
+ 					{x: 3, y: 30,color: "steelblue", name: "张伟"},
+					{x: 1, y: 13,color: "steelblue", name: "李卫"}, 
+					{x: 2, y: 44,color: "steelblue", name: "孙伟"},
+ 					{x: 3, y: 30,color: "steelblue", name: "张伟"},
+					{x: 1, y: 13,color: "steelblue", name: "李卫"}, 
+					{x: 2, y: 44,color: "steelblue", name: "孙伟"},
+ 					{x: 3, y: 30,color: "steelblue", name: "张伟"},
+					{x: 1, y: 13,color: "steelblue", name: "李卫"}, 
+					{x: 2, y: 44,color: "steelblue", name: "孙伟"},
+ 					{x: 3, y: 30,color: "steelblue", name: "张伟"},
+					{x: 1, y: 13,color: "steelblue", name: "李卫"}, 
+					{x: 2, y: 44,color: "steelblue", name: "孙伟"},
+ 					{x: 3, y: 30,color: "steelblue", name: "张伟"},
+					{x: 4, y: 39,color: "steelblue", name: "刘伟"}
+				],
+				xAxis: true,
+				yAxis: true
+			});
+			frost.render();
+		</script>
+	</body>
+</html>
