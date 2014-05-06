@@ -15,7 +15,6 @@
 	stroke: #000;
 	shape-rendering: crispEdges;
 }
-.frost_xAxis text {
+.frost_xAxis text, .frost_yAxis text{
 	font-size: 12px;
-	color: steelblue;
 }

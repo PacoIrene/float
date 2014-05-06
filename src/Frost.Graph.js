@@ -7,7 +7,9 @@ function Graph(cfg) {
 	this.width = cfg.width;
 	this.height = cfg.height;
 	this.chartObject = null;
-	this.detail = null
+	this.detail = null;
+	this.hasXAxis = cfg.xAxis || false;
+	this.hasYAxis = cfg.yAxis || false;
 }
 
 Graph.prototype.getNode = function() {
@@ -57,7 +59,13 @@ Graph.prototype.getDetail = function() {
 };
 Graph.prototype.getContainer = function() {
 	return this.container;
-}
+};
+Graph.prototype.IsHasYAxis = function() {
+	return this.hasYAxis;
+};
+Graph.prototype.IsHasXAxis = function() {
+	return this.hasXAxis;
+};
 /**
  * Render the Chart.
  * @method Frost.Graph.render
@@ -73,7 +81,13 @@ Graph.prototype.render = function() {
 	this.detail = new Frost.Detail({container: rootNode}).render();
 	switch(this.getType().toLowerCase()) {
 		case "column":
-			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight() - 25, series: this.getSeries(), container: this.container, parent: this});
+			this.chartObject = new Frost.Columns({
+				x: this.getWidth(), 
+				y: this.getHeight(), 
+				series: this.getSeries(), 
+				container: this.container, 
+				parent: this
+			});
 			this.chartObject.render();
 			return this;
 			break;

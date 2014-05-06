@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 		concat: {
 			domop: {
 				src:['src/Frost.js', 'src/Frost.Title.js', 'src/Frost.XAxis.js', 
-				'src/Frost.Detail.js',
+				'src/Frost.Detail.js', 'src/Frost.YAxis.js',
 				'src/Frost.Column.js','src/Frost.Columns.js', 'src/Frost.Graph.js'],
 				dest: 'build/frost.js'
 			}

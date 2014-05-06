@@ -160,7 +160,8 @@ function XAxis(cfg) {
 	this.domainRange = cfg.length;
 	this.width = cfg.width;
 	this._parent = cfg.parent;
-	this.space = cfg.space;
+	this.xSpace = cfg.xSpace || 0;
+	this.ySpace = cfg.ySpace || 0;
 	this.valueList = cfg.valueList;
 	this.outerPadding = cfg.outerPadding;
 	this.padding = cfg.padding;
@@ -192,8 +193,12 @@ XAxis.prototype.getWidth = function() {
 	return this.width;
 };
 
-XAxis.prototype.getSpace = function() {
-	return this.space;
+XAxis.prototype.getySpace = function() {
+	return this.ySpace;
+};
+
+XAxis.prototype.getxSpace = function() {
+	return this.xSpace;
 };
 
 XAxis.prototype.getParent = function() {
@@ -210,7 +215,7 @@ XAxis.prototype.render = function() {
 	var outerPaddingRate = this.getOuterPadding() / step;
 	this.xAxisNode = this._container.append("g")
 							  .attr("class", "frost_xAxis")
-							  .attr("transform", "translate(0,"+ this.getSpace() +")");
+							  .attr("transform", "translate("+ this.getxSpace() + ","+ this.getySpace() +")");
 	var x = d3.scale.ordinal()
 	    .domain(d3.range(this.getDomainRange()))
 	    .rangeBands([0, this.getWidth()], paddingRate, outerPaddingRate);
@@ -259,6 +264,76 @@ Detail.prototype.render = function() {
 };
 
 Frost.Detail = Detail;
+Frost.namespace("Frost.YAxis");
+
+function YAxis(cfg) {
+	this.domainRange = cfg.length;
+	this.height = cfg.height;
+	this._parent = cfg.parent;
+	this._container = cfg.container;
+	this.outerPadding = cfg.outerPadding || 0;
+	this.padding = cfg.padding || 0;
+	this.step = cfg.step || 0; 
+	this.xSpace = cfg.xSpace || 0;
+	this.ySpace = cfg.ySpace || 0;
+}
+
+YAxis.prototype.getOuterPadding = function() {
+	return this.outerPadding;
+};
+
+YAxis.prototype.getStep = function() {
+	return this.step;
+};
+
+YAxis.prototype.getPadding = function() {
+	return this.padding;
+};
+
+YAxis.prototype.getDomainRange = function() {
+	return this.domainRange;
+};
+
+YAxis.prototype.getHeight = function() {
+	return this.height;
+};
+
+YAxis.prototype.getParent = function() {
+	return this._parent;
+};
+
+YAxis.prototype.getContainer = function() {
+	return this._container;
+};
+
+YAxis.prototype.getySpace = function() {
+	return this.ySpace;
+};
+
+YAxis.prototype.getxSpace = function() {
+	return this.xSpace;
+};
+
+YAxis.prototype.render = function() {
+	var step = this.getStep() == 0?1:this.getStep();
+	var paddingRate = this.getPadding() / step;
+	var outerPaddingRate = this.getOuterPadding() / step;
+	this.yAxisNode = this._container.append("g")
+							  .attr("class", "frost_yAxis")
+							  .attr("transform", "translate("+ this.getxSpace() +", "+this.getySpace()+")");
+	var y = d3.scale.ordinal()
+	    .domain(d3.range(this.getDomainRange()))
+	    .rangeBands([this.getHeight(), 0]);
+	var yAxis = d3.svg.axis()
+	    .scale(y)
+	    .tickSize(1)
+	    .tickPadding(4)
+	    .orient("left");
+	this.yAxisNode.call(yAxis);
+	return this;
+}
+
+Frost.YAxis = YAxis;
 Frost.namespace("Frost.Column");
 
 function Column(cfg) {
@@ -393,6 +468,8 @@ Column.prototype._bindUI = function() {
 };
 Frost.Column = Column;
 Frost.namespace("Frost.Columns");
+var ySpaceRate = 20 / 300;
+var xSpaceRate = 20 / 500;
 
 function Columns(cfg) {
 	this.x = cfg.x;
@@ -401,6 +478,16 @@ function Columns(cfg) {
 	this._container = cfg.container;
 	this.columnList = [];
 	this._parent = cfg.parent;
+	this.xSpace = 0;
+	this.ySpace = 0;
+	if(this.getParent().IsHasXAxis()) {
+		this.xSpace = this.x * xSpaceRate;
+		this.x = this.x - this.xSpace;
+	}
+	if(this.getParent().IsHasYAxis()) {
+		this.ySpace = this.y * ySpaceRate;
+		this.y = this.y - this.ySpace;
+	}
 }
 Columns.prototype.getX = function() {
 	return this.x;
@@ -464,7 +551,7 @@ Columns.prototype.render = function() {
 		valueList.push(this.getSeries()[i].name);
 		var column = new Frost.Column({
 			value: this.getSeries()[i].y,
-			x: this.getGap() * (i+1) + this.getSingleWidth() * i,
+			x: this.getGap() * (i+1) + this.getSingleWidth() * i + this.ySpace,
 			y: this.getY() - this.getSingleHeight(this.getSeries()[i].y),
 			width: this.getSingleWidth(),
 			height: this.getSingleHeight(this.getSeries()[i].y),
@@ -475,17 +562,33 @@ Columns.prototype.render = function() {
 		});
 		this.columnList.push(column.render());
 	}
-	this.xAxis = new Frost.XAxis({
-		length: this.getSeries().length, 
-		width: this.getX(), 
-		parent: this, 
-		container: this._container, 
-		space: this.getY(), 
-		outerPadding: this.getGap(),
-		padding: this.getGap(),
-		valueList: valueList,
-		step: this.getSingleWidth() + this.getGap()
-	}).render();
+	if(this.getParent().IsHasXAxis()) {
+		this.xAxis = new Frost.XAxis({
+			length: this.getSeries().length, 
+			width: this.getX(), 
+			parent: this, 
+			container: this._container, 
+			xSpace: this.xSpace,
+			ySpace: this.getY(), 
+			outerPadding: this.getGap(),
+			padding: this.getGap(),
+			valueList: valueList,
+			step: this.getSingleWidth() + this.getGap()
+		}).render();
+	}
+	if(this.getParent().IsHasYAxis()) {
+		this.yAxis = new Frost.YAxis({
+			length: parseInt(this.getSeries().length / 3), 
+			height: this.getY(), 
+			parent: this, 
+			container: this._container, 
+			xSpace: this.xSpace,
+			ySpace: 0, 
+			outerPadding: 0,
+			padding: 0,
+			step: 0
+		}).render();
+	}
 	this.bindUI();
 	return this;
 };
@@ -509,7 +612,9 @@ function Graph(cfg) {
 	this.width = cfg.width;
 	this.height = cfg.height;
 	this.chartObject = null;
-	this.detail = null
+	this.detail = null;
+	this.hasXAxis = cfg.xAxis || false;
+	this.hasYAxis = cfg.yAxis || false;
 }
 
 Graph.prototype.getNode = function() {
@@ -559,7 +664,13 @@ Graph.prototype.getDetail = function() {
 };
 Graph.prototype.getContainer = function() {
 	return this.container;
-}
+};
+Graph.prototype.IsHasYAxis = function() {
+	return this.hasYAxis;
+};
+Graph.prototype.IsHasXAxis = function() {
+	return this.hasXAxis;
+};
 /**
  * Render the Chart.
  * @method Frost.Graph.render
@@ -575,7 +686,13 @@ Graph.prototype.render = function() {
 	this.detail = new Frost.Detail({container: rootNode}).render();
 	switch(this.getType().toLowerCase()) {
 		case "column":
-			this.chartObject = new Frost.Columns({x: this.getWidth(), y: this.getHeight() - 25, series: this.getSeries(), container: this.container, parent: this});
+			this.chartObject = new Frost.Columns({
+				x: this.getWidth(), 
+				y: this.getHeight(), 
+				series: this.getSeries(), 
+				container: this.container, 
+				parent: this
+			});
 			this.chartObject.render();
 			return this;
 			break;

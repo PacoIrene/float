@@ -1,4 +1,6 @@
 Frost.namespace("Frost.Columns");
+var ySpaceRate = 20 / 300;
+var xSpaceRate = 20 / 500;
 
 function Columns(cfg) {
 	this.x = cfg.x;
@@ -7,6 +9,16 @@ function Columns(cfg) {
 	this._container = cfg.container;
 	this.columnList = [];
 	this._parent = cfg.parent;
+	this.xSpace = 0;
+	this.ySpace = 0;
+	if(this.getParent().IsHasXAxis()) {
+		this.xSpace = this.x * xSpaceRate;
+		this.x = this.x - this.xSpace;
+	}
+	if(this.getParent().IsHasYAxis()) {
+		this.ySpace = this.y * ySpaceRate;
+		this.y = this.y - this.ySpace;
+	}
 }
 Columns.prototype.getX = function() {
 	return this.x;
@@ -70,7 +82,7 @@ Columns.prototype.render = function() {
 		valueList.push(this.getSeries()[i].name);
 		var column = new Frost.Column({
 			value: this.getSeries()[i].y,
-			x: this.getGap() * (i+1) + this.getSingleWidth() * i,
+			x: this.getGap() * (i+1) + this.getSingleWidth() * i + this.ySpace,
 			y: this.getY() - this.getSingleHeight(this.getSeries()[i].y),
 			width: this.getSingleWidth(),
 			height: this.getSingleHeight(this.getSeries()[i].y),
@@ -81,17 +93,33 @@ Columns.prototype.render = function() {
 		});
 		this.columnList.push(column.render());
 	}
-	this.xAxis = new Frost.XAxis({
-		length: this.getSeries().length, 
-		width: this.getX(), 
-		parent: this, 
-		container: this._container, 
-		space: this.getY(), 
-		outerPadding: this.getGap(),
-		padding: this.getGap(),
-		valueList: valueList,
-		step: this.getSingleWidth() + this.getGap()
-	}).render();
+	if(this.getParent().IsHasXAxis()) {
+		this.xAxis = new Frost.XAxis({
+			length: this.getSeries().length, 
+			width: this.getX(), 
+			parent: this, 
+			container: this._container, 
+			xSpace: this.xSpace,
+			ySpace: this.getY(), 
+			outerPadding: this.getGap(),
+			padding: this.getGap(),
+			valueList: valueList,
+			step: this.getSingleWidth() + this.getGap()
+		}).render();
+	}
+	if(this.getParent().IsHasYAxis()) {
+		this.yAxis = new Frost.YAxis({
+			length: parseInt(this.getSeries().length / 3), 
+			height: this.getY(), 
+			parent: this, 
+			container: this._container, 
+			xSpace: this.xSpace,
+			ySpace: 0, 
+			outerPadding: 0,
+			padding: 0,
+			step: 0
+		}).render();
+	}
 	this.bindUI();
 	return this;
 };
