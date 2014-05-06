@@ -72,14 +72,44 @@ BaseChart.prototype.getMaxSerie = function() {
 };
 
 BaseChart.prototype.getData = function() {
-	var lineData = [];
+	this._xyData = [];
 	for(var i = 0; i != this.getSeries().length; i++) {
 		var x = this.getGap() * (i+1) + this.getSingleWidth() * i + this.ySpace;
 		var y = this.getY() - this.getSingleHeight(this.getSeries()[i].y);
 		var obj = {"x": x, "y": y};
-		lineData.push(obj);
+		this._xyData.push(obj);
 	}
-	return lineData;
+	return this._xyData;
+};
+
+BaseChart.prototype.render = function() {
+	if(this.getParent().IsHasXAxis()) {
+		this.xAxis = new Frost.XAxis({
+			length: this.getSeries().length, 
+			width: this.getX(), 
+			parent: this, 
+			container: this._container, 
+			xSpace: this.xSpace,
+			ySpace: this.getY(), 
+			outerPadding: this.getGap(),
+			padding: this.getGap(),
+			// valueList: valueList,
+			step: this.getSingleWidth() + this.getGap()
+		}).render();
+	}
+	if(this.getParent().IsHasYAxis()) {
+		this.yAxis = new Frost.YAxis({
+			length: parseInt(this.getSeries().length / 3), 
+			height: this.getY(), 
+			parent: this, 
+			container: this._container, 
+			xSpace: this.xSpace,
+			ySpace: 0, 
+			outerPadding: 0,
+			padding: 0,
+			step: 0
+		}).render();
+	}
 };
 
 Frost.BaseChart = BaseChart;
