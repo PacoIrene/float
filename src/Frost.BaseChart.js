@@ -1,9 +1,10 @@
 Frost.namespace("Frost.BaseChart");
 
 function BaseChart(cfg) {
+	this.color = cfg.color;
 	this.x = cfg.x;
 	this.y = cfg.y;
-	this.series = cfg.series;
+	this.series = cfg.data;
 	this._container = cfg.container;
 	this._parent = cfg.parent;
 	this.xSpace = 0;
@@ -70,7 +71,9 @@ BaseChart.prototype.getMaxSerie = function() {
 	}	
 	return max;
 };
-
+BaseChart.prototype.getColor = function() {
+	return this.color;
+};
 BaseChart.prototype.getData = function() {
 	this._xyData = [];
 	for(var i = 0; i != this.getSeries().length; i++) {

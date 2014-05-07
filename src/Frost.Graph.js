@@ -3,10 +3,10 @@ Frost.namespace("Frost.Graph");
 function Graph(cfg) {
 	this.node = cfg.element || "body";
 	this.series = cfg.series;
-	this.type = cfg.type;
 	this.width = cfg.width;
 	this.height = cfg.height;
-	this.chartObject = null;
+	this.type = cfg.type || "column";
+	this.chartObject = [];
 	this.detail = null;
 	this.hasXAxis = cfg.xAxis || false;
 	this.hasYAxis = cfg.yAxis || false;
@@ -19,18 +19,14 @@ Graph.prototype.setNode = function(data) {
 	this.node = data;
 };
 
+Graph.prototype.getType = function() {
+	return this.type;
+};
 Graph.prototype.getSeries = function() {
 	return this.series;
 };
 Graph.prototype.setSeries = function(data) {
 	this.series = data;
-};
-
-Graph.prototype.getType = function() {
-	return this.type;
-};
-Graph.prototype.setType = function(data) {
-	this.type = data;
 };
 
 Graph.prototype.getWidth = function() {
@@ -79,32 +75,33 @@ Graph.prototype.render = function() {
 							.attr("width", this.getWidth())
 							.attr("height", this.getHeight());
 	this.detail = new Frost.Detail({container: rootNode}).render();
-	switch(this.getType().toLowerCase()) {
-		case "column":
-			this.chartObject = new Frost.Columns({
-				x: this.getWidth(), 
-				y: this.getHeight(), 
-				series: this.getSeries(), 
-				container: this.container, 
-				parent: this
-			});
-			this.chartObject.render();
-			return this;
-			break;
-		case "line":
-			this.chartObject = new Frost.Lines({
-				x: this.getWidth(), 
-				y: this.getHeight(), 
-				series: this.getSeries(), 
-				container: this.container, 
-				parent: this
-			});
-			this.chartObject.render();
-			return this;
-			break;
-		default: 
-			break;
+	for(var i = 0; i != this.getSeries().length; i++) {
+		switch(this.getType().toLowerCase()) {
+			case "column":
+				this.chartObject.push(new Frost.Columns({
+					x: this.getWidth(), 
+					y: this.getHeight(), 
+					data: this.getSeries()[i].data, 
+					container: this.container, 
+					parent: this,
+					color: this.getSeries()[i].color
+				}).render());
+				break;
+			case "line":
+				this.chartObject.push(new Frost.Lines({
+					x: this.getWidth(), 
+					y: this.getHeight(), 
+					data: this.getSeries()[i].data, 
+					container: this.container, 
+					parent: this,
+					color: this.getSeries()[i].color
+				}).render());
+				break;
+			default: 
+				break;
+		}
 	}
+	return this;
 };
 
 Frost.Graph = Graph;

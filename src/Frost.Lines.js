@@ -15,11 +15,11 @@ Lines.prototype.render = function() {
 	var lineFunction = d3.svg.line()
 	                        .x(function(d) { return d.x; })
 	                        .y(function(d) { return d.y; })
-	                        .interpolate("linear");
+	                        .interpolate(this.getLineType());
 
 	var lineGraph = this._groupContainer.append("path")
 			                            .attr("d", lineFunction(lineData))
-			                            .attr("stroke", "steelblue")
+			                            .attr("stroke", this.getColor())
 			                            .attr("stroke-width", 2)
 			                            .attr("fill", "none");
 

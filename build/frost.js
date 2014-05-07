@@ -116,9 +116,10 @@ var Frost = {
 Frost.namespace("Frost.BaseChart");
 
 function BaseChart(cfg) {
+	this.color = cfg.color;
 	this.x = cfg.x;
 	this.y = cfg.y;
-	this.series = cfg.series;
+	this.series = cfg.data;
 	this._container = cfg.container;
 	this._parent = cfg.parent;
 	this.xSpace = 0;
@@ -185,7 +186,9 @@ BaseChart.prototype.getMaxSerie = function() {
 	}	
 	return max;
 };
-
+BaseChart.prototype.getColor = function() {
+	return this.color;
+};
 BaseChart.prototype.getData = function() {
 	this._xyData = [];
 	for(var i = 0; i != this.getSeries().length; i++) {
@@ -485,11 +488,11 @@ Lines.prototype.render = function() {
 	var lineFunction = d3.svg.line()
 	                        .x(function(d) { return d.x; })
 	                        .y(function(d) { return d.y; })
-	                        .interpolate("linear");
+	                        .interpolate(this.getLineType());
 
 	var lineGraph = this._groupContainer.append("path")
 			                            .attr("d", lineFunction(lineData))
-			                            .attr("stroke", "steelblue")
+			                            .attr("stroke", this.getColor())
 			                            .attr("stroke-width", 2)
 			                            .attr("fill", "none");
 
@@ -651,7 +654,7 @@ Columns.prototype.render = function() {
 			y: columnData[i].y,
 			width: this.getSingleWidth(),
 			height: this.getSingleHeight(this.getSeries()[i].y),
-			color: this.getSeries()[i].color,
+			color: this.getColor(),
 			name: this.getSeries()[i].name,
 			container: this._groupContainer,
 			parent: this
@@ -677,10 +680,10 @@ Frost.namespace("Frost.Graph");
 function Graph(cfg) {
 	this.node = cfg.element || "body";
 	this.series = cfg.series;
-	this.type = cfg.type;
 	this.width = cfg.width;
 	this.height = cfg.height;
-	this.chartObject = null;
+	this.type = cfg.type || "column";
+	this.chartObject = [];
 	this.detail = null;
 	this.hasXAxis = cfg.xAxis || false;
 	this.hasYAxis = cfg.yAxis || false;
@@ -693,18 +696,14 @@ Graph.prototype.setNode = function(data) {
 	this.node = data;
 };
 
+Graph.prototype.getType = function() {
+	return this.type;
+};
 Graph.prototype.getSeries = function() {
 	return this.series;
 };
 Graph.prototype.setSeries = function(data) {
 	this.series = data;
-};
-
-Graph.prototype.getType = function() {
-	return this.type;
-};
-Graph.prototype.setType = function(data) {
-	this.type = data;
 };
 
 Graph.prototype.getWidth = function() {
@@ -753,32 +752,33 @@ Graph.prototype.render = function() {
 							.attr("width", this.getWidth())
 							.attr("height", this.getHeight());
 	this.detail = new Frost.Detail({container: rootNode}).render();
-	switch(this.getType().toLowerCase()) {
-		case "column":
-			this.chartObject = new Frost.Columns({
-				x: this.getWidth(), 
-				y: this.getHeight(), 
-				series: this.getSeries(), 
-				container: this.container, 
-				parent: this
-			});
-			this.chartObject.render();
-			return this;
-			break;
-		case "line":
-			this.chartObject = new Frost.Lines({
-				x: this.getWidth(), 
-				y: this.getHeight(), 
-				series: this.getSeries(), 
-				container: this.container, 
-				parent: this
-			});
-			this.chartObject.render();
-			return this;
-			break;
-		default: 
-			break;
+	for(var i = 0; i != this.getSeries().length; i++) {
+		switch(this.getType().toLowerCase()) {
+			case "column":
+				this.chartObject.push(new Frost.Columns({
+					x: this.getWidth(), 
+					y: this.getHeight(), 
+					data: this.getSeries()[i].data, 
+					container: this.container, 
+					parent: this,
+					color: this.getSeries()[i].color
+				}).render());
+				break;
+			case "line":
+				this.chartObject.push(new Frost.Lines({
+					x: this.getWidth(), 
+					y: this.getHeight(), 
+					data: this.getSeries()[i].data, 
+					container: this.container, 
+					parent: this,
+					color: this.getSeries()[i].color
+				}).render());
+				break;
+			default: 
+				break;
+		}
 	}
+	return this;
 };
 
 Frost.Graph = Graph;

@@ -20,7 +20,7 @@ Columns.prototype.render = function() {
 			y: columnData[i].y,
 			width: this.getSingleWidth(),
 			height: this.getSingleHeight(this.getSeries()[i].y),
-			color: this.getSeries()[i].color,
+			color: this.getColor(),
 			name: this.getSeries()[i].name,
 			container: this._groupContainer,
 			parent: this
