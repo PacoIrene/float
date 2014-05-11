@@ -10,11 +10,21 @@
 	color: #fff;
 	cursor: default;
 }
-.frost_xAxis line {
-	fill: none;
-	stroke: #000;
-	shape-rendering: crispEdges;
+.frost_legendRootNode {
+	position: absolute;
+	cursor: pointer;
 }
-.frost_xAxis text, .frost_yAxis text{
-	font-size: 12px;
+.frost_axis text, .frost_legend_single text {
+  font: 10px sans-serif;
+}
+
+.frost_axis path,
+.frost_axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.frost_axis path {
+  display: none;
 }

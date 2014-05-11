@@ -55,15 +55,16 @@ YAxis.prototype.render = function() {
 	this.yAxisNode = this._container.append("g")
 							  .attr("class", "frost_yAxis")
 							  .attr("transform", "translate("+ this.getxSpace() +", "+this.getySpace()+")");
-	var y = d3.scale.ordinal()
-	    .domain(d3.range(this.getDomainRange()))
-	    .rangeBands([this.getHeight(), 0]);
+	var y = d3.scale.linear()
+		.rangeRound([this.getHeight(), 0])
+	    .domain([0,44]);
+	    
 	var yAxis = d3.svg.axis()
 	    .scale(y)
 	    .tickSize(1)
 	    .tickPadding(4)
 	    .orient("left");
-	this.yAxisNode.call(yAxis);
+	this.yAxisNode.call(yAxis).attr("dy", ".71em");
 	return this;
 }
 

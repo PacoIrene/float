@@ -3,7 +3,7 @@ Frost.namespace("Frost.Column");
 function Column(cfg) {
 	this.value = cfg.value;
 	this.x = cfg.x;
-	this.y = cfg.y;
+	this.value = cfg.value;
 	this.height = cfg.height;
 	this.width = cfg.width;
 	this.color = cfg.color || "steelblue";
@@ -29,12 +29,12 @@ Column.prototype.setX = function(data) {
 	this.x = data;
 };
 
-Column.prototype.getY = function() {
-	return this.y;
+Column.prototype.getValue = function() {
+	return this.value;
 };
 
-Column.prototype.setY = function(data) {
-	this.y = data;
+Column.prototype.setValue = function(data) {
+	this.value = data;
 };
 
 Column.prototype.getHeight = function() {
@@ -97,7 +97,7 @@ Column.prototype.deleteHighLight = function() {
 Column.prototype.render = function() {
 	this._rectNode = this._container.append("rect")
 				  					.attr("x", this.getX())
-								  	.attr("y", this.getY())
+								  	.attr("y", this.getValue())
 								  	.attr("width", this.getWidth())
 								  	.attr("height", this.getHeight())
 								  	.attr("fill", this.getColor());

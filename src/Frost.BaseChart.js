@@ -63,10 +63,10 @@ BaseChart.prototype.getSingleHeight = function(actualHeight) {
 	return actualHeight / this.getMaxSerie() * this.getY();
 };
 BaseChart.prototype.getMaxSerie = function() {
-	var max = this.getSeries()[0].y;
+	var max = this.getSeries()[0].value;
 	for(var i = 0; i != this.getSeries().length; i++) {
-		if(this.getSeries()[i].y > max) {
-			max = this.getSeries()[i].y;
+		if(this.getSeries()[i].value > max) {
+			max = this.getSeries()[i].value;
 		}
 	}	
 	return max;

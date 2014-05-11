@@ -15,11 +15,11 @@ Columns.prototype.render = function() {
 	for(var i = 0; i != this.getSeries().length; i++) {
 		valueList.push(this.getSeries()[i].name);
 		var column = new Frost.Column({
-			value: this.getSeries()[i].y,
+			value: this.getSeries()[i].value,
 			x: columnData[i].x,
-			y: columnData[i].y,
+			y: columnData[i].value,
 			width: this.getSingleWidth(),
-			height: this.getSingleHeight(this.getSeries()[i].y),
+			height: this.getSingleHeight(this.getSeries()[i].value),
 			color: this.getColor(),
 			name: this.getSeries()[i].name,
 			container: this._groupContainer,

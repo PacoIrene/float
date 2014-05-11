@@ -61,7 +61,7 @@ XAxis.prototype.render = function() {
 							  .attr("class", "frost_xAxis")
 							  .attr("transform", "translate("+ this.getxSpace() + ","+ this.getySpace() +")");
 	var x = d3.scale.ordinal()
-	    .domain(d3.range(this.getDomainRange()))
+	    .domain(["A","B","C","D","E"])
 	    .rangeBands([0, this.getWidth()], paddingRate, outerPaddingRate);
 	var xAxis = d3.svg.axis()
 	    .scale(x)

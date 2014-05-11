@@ -113,222 +113,190 @@ var Frost = {
 		return Array.isArray(obj);
 	}
 };
-Frost.namespace("Frost.BaseChart");
+Frost.namespace("Frost.ColorConst");
 
-function BaseChart(cfg) {
+Frost.ColorConst = function(n) {
+	var constColor = [
+		'#ecb796',
+		'#dc8f70',
+		'#b2a470',
+		'#92875a',
+		'#716c49',
+		'#d2ed82',
+		'#bbe468',
+		'#a1d05d',
+		'#e7cbe6',
+		'#d8aad6',
+		'#a888c2',
+		'#9dc2d3',
+		'#649eb9',
+		'#387aa3'
+	];
+	if(n >= constColor.length) {
+		return constColor;
+	} else {
+		var returnColor = [];
+		for(var i = 0; i != n; i++) {
+			var index = Math.floor(Math.random() * constColor.length);
+			returnColor.push(constColor.splice(index, 1)[0]);
+		}
+		return returnColor;
+	}
+};
+Frost.namespace("Frost.SingleBar");
+function SingleBar (cfg) {
 	this.color = cfg.color;
-	this.x = cfg.x;
-	this.y = cfg.y;
-	this.series = cfg.data;
 	this._container = cfg.container;
 	this._parent = cfg.parent;
-	this.xSpace = 0;
-	this.ySpace = 0;
-	if(this.getParent().IsHasXAxis()) {
-		this.xSpace = this.x * xSpaceRate;
-		this.x = this.x - this.xSpace;
-	}
-	if(this.getParent().IsHasYAxis()) {
-		this.ySpace = this.y * ySpaceRate;
-		this.y = this.y - this.ySpace;
-	}
+	this.data = cfg.data;
+	this.height = cfg.height;
+	this.width = cfg.width;
 }
 
-BaseChart.prototype.getX = function() {
-	return this.x;
+SingleBar.prototype.getHeight = function() {
+	return this.height;
 };
 
-BaseChart.prototype.setX = function(data) {
-	this.x = data;
+SingleBar.prototype.setHeight = function(data) {
+	this.height = data;
 };
 
-BaseChart.prototype.getY = function() {
-	return this.y;
+SingleBar.prototype.getWidth = function() {
+	return this.width;
 };
 
-BaseChart.prototype.setY = function(data) {
-	this.y = data;
+SingleBar.prototype.setWidth = function(data) {
+	this.Width = data;
 };
-
-BaseChart.prototype.getSeries = function() {
-	return this.series;
-};
-BaseChart.prototype.setSeries = function(data) {
-	this.series = data;
-};
-BaseChart.prototype.getContainer = function() {
+SingleBar.prototype.getContainer = function() {
 	return this._container;
 };
 
-BaseChart.prototype.setContainer = function(data) {
+SingleBar.prototype.setContainer = function(data) {
 	this._container = data;
 };
-BaseChart.prototype.getParent = function() {
+SingleBar.prototype.getParent = function() {
 	return this._parent;
 };
-BaseChart.prototype.getGap = function() {
-	return this.getSingleWidth() / 2;
-};
-BaseChart.prototype.getSingleWidth = function() {
-	var number = this.getSeries().length * 3 + 1;
-	var singleWidth = this.getX() / number;
-	return singleWidth * 2;
-};
-BaseChart.prototype.getSingleHeight = function(actualHeight) {
-	return actualHeight / this.getMaxSerie() * this.getY();
-};
-BaseChart.prototype.getMaxSerie = function() {
-	var max = this.getSeries()[0].y;
-	for(var i = 0; i != this.getSeries().length; i++) {
-		if(this.getSeries()[i].y > max) {
-			max = this.getSeries()[i].y;
-		}
-	}	
-	return max;
-};
-BaseChart.prototype.getColor = function() {
+SingleBar.prototype.getColor = function() {
 	return this.color;
 };
-BaseChart.prototype.getData = function() {
-	this._xyData = [];
-	for(var i = 0; i != this.getSeries().length; i++) {
-		var x = this.getGap() * (i+1) + this.getSingleWidth() * i + this.ySpace;
-		var y = this.getY() - this.getSingleHeight(this.getSeries()[i].y);
-		var obj = {"x": x, "y": y};
-		this._xyData.push(obj);
-	}
-	return this._xyData;
+SingleBar.prototype.getData = function() {
+	return this.data;
+};
+SingleBar.prototype.render = function() {
+	var x = this.getParent().getXScale();
+	var y = this.getParent().getYScale();
+	var height = this.getHeight();
+	this._groupContainer = this._container.append("g");
+	this._groupContainer.selectAll(".frost_bar")
+      					.data(this.getData())
+    					.enter().append("rect")
+      					.attr("class", "frost_bar")
+      					.attr("x", function(d) {return x(d.name); })
+      					.attr("y", function(d) { return y(d.value); })
+      					.attr("height", function(d) { return height - y(d.value); })
+      					.attr("width", x.rangeBand())
+      					.attr("fill", this.getColor());
 };
 
-BaseChart.prototype.render = function() {
-	if(this.getParent().IsHasXAxis()) {
-		this.xAxis = new Frost.XAxis({
-			length: this.getSeries().length, 
-			width: this.getX(), 
-			parent: this, 
-			container: this._container, 
-			xSpace: this.xSpace,
-			ySpace: this.getY(), 
-			outerPadding: this.getGap(),
-			padding: this.getGap(),
-			// valueList: valueList,
-			step: this.getSingleWidth() + this.getGap()
-		}).render();
-	}
-	if(this.getParent().IsHasYAxis()) {
-		this.yAxis = new Frost.YAxis({
-			length: parseInt(this.getSeries().length / 3), 
-			height: this.getY(), 
-			parent: this, 
-			container: this._container, 
-			xSpace: this.xSpace,
-			ySpace: 0, 
-			outerPadding: 0,
-			padding: 0,
-			step: 0
-		}).render();
-	}
-};
-
-Frost.BaseChart = BaseChart;
-/**
- * The Frost.Title is the title of the chart
- * There are a attribute and a function in Frost.Title
- * name is the title 
- * render is the function to add the title node to the document
- * 
- * Author: Chu Zhenyang
- * Date:   2014-4-16 21:55
- */ 
-Frost.namespace("Frost.Title");
-
-/**
- * Title Class
- * @attr {object} cfg own title and parent node
- */
-function Title(cfg) {
-	this.name = cfg.title;
-	this._container = cfg.container; 
+Frost.SingleBar = SingleBar;
+Frost.namespace("Frost.Legend");
+function Legend (cfg) {
+	this._parent = cfg.parent;
+	this._container = cfg.container;
+	this._seriesName = cfg.seriesName;
+	this._colorList = cfg.colorList;
+	this.xSpace = cfg.xSpace;
+	this._isShow = true;
 }
-/**
- * get the name of Frost Title.
- * @method Title.getName
- */
-Title.prototype.getName = function() {
-	return this.name;
+
+Legend.prototype.getParent = function() {
+	return this._parent;
 };
-/**
- * set the name of Frost Title.
- * @method Title.setName
- * @param {String} data The String of the Title name.
- */
-Title.prototype.setName = function(data) {
-	this.name = data;
-};
-/**
- * get the parent node of Frost Title.
- * @method Title.getContainer
- */
-Title.prototype.getContainer = function() {
+
+Legend.prototype.getContainer = function() {
 	return this._container;
 };
-/**
- * set the parent node of Frost Title.
- * @method Title.setContainer
- * @param {Node} data The parent node.
- */
-Title.prototype.setContainer = function(data) {
-	this._container = data;
+
+Legend.prototype.getSeriesName = function() {
+	return this._seriesName;
 };
-/**
- * render the title node to the parent node.
- * @method Title.render
- */
-Title.prototype.render = function() {
-	this._container.append("div")
-				  .attr("class", "frost_title")
-				  .html(this.name);
+Legend.prototype.getColorList = function() {
+	return this._colorList;
+};
+Legend.prototype.getXSpace = function() {
+	return this.xSpace;
+};
+Legend.prototype.show = function() {
+	this._isShow = true;
+	this._containerSVGNode.style("display", "block");
+};
+Legend.prototype.hide = function() {
+	this._isShow = false;
+	this._containerSVGNode.style("display", "none");
+};
+Legend.prototype.render = function() {
+	var color = d3.scale.ordinal()
+    					.range(this.getColorList());
+    this._containerSVGNode = this._container.append("svg");
+    var containerNode = this._containerSVGNode.append("g")
+    								   .attr("class", "frost_legend");
+	this._legend = containerNode.selectAll(".frost_legend_single")
+			      				.data(this.getSeriesName())
+			    				.enter().append("g")
+			      				.attr("class", "frost_legend_single")
+			      				.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+	this._legend.append("rect")
+	      .attr("x", 100 - 18)
+	      .attr("width", 18)
+	      .attr("height", 18)
+	      .style("fill", color);
+
+  	this._legend.append("text")
+	      .attr("x", 100 - 24)
+	      .attr("y", 9)
+	      .attr("dy", ".35em")
+	      .style("text-anchor", "end")
+	      .text(function(d) { return d; });
+	var boundingRect = document.querySelector(".frost_legend").getBoundingClientRect();
+	this._containerSVGNode.attr("width", 100)
+				   		.attr("height", boundingRect.height);
+	this._container.style("top",20 + "px")
+					.style("left",(this.getXSpace() - 100 )+ "px")
+					.style("width", "100px")
+					.style("height", boundingRect.height + "px");
+	this._bindUI();
+	return this;
+};
+Legend.prototype._bindUI = function() {
+	// this._container.on("mousemove", function() {
+	// 	this.show();
+	// }.bind(this));
+	// this._container.on("mouseleave", function() {
+	// 	this.hide();
+	// }.bind(this));
+	this._container.on("click", function() {
+		if(this._isShow) {
+			this.hide();
+		} else {
+			this.show();
+		}
+	}.bind(this));
 };
 
-Frost.Title = Title;
+Frost.Legend = Legend;
 Frost.namespace("Frost.XAxis");
 
 function XAxis(cfg) {
-	this.domainRange = cfg.length;
-	this.width = cfg.width;
+	// this.domainRange = cfg.length;
+	// this.width = cfg.width;
 	this._parent = cfg.parent;
 	this.xSpace = cfg.xSpace || 0;
 	this.ySpace = cfg.ySpace || 0;
-	this.valueList = cfg.valueList;
-	this.outerPadding = cfg.outerPadding;
-	this.padding = cfg.padding;
-	this.step = cfg.step;
 	this._container = cfg.container;
 }
-
-XAxis.prototype.getDomainRange = function() {
-	return this.domainRange;
-};
-
-XAxis.prototype.getValueList = function() {
-	return this.valueList;
-};
-
-XAxis.prototype.getOuterPadding = function() {
-	return this.outerPadding;
-};
-
-XAxis.prototype.getStep = function() {
-	return this.step;
-};
-
-XAxis.prototype.getPadding = function() {
-	return this.padding;
-};
-
-XAxis.prototype.getWidth = function() {
-	return this.width;
-};
 
 XAxis.prototype.getySpace = function() {
 	return this.ySpace;
@@ -347,17 +315,11 @@ XAxis.prototype.getContainer = function() {
 };
 
 XAxis.prototype.render = function() {
-	var step = this.getStep();
-	var paddingRate = this.getPadding() / step;
-	var outerPaddingRate = this.getOuterPadding() / step;
 	this.xAxisNode = this._container.append("g")
-							  .attr("class", "frost_xAxis")
+							  .attr("class", "frost_axis frost_xAxis")
 							  .attr("transform", "translate("+ this.getxSpace() + ","+ this.getySpace() +")");
-	var x = d3.scale.ordinal()
-	    .domain(d3.range(this.getDomainRange()))
-	    .rangeBands([0, this.getWidth()], paddingRate, outerPaddingRate);
 	var xAxis = d3.svg.axis()
-	    .scale(x)
+	    .scale(this.getParent().getXScale())
 	    .tickSize(1)
 	    .tickPadding(4)
 	    .orient("bottom");
@@ -366,74 +328,62 @@ XAxis.prototype.render = function() {
 };
 
 Frost.XAxis = XAxis;
-Frost.namespace("Frost.Detail");
+Frost.namespace("Frost.Util");
+var Util = {};
 
-function Detail(cfg) {
-	this._container = cfg.container;
-	this.detailNode = null;
-}
-Detail.prototype.getContainer = function() {
-	return this._container;
-};
-Detail.prototype.setX = function(x) {
-	this.detailNode.style("left", x + "px");
-};
-Detail.prototype.setY = function(y) {
-	this.detailNode.style("top", y + "px");
-};
-Detail.prototype.setContent = function(content) {
-	this.detailNode.html(content);
-};
-Detail.prototype.setPosition = function(cfg) {
-	this.setX(cfg.x);
-	this.setY(cfg.y);
-}
-Detail.prototype.show = function() {
-	this.detailNode.style("display", "block");
-}; 
-Detail.prototype.hide = function() {
-	this.detailNode.style("display", "none");
-};
-Detail.prototype.render = function() {
-	this.detailNode = this._container.append("div")
-									 .attr("class", "frost_detail");
-	return this;
+Util.getNameDomain = function(series) {
+	var list = [];
+	for(var i = 0; i != series.length; i++) {
+		var data = series[i].data;
+		for(var j = 0; j != data.length; j++) {
+			if(list.indexOf(data[j].name) < 0) {
+				list.push(data[j].name);
+			}
+		}
+	}
+	return list;
 };
 
-Frost.Detail = Detail;
+Util.getMaxValue = function(series) {
+	var max = d3.max(series[0].data, function(d) { return Number(d.value); })
+	for(var i = 0; i != series.length; i++) {
+		var tempMax = d3.max(series[i].data, function(d) { return Number(d.value); });
+		if(tempMax >= max) {
+			max = tempMax;
+		}
+	}
+	return max;
+};
+Util.getSeriesName = function(series) {
+	var list = [];
+	for(var i = 0; i != series.length; i++) {
+		list.push(series[i].name);
+	}
+	return list;
+};
+
+Util.getColorList = function(series) {
+	if(series[0].color) {
+		var list = [];
+		for(var i = 0; i != series.length; i++) {
+			list.push(series[i].color);
+		}
+		return list;
+	} else {
+		return Frost.ColorConst(series.length);
+	}
+};
+
+Frost.Util = Util;
 Frost.namespace("Frost.YAxis");
 
 function YAxis(cfg) {
-	this.domainRange = cfg.length;
-	this.height = cfg.height;
 	this._parent = cfg.parent;
 	this._container = cfg.container;
-	this.outerPadding = cfg.outerPadding || 0;
-	this.padding = cfg.padding || 0;
-	this.step = cfg.step || 0; 
 	this.xSpace = cfg.xSpace || 0;
 	this.ySpace = cfg.ySpace || 0;
 }
 
-YAxis.prototype.getOuterPadding = function() {
-	return this.outerPadding;
-};
-
-YAxis.prototype.getStep = function() {
-	return this.step;
-};
-
-YAxis.prototype.getPadding = function() {
-	return this.padding;
-};
-
-YAxis.prototype.getDomainRange = function() {
-	return this.domainRange;
-};
-
-YAxis.prototype.getHeight = function() {
-	return this.height;
-};
 
 YAxis.prototype.getParent = function() {
 	return this._parent;
@@ -452,17 +402,11 @@ YAxis.prototype.getxSpace = function() {
 };
 
 YAxis.prototype.render = function() {
-	var step = this.getStep() == 0?1:this.getStep();
-	var paddingRate = this.getPadding() / step;
-	var outerPaddingRate = this.getOuterPadding() / step;
 	this.yAxisNode = this._container.append("g")
-							  .attr("class", "frost_yAxis")
-							  .attr("transform", "translate("+ this.getxSpace() +", "+this.getySpace()+")");
-	var y = d3.scale.ordinal()
-	    .domain(d3.range(this.getDomainRange()))
-	    .rangeBands([this.getHeight(), 0]);
+							  .attr("class", "frost_axis frost_yAxis")
+							  .attr("transform", "translate("+ this.getxSpace() +", "+this.getySpace()+")");    
 	var yAxis = d3.svg.axis()
-	    .scale(y)
+	    .scale(this.getParent().getYScale())
 	    .tickSize(1)
 	    .tickPadding(4)
 	    .orient("left");
@@ -471,211 +415,9 @@ YAxis.prototype.render = function() {
 }
 
 Frost.YAxis = YAxis;
-Frost.namespace("Frost.Lines");
-
-function Lines (cfg) {
-	Lines.superclass.constructor.apply(this, arguments);
-	this.type = cfg.lineType;
-}
-Frost.extend(Lines, Frost.BaseChart);
-Lines.prototype.getLineType = function() {
-	return this.lineType;
-};
-Lines.prototype.render = function() {
-	Lines.superclass.render.apply(this, arguments);
-	this._groupContainer = this._container.append("g");
-	var lineData = this.getData();
-	var lineFunction = d3.svg.line()
-	                        .x(function(d) { return d.x; })
-	                        .y(function(d) { return d.y; })
-	                        .interpolate(this.getLineType());
-
-	var lineGraph = this._groupContainer.append("path")
-			                            .attr("d", lineFunction(lineData))
-			                            .attr("stroke", this.getColor())
-			                            .attr("stroke-width", 2)
-			                            .attr("fill", "none");
-
-};
-
-Frost.Lines = Lines;
-Frost.namespace("Frost.Column");
-
-function Column(cfg) {
-	this.value = cfg.value;
-	this.x = cfg.x;
-	this.y = cfg.y;
-	this.height = cfg.height;
-	this.width = cfg.width;
-	this.color = cfg.color || "steelblue";
-	this.name = cfg.name || "";
-	this._container = cfg.container;
-	this._parent = cfg.parent;
-	this._isHighLight = false;
-}
-
-Column.prototype.getValue = function() {
-	return this.value;
-};
-
-Column.prototype.setValue = function(data) {
-	this.value = data;
-};
-
-Column.prototype.getX = function() {
-	return this.x;
-};
-
-Column.prototype.setX = function(data) {
-	this.x = data;
-};
-
-Column.prototype.getY = function() {
-	return this.y;
-};
-
-Column.prototype.setY = function(data) {
-	this.y = data;
-};
-
-Column.prototype.getHeight = function() {
-	return this.height;
-};
-
-Column.prototype.setHeight = function(data) {
-	this.height = data;
-};
-
-Column.prototype.getWidth = function() {
-	return this.width;
-};
-
-Column.prototype.setWidth = function(data) {
-	this.Width = data;
-};
-
-Column.prototype.getColor = function() {
-	return this.color;
-};
-
-Column.prototype.setColor = function(data) {
-	this.color = data;
-};
-
-Column.prototype.getName = function() {
-	return this.name;
-};
-
-Column.prototype.setName = function(data) {
-	this.name = data;
-};
-
-Column.prototype.getContainer = function() {
-	return this._container;
-};
-
-Column.prototype.setContainer = function(data) {
-	this._container = data;
-};
-//return Columns
-Column.prototype.getParent = function() {
-	return this._parent;
-};
-Column.prototype.getRectNode = function() {
-	return this._rectNode;
-};
-Column.prototype.isHighLight = function() {
-	return this._isHighLight;
-}
-Column.prototype.setHighLight = function() {
-	this._isHighLight = true;
-	this.getRectNode().attr("fill", "#0870B4");
-};
-Column.prototype.deleteHighLight = function() {
-	this._isHighLight = false;
-	this.getRectNode().attr("fill", this.getColor());
-};
-Column.prototype.render = function() {
-	this._rectNode = this._container.append("rect")
-				  					.attr("x", this.getX())
-								  	.attr("y", this.getY())
-								  	.attr("width", this.getWidth())
-								  	.attr("height", this.getHeight())
-								  	.attr("fill", this.getColor());
-	this._bindUI();
-	return this;
-};
-
-Column.prototype._bindUI = function() {
-	var that = this;
-	var detailNode = that.getParent().getParent().getDetail();
-	this._rectNode.on("mouseover", function() {
-		var position = d3.mouse(this);
-		detailNode.setContent(that.getName() + ":" + that.getValue());
-		detailNode.setPosition({x: position[0], y: position[1]});
-		detailNode.show();
-	});
-	this._rectNode.on("mousemove", function() {
-		var position = d3.mouse(this);
-		detailNode.setPosition({x: position[0] + 8, y: position[1]});
-	});
-	this._rectNode.on("mouseleave", function() {
-		detailNode.hide();
-	});
-	this._rectNode.on("click", function() {
-		d3.event.stopPropagation();
-		if(that.isHighLight()) {
-			that.deleteHighLight();
-		} else {
-			that.setHighLight();
-		}
-	});
-};
-Frost.Column = Column;
-Frost.namespace("Frost.Columns");
+Frost.namespace("Frost.Graph");
 var ySpaceRate = 20 / 300;
 var xSpaceRate = 20 / 500;
-
-function Columns(cfg) {
-	this.columnList = [];
-	Columns.superclass.constructor.apply(this, arguments);
-}
-Frost.extend(Columns, Frost.BaseChart);
-Columns.prototype.render = function() {
-	Columns.superclass.render.apply(this, arguments);
-	var columnData = this.getData();
-	var valueList = [];
-	this._groupContainer = this._container.append("g");
-	for(var i = 0; i != this.getSeries().length; i++) {
-		valueList.push(this.getSeries()[i].name);
-		var column = new Frost.Column({
-			value: this.getSeries()[i].y,
-			x: columnData[i].x,
-			y: columnData[i].y,
-			width: this.getSingleWidth(),
-			height: this.getSingleHeight(this.getSeries()[i].y),
-			color: this.getColor(),
-			name: this.getSeries()[i].name,
-			container: this._groupContainer,
-			parent: this
-		});
-		this.columnList.push(column.render());
-	}
-	this.bindUI();
-	return this;
-};
-Columns.prototype.bindUI = function() {
-	var columnList = this.columnList;
-	this.getParent().getContainer().on("click", function() {
-		for(var i = 0; i != columnList.length; i++) {
-			if(columnList[i].isHighLight()) {
-				columnList[i].deleteHighLight();
-			}
-		}
-	});
-};
-Frost.Columns = Columns;
-Frost.namespace("Frost.Graph");
 
 function Graph(cfg) {
 	this.node = cfg.element || "body";
@@ -684,9 +426,16 @@ function Graph(cfg) {
 	this.height = cfg.height;
 	this.type = cfg.type || "column";
 	this.chartObject = [];
-	this.detail = null;
+	// this.detail = null;
 	this.hasXAxis = cfg.xAxis || false;
 	this.hasYAxis = cfg.yAxis || false;
+	this.hasLegend = cfg.legend || false;
+	this.leftGap = this.width * xSpaceRate;
+	this.bottomGap = this.height * ySpaceRate;
+	this.rightGap = this.width * xSpaceRate / 2;
+	this.topGap = this.height * ySpaceRate / 2;
+	this.xScale = null;
+	this.yScale = null;
 }
 
 Graph.prototype.getNode = function() {
@@ -726,18 +475,38 @@ Graph.prototype.getChartObject = function() {
 Graph.prototype.setChartObject = function(data) {
 	this.chartObject = data;
 };
-
-Graph.prototype.getDetail = function() {
-	return this.detail;
+Graph.prototype.getXScale = function() {
+	return this.xScale;
 };
+Graph.prototype.getYScale = function() {
+	return this.yScale;
+};
+// Graph.prototype.getDetail = function() {
+// 	return this.detail;
+// };
 Graph.prototype.getContainer = function() {
-	return this.container;
+	return this._container;
 };
 Graph.prototype.IsHasYAxis = function() {
 	return this.hasYAxis;
 };
 Graph.prototype.IsHasXAxis = function() {
 	return this.hasXAxis;
+};
+Graph.prototype.IsHasLegend = function() {
+	return this.hasLegend;
+};
+Graph.prototype.getLeftGap = function() {
+	return this.leftGap;
+};
+Graph.prototype.getBottomGap = function() {
+	return this.bottomGap;
+};
+Graph.prototype.getTopGap = function() {
+	return this.topGap;
+};
+Graph.prototype.getRightGap = function() {
+	return this.rightGap;
 };
 /**
  * Render the Chart.
@@ -748,34 +517,72 @@ Graph.prototype.render = function() {
 									   .attr("class", "frost_rootNode")
 									   .style("height", this.getHeight() + "px")
 									   .style("width", this.getWidth() + "px");
-	this.container = rootNode.append("svg")
+	var legnedRootNode = rootNode.append("div")
+								.attr("class", "frost_legendRootNode");
+	var svgNode = rootNode.append("svg")
 							.attr("width", this.getWidth())
 							.attr("height", this.getHeight());
-	this.detail = new Frost.Detail({container: rootNode}).render();
+	this._container = svgNode.append("g")
+    						.attr("transform", "translate(" + this.getLeftGap() + "," + this.getTopGap() + ")");
+	// this.detail = new Frost.Detail({container: rootNode}).render();
+	var colorList = Frost.Util.getColorList(this.getSeries());
+	var actaulWidth = this.IsHasXAxis() ? (this.getWidth() - this.getLeftGap() - this.getRightGap()) : this.getWidth();
+	var actualHeight = this.IsHasYAxis() ? (this.getHeight() - this.getBottomGap() - this.getTopGap()) : this.getHeight();
+	this.xScale = d3.scale.ordinal()
+    			 		  .rangeRoundBands([0, actaulWidth], .1);
+    this.yScale = d3.scale.linear()
+    					  .range([actualHeight, 0]);
+    this.xScale.domain(Frost.Util.getNameDomain(this.getSeries()));
+    this.yScale.domain([0, Frost.Util.getMaxValue(this.getSeries())]);
+    if(this.IsHasXAxis()) {
+    	this.xAxis = new Frost.XAxis({
+			parent: this, 
+			container: this._container, 
+			xSpace: 0,
+			ySpace: this.getHeight()-this.getBottomGap() - this.topGap,
+		}).render();
+    }
+    if(this.IsHasYAxis()) {
+    	this.yAxis = new Frost.YAxis({
+			parent: this, 
+			container: this._container, 
+			xSpace: 0,
+			ySpace: 0
+		}).render();
+    }
+    if(this.IsHasLegend()) {
+    	this.legend = new Frost.Legend({
+    		parent: this, 
+			container: legnedRootNode,
+			seriesName: Frost.Util.getSeriesName(this.getSeries()),
+			colorList: colorList,
+			xSpace: this.getWidth()
+    	}).render();
+    }
 	for(var i = 0; i != this.getSeries().length; i++) {
 		switch(this.getType().toLowerCase()) {
-			case "column":
-				this.chartObject.push(new Frost.Columns({
-					x: this.getWidth(), 
-					y: this.getHeight(), 
+			case "bar":
+				this.chartObject.push(new Frost.SingleBar({
+					width: actaulWidth, 
+					height: actualHeight, 
 					data: this.getSeries()[i].data, 
-					container: this.container, 
+					container: this._container, 
 					parent: this,
-					color: this.getSeries()[i].color
+					color: colorList[i]
 				}).render());
 				break;
-			case "line":
-				this.chartObject.push(new Frost.Lines({
-					x: this.getWidth(), 
-					y: this.getHeight(), 
-					data: this.getSeries()[i].data, 
-					container: this.container, 
-					parent: this,
-					color: this.getSeries()[i].color
-				}).render());
-				break;
-			default: 
-				break;
+	// 		case "line":
+	// 			this.chartObject.push(new Frost.Lines({
+	// 				x: this.getWidth(), 
+	// 				y: this.getHeight(), 
+	// 				data: this.getSeries()[i].data, 
+	// 				container: this.container, 
+	// 				parent: this,
+	// 				color: this.getSeries()[i].color
+	// 			}).render());
+	// 			break;
+	// 		default: 
+	// 			break;
 		}
 	}
 	return this;
