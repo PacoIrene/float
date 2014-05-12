@@ -25,7 +25,8 @@ module.exports = function(grunt) {
 		concat: {
 			domop: {
 				src:['srcc/Frost.js', 'srcc/Frost.ColorConst.js', 
-				'srcc/Frost.SingleBar.js', 'srcc/Frost.Legend.js', 
+				'srcc/Frost.SingleBar.js', 'srcc/Frost.GroupBar.js',
+				'srcc/Frost.Legend.js', 
 				'srcc/Frost.XAxis.js','srcc/Frost.Util.js',  
 				'srcc/Frost.YAxis.js',  'srcc/Frost.Graph.js'],
 				dest: 'build/frost.js'

@@ -33,7 +33,13 @@ YAxis.prototype.render = function() {
 	    .tickSize(1)
 	    .tickPadding(4)
 	    .orient("left");
-	this.yAxisNode.call(yAxis);
+	this.yAxisNode.call(yAxis)
+	.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("");;
 	return this;
 }
 

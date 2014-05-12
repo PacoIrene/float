@@ -184,6 +184,9 @@ SingleBar.prototype.getColor = function() {
 SingleBar.prototype.getData = function() {
 	return this.data;
 };
+SingleBar.prototype.getGroupContainer = function() {
+	return this._groupContainer;
+};
 SingleBar.prototype.render = function() {
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
@@ -201,6 +204,82 @@ SingleBar.prototype.render = function() {
 };
 
 Frost.SingleBar = SingleBar;
+// http://bl.ocks.org/mbostock/882152
+// http://bl.ocks.org/mbostock/3887051
+// http://bl.ocks.org/mbostock/3943967
+Frost.namespace("Frost.GroupBar");
+
+function GroupBar (cfg) {
+	this.height = cfg.height;
+	this.width = cfg.width;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.data = cfg.data;
+	this.colorList = cfg.colorList;
+	this._seriesName = cfg.seriesName;
+}
+GroupBar.prototype.getHeight = function() {
+	return this.height;
+};
+
+GroupBar.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+GroupBar.prototype.getWidth = function() {
+	return this.width;
+};
+
+GroupBar.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+GroupBar.prototype.getContainer = function() {
+	return this._container;
+};
+GroupBar.prototype.setContainer = function(data) {
+	this._container = data;
+};
+GroupBar.prototype.getParent = function() {
+	return this._parent;
+};
+GroupBar.prototype.getData = function() {
+	return this.data;
+};
+GroupBar.prototype.getColorList = function() {
+	return this.colorList;
+};
+GroupBar.prototype.getSeriesName = function() {
+	return this._seriesName;
+};
+GroupBar.prototype.render = function() {
+	var x = this.getParent().getXScale();
+	var y = this.getParent().getYScale();
+	var x1 = d3.scale.ordinal();
+	x1.domain(this.getSeriesName()).rangeRoundBands([0, x.rangeBand()]);
+	var height = this.getHeight();
+	var colorList = this.getColorList();
+	var formatData = Frost.Util.formatDataForGroupBar(this.getData());
+	this._groupContainer = this._container.append("g");
+	var groupNode = this._groupContainer.selectAll(".frost_groupBar")
+									    .data(formatData)
+									    .enter().append("g")
+									    .attr("class", "frost_groupBar_single")
+									    .attr("transform", function(d,i) {
+									    	return "translate(" + x(d.name) + ",0)"; 
+									    });
+
+	groupNode.selectAll("rect")
+	     .data(function(d) { return d.data; })
+	     .enter().append("rect")
+	     .attr("width", x1.rangeBand())
+	     .attr("x", function(d) { return x1(d.name); })
+	     .attr("y", function(d) { return y(d.value); })
+	     .attr("height", function(d) { return height - y(d.value); })
+	     .style("fill", function(d,i) { return colorList[i]; });
+	return this;
+}
+
+Frost.GroupBar = GroupBar;
 Frost.namespace("Frost.Legend");
 function Legend (cfg) {
 	this._parent = cfg.parent;
@@ -374,6 +453,34 @@ Util.getColorList = function(series) {
 	}
 };
 
+Util.formatDataForGroupBar = function(series) {
+	var getValue = function(name, data) {
+		var result = 0;
+		for(var k = 0; k != data.length; k++) {
+			if(data[k].name == name) {
+				result = data[k].value;
+				return result;
+			}
+		}
+		return result;
+	};
+	var objList = [];
+	var seriesName = this.getNameDomain(series);
+	for(var i = 0; i != seriesName.length; i++) {
+		var obj = {};
+		obj["name"] = seriesName[i];
+		obj["data"] = [];
+		for(var j = 0; j != series.length; j++) {
+			var tempObj = {};
+			tempObj["name"] = series[j].name;
+			tempObj["value"] = getValue(obj["name"], series[j].data)
+			obj["data"].push(tempObj);
+		}
+		objList.push(obj);
+	}
+	return objList
+};
+
 Frost.Util = Util;
 Frost.namespace("Frost.YAxis");
 
@@ -410,7 +517,13 @@ YAxis.prototype.render = function() {
 	    .tickSize(1)
 	    .tickPadding(4)
 	    .orient("left");
-	this.yAxisNode.call(yAxis);
+	this.yAxisNode.call(yAxis)
+	.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("");;
 	return this;
 }
 
@@ -430,6 +543,7 @@ function Graph(cfg) {
 	this.hasXAxis = cfg.xAxis || false;
 	this.hasYAxis = cfg.yAxis || false;
 	this.hasLegend = cfg.legend || false;
+	this.hasStack = cfg.stack || false;
 	this.leftGap = this.width * xSpaceRate;
 	this.bottomGap = this.height * ySpaceRate;
 	this.rightGap = this.width * xSpaceRate / 2;
@@ -496,6 +610,9 @@ Graph.prototype.IsHasXAxis = function() {
 Graph.prototype.IsHasLegend = function() {
 	return this.hasLegend;
 };
+Graph.prototype.IsStack = function() {
+	return this.hasStack;
+};
 Graph.prototype.getLeftGap = function() {
 	return this.leftGap;
 };
@@ -528,6 +645,7 @@ Graph.prototype.render = function() {
 	var colorList = Frost.Util.getColorList(this.getSeries());
 	var actaulWidth = this.IsHasXAxis() ? (this.getWidth() - this.getLeftGap() - this.getRightGap()) : this.getWidth();
 	var actualHeight = this.IsHasYAxis() ? (this.getHeight() - this.getBottomGap() - this.getTopGap()) : this.getHeight();
+	var seriesName = Frost.Util.getSeriesName(this.getSeries());
 	this.xScale = d3.scale.ordinal()
     			 		  .rangeRoundBands([0, actaulWidth], .1);
     this.yScale = d3.scale.linear()
@@ -535,57 +653,96 @@ Graph.prototype.render = function() {
     this.xScale.domain(Frost.Util.getNameDomain(this.getSeries()));
     this.yScale.domain([0, Frost.Util.getMaxValue(this.getSeries())]);
     if(this.IsHasXAxis()) {
-    	this.xAxis = new Frost.XAxis({
+    	this.xAxisRender({
 			parent: this, 
 			container: this._container, 
 			xSpace: 0,
 			ySpace: this.getHeight()-this.getBottomGap() - this.topGap,
-		}).render();
+		});
     }
     if(this.IsHasYAxis()) {
-    	this.yAxis = new Frost.YAxis({
+    	this.yAxisRender({
 			parent: this, 
 			container: this._container, 
 			xSpace: 0,
 			ySpace: 0
-		}).render();
+		});
     }
     if(this.IsHasLegend()) {
-    	this.legend = new Frost.Legend({
+    	this.legendRender({
     		parent: this, 
 			container: legnedRootNode,
-			seriesName: Frost.Util.getSeriesName(this.getSeries()),
+			seriesName: seriesName,
 			colorList: colorList,
 			xSpace: this.getWidth()
-    	}).render();
+    	});
     }
-	for(var i = 0; i != this.getSeries().length; i++) {
-		switch(this.getType().toLowerCase()) {
-			case "bar":
+	switch(this.getType().toLowerCase()) {
+		case "bar":
+			if(this.getSeries().length == 1) {
 				this.chartObject.push(new Frost.SingleBar({
 					width: actaulWidth, 
 					height: actualHeight, 
-					data: this.getSeries()[i].data, 
+					data: this.getSeries()[0].data, 
 					container: this._container, 
 					parent: this,
-					color: colorList[i]
+					color: colorList[0]
 				}).render());
-				break;
-	// 		case "line":
-	// 			this.chartObject.push(new Frost.Lines({
-	// 				x: this.getWidth(), 
-	// 				y: this.getHeight(), 
-	// 				data: this.getSeries()[i].data, 
-	// 				container: this.container, 
-	// 				parent: this,
-	// 				color: this.getSeries()[i].color
-	// 			}).render());
-	// 			break;
-	// 		default: 
-	// 			break;
-		}
+			} else if (this.getSeries().length > 1) {
+				if(this.IsStack()) {
+
+				} else {
+					this.chartObject.push(new Frost.GroupBar({
+						width: actaulWidth, 
+						height: actualHeight,
+						data: this.getSeries(), 
+						container: this._container, 
+						parent: this,
+						seriesName: seriesName,
+						colorList: colorList
+					}).render());
+				}
+			}
+			
+			break;
+// 		case "line":
+// 			this.chartObject.push(new Frost.Lines({
+// 				x: this.getWidth(), 
+// 				y: this.getHeight(), 
+// 				data: this.getSeries()[i].data, 
+// 				container: this.container, 
+// 				parent: this,
+// 				color: this.getSeries()[i].color
+// 			}).render());
+// 			break;
+// 		default: 
+// 			break;
 	}
 	return this;
 };
-
+Graph.prototype.xAxisRender = function(cfg) {
+	this.xAxis = new Frost.XAxis({
+		parent: cfg.parent, 
+		container: cfg.container, 
+		xSpace: cfg.xSpace,
+		ySpace: cfg.ySpace,
+	}).render();
+};
+Graph.prototype.yAxisRender = function(cfg) {
+	this.yAxis = new Frost.YAxis({
+		parent: cfg.parent, 
+		container: cfg.container, 
+		xSpace: cfg.xSpace,
+		ySpace: cfg.ySpace
+	}).render();
+};
+Graph.prototype.legendRender = function(cfg) {
+	this.legend = new Frost.Legend({
+		parent: cfg.parent, 
+		container: cfg.container,
+		seriesName: cfg.seriesName,
+		colorList: cfg.colorList,
+		xSpace: cfg.xSpace
+	}).render();
+};
 Frost.Graph = Graph;

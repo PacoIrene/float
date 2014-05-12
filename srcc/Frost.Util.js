@@ -44,4 +44,32 @@ Util.getColorList = function(series) {
 	}
 };
 
+Util.formatDataForGroupBar = function(series) {
+	var getValue = function(name, data) {
+		var result = 0;
+		for(var k = 0; k != data.length; k++) {
+			if(data[k].name == name) {
+				result = data[k].value;
+				return result;
+			}
+		}
+		return result;
+	};
+	var objList = [];
+	var seriesName = this.getNameDomain(series);
+	for(var i = 0; i != seriesName.length; i++) {
+		var obj = {};
+		obj["name"] = seriesName[i];
+		obj["data"] = [];
+		for(var j = 0; j != series.length; j++) {
+			var tempObj = {};
+			tempObj["name"] = series[j].name;
+			tempObj["value"] = getValue(obj["name"], series[j].data)
+			obj["data"].push(tempObj);
+		}
+		objList.push(obj);
+	}
+	return objList
+};
+
 Frost.Util = Util;

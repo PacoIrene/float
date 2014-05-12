@@ -39,6 +39,9 @@ SingleBar.prototype.getColor = function() {
 SingleBar.prototype.getData = function() {
 	return this.data;
 };
+SingleBar.prototype.getGroupContainer = function() {
+	return this._groupContainer;
+};
 SingleBar.prototype.render = function() {
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();

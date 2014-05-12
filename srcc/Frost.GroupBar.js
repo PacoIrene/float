@@ -1,3 +1,76 @@
-http://bl.ocks.org/mbostock/882152
-http://bl.ocks.org/mbostock/3887051
-http://bl.ocks.org/mbostock/3943967
+// http://bl.ocks.org/mbostock/882152
+// http://bl.ocks.org/mbostock/3887051
+// http://bl.ocks.org/mbostock/3943967
+Frost.namespace("Frost.GroupBar");
+
+function GroupBar (cfg) {
+	this.height = cfg.height;
+	this.width = cfg.width;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.data = cfg.data;
+	this.colorList = cfg.colorList;
+	this._seriesName = cfg.seriesName;
+}
+GroupBar.prototype.getHeight = function() {
+	return this.height;
+};
+
+GroupBar.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+GroupBar.prototype.getWidth = function() {
+	return this.width;
+};
+
+GroupBar.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+GroupBar.prototype.getContainer = function() {
+	return this._container;
+};
+GroupBar.prototype.setContainer = function(data) {
+	this._container = data;
+};
+GroupBar.prototype.getParent = function() {
+	return this._parent;
+};
+GroupBar.prototype.getData = function() {
+	return this.data;
+};
+GroupBar.prototype.getColorList = function() {
+	return this.colorList;
+};
+GroupBar.prototype.getSeriesName = function() {
+	return this._seriesName;
+};
+GroupBar.prototype.render = function() {
+	var x = this.getParent().getXScale();
+	var y = this.getParent().getYScale();
+	var x1 = d3.scale.ordinal();
+	x1.domain(this.getSeriesName()).rangeRoundBands([0, x.rangeBand()]);
+	var height = this.getHeight();
+	var colorList = this.getColorList();
+	var formatData = Frost.Util.formatDataForGroupBar(this.getData());
+	this._groupContainer = this._container.append("g");
+	var groupNode = this._groupContainer.selectAll(".frost_groupBar")
+									    .data(formatData)
+									    .enter().append("g")
+									    .attr("class", "frost_groupBar_single")
+									    .attr("transform", function(d,i) {
+									    	return "translate(" + x(d.name) + ",0)"; 
+									    });
+
+	groupNode.selectAll("rect")
+	     .data(function(d) { return d.data; })
+	     .enter().append("rect")
+	     .attr("width", x1.rangeBand())
+	     .attr("x", function(d) { return x1(d.name); })
+	     .attr("y", function(d) { return y(d.value); })
+	     .attr("height", function(d) { return height - y(d.value); })
+	     .style("fill", function(d,i) { return colorList[i]; });
+	return this;
+}
+
+Frost.GroupBar = GroupBar;

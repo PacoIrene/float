@@ -13,6 +13,7 @@ function Graph(cfg) {
 	this.hasXAxis = cfg.xAxis || false;
 	this.hasYAxis = cfg.yAxis || false;
 	this.hasLegend = cfg.legend || false;
+	this.hasStack = cfg.stack || false;
 	this.leftGap = this.width * xSpaceRate;
 	this.bottomGap = this.height * ySpaceRate;
 	this.rightGap = this.width * xSpaceRate / 2;
@@ -79,6 +80,9 @@ Graph.prototype.IsHasXAxis = function() {
 Graph.prototype.IsHasLegend = function() {
 	return this.hasLegend;
 };
+Graph.prototype.IsStack = function() {
+	return this.hasStack;
+};
 Graph.prototype.getLeftGap = function() {
 	return this.leftGap;
 };
@@ -111,6 +115,7 @@ Graph.prototype.render = function() {
 	var colorList = Frost.Util.getColorList(this.getSeries());
 	var actaulWidth = this.IsHasXAxis() ? (this.getWidth() - this.getLeftGap() - this.getRightGap()) : this.getWidth();
 	var actualHeight = this.IsHasYAxis() ? (this.getHeight() - this.getBottomGap() - this.getTopGap()) : this.getHeight();
+	var seriesName = Frost.Util.getSeriesName(this.getSeries());
 	this.xScale = d3.scale.ordinal()
     			 		  .rangeRoundBands([0, actaulWidth], .1);
     this.yScale = d3.scale.linear()
@@ -118,57 +123,96 @@ Graph.prototype.render = function() {
     this.xScale.domain(Frost.Util.getNameDomain(this.getSeries()));
     this.yScale.domain([0, Frost.Util.getMaxValue(this.getSeries())]);
     if(this.IsHasXAxis()) {
-    	this.xAxis = new Frost.XAxis({
+    	this.xAxisRender({
 			parent: this, 
 			container: this._container, 
 			xSpace: 0,
 			ySpace: this.getHeight()-this.getBottomGap() - this.topGap,
-		}).render();
+		});
     }
     if(this.IsHasYAxis()) {
-    	this.yAxis = new Frost.YAxis({
+    	this.yAxisRender({
 			parent: this, 
 			container: this._container, 
 			xSpace: 0,
 			ySpace: 0
-		}).render();
+		});
     }
     if(this.IsHasLegend()) {
-    	this.legend = new Frost.Legend({
+    	this.legendRender({
     		parent: this, 
 			container: legnedRootNode,
-			seriesName: Frost.Util.getSeriesName(this.getSeries()),
+			seriesName: seriesName,
 			colorList: colorList,
 			xSpace: this.getWidth()
-    	}).render();
+    	});
     }
-	for(var i = 0; i != this.getSeries().length; i++) {
-		switch(this.getType().toLowerCase()) {
-			case "bar":
+	switch(this.getType().toLowerCase()) {
+		case "bar":
+			if(this.getSeries().length == 1) {
 				this.chartObject.push(new Frost.SingleBar({
 					width: actaulWidth, 
 					height: actualHeight, 
-					data: this.getSeries()[i].data, 
+					data: this.getSeries()[0].data, 
 					container: this._container, 
 					parent: this,
-					color: colorList[i]
+					color: colorList[0]
 				}).render());
-				break;
-	// 		case "line":
-	// 			this.chartObject.push(new Frost.Lines({
-	// 				x: this.getWidth(), 
-	// 				y: this.getHeight(), 
-	// 				data: this.getSeries()[i].data, 
-	// 				container: this.container, 
-	// 				parent: this,
-	// 				color: this.getSeries()[i].color
-	// 			}).render());
-	// 			break;
-	// 		default: 
-	// 			break;
-		}
+			} else if (this.getSeries().length > 1) {
+				if(this.IsStack()) {
+
+				} else {
+					this.chartObject.push(new Frost.GroupBar({
+						width: actaulWidth, 
+						height: actualHeight,
+						data: this.getSeries(), 
+						container: this._container, 
+						parent: this,
+						seriesName: seriesName,
+						colorList: colorList
+					}).render());
+				}
+			}
+			
+			break;
+// 		case "line":
+// 			this.chartObject.push(new Frost.Lines({
+// 				x: this.getWidth(), 
+// 				y: this.getHeight(), 
+// 				data: this.getSeries()[i].data, 
+// 				container: this.container, 
+// 				parent: this,
+// 				color: this.getSeries()[i].color
+// 			}).render());
+// 			break;
+// 		default: 
+// 			break;
 	}
 	return this;
 };
-
+Graph.prototype.xAxisRender = function(cfg) {
+	this.xAxis = new Frost.XAxis({
+		parent: cfg.parent, 
+		container: cfg.container, 
+		xSpace: cfg.xSpace,
+		ySpace: cfg.ySpace,
+	}).render();
+};
+Graph.prototype.yAxisRender = function(cfg) {
+	this.yAxis = new Frost.YAxis({
+		parent: cfg.parent, 
+		container: cfg.container, 
+		xSpace: cfg.xSpace,
+		ySpace: cfg.ySpace
+	}).render();
+};
+Graph.prototype.legendRender = function(cfg) {
+	this.legend = new Frost.Legend({
+		parent: cfg.parent, 
+		container: cfg.container,
+		seriesName: cfg.seriesName,
+		colorList: cfg.colorList,
+		xSpace: cfg.xSpace
+	}).render();
+};
 Frost.Graph = Graph;
