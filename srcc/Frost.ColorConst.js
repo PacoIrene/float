@@ -17,14 +17,19 @@ Frost.ColorConst = function(n) {
 		'#649eb9',
 		'#387aa3'
 	];
-	if(n >= constColor.length) {
-		return constColor;
-	} else {
-		var returnColor = [];
-		for(var i = 0; i != n; i++) {
-			var index = Math.floor(Math.random() * constColor.length);
-			returnColor.push(constColor.splice(index, 1)[0]);
-		}
-		return returnColor;
+	var returnColor = [];
+	for(var i = 0; i != n; i++) {
+		returnColor.push(constColor[i%n]);
 	}
+	return returnColor;
+	// if(n >= constColor.length) {
+	// 	return constColor;
+	// } else {
+	// 	var returnColor = [];
+	// 	for(var i = 0; i != n; i++) {
+	// 		var index = Math.floor(Math.random() * constColor.length);
+	// 		returnColor.push(constColor.splice(index, 1)[0]);
+	// 	}
+	// 	return returnColor;
+	// }
 };

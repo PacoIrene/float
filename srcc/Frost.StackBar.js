@@ -53,10 +53,14 @@ StackBar.prototype.render = function() {
 	if(this.getType() == 1) {
 		this.data = Frost.Util.formatDataForStackBar(this.getData(), 1);
 		// x.domain(this.getParent().getSeriesName());
+		colorList = Frost.Util.getColorList(this.getData(), this.getParent().getNameDomain().length);
+		this.getParent().setColorList(colorList);
 		this.getParent().setLegendName(this.getParent().getNameDomain());
 		x.domain(this.getSeriesName());
 	} else if(this.getType() == 2) {	
 		this.data = Frost.Util.formatDataForStackBar(this.getData(), 2);
+		colorList = Frost.Util.getColorList(this.getData(), this.getSeriesName().length);
+		this.getParent().setColorList(colorList);
 		this.getParent().setLegendName(this.getSeriesName());
 		x.domain(this.getParent().getNameDomain());
 	}
@@ -66,7 +70,7 @@ StackBar.prototype.render = function() {
 	var groupNode = this._groupContainer.selectAll(".frost_stackBar")
       									.data(data)
    										.enter().append("g")
-									    .attr("class", "frost_stackBarg")
+									    .attr("class", "frost_stackBar")
 									    .attr("transform", function(d) { return "translate(" + x(d.name) + ",0)"; });
 
   	groupNode.selectAll("rect")

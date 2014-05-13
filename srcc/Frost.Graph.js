@@ -68,6 +68,12 @@ Graph.prototype.getXScale = function() {
 Graph.prototype.getYScale = function() {
 	return this.yScale;
 };
+Graph.prototype.setXScale = function(data) {
+	this.xScale = data;
+};
+Graph.prototype.setYScale = function(data) {
+	this.yScale = data;
+};
 // Graph.prototype.getDetail = function() {
 // 	return this.detail;
 // };
@@ -104,6 +110,12 @@ Graph.prototype.getXAxis = function() {
 Graph.prototype.getYAxis = function() {
 	return this.yAxis;
 };
+Graph.prototype.setXAxis = function(data) {
+	this.xAxis = data;
+};
+Graph.prototype.setYAxis = function(data) {
+	this.yAxis = data;
+};
 Graph.prototype.getLegend = function() {
 	return this.legend;
 };
@@ -112,6 +124,12 @@ Graph.prototype.setNameDomain = function(data) {
 };
 Graph.prototype.getNameDomain = function() {
 	return this.nameDomain;
+};
+Graph.prototype.setColorList = function(data) {
+	this.colorList = data;
+};
+Graph.prototype.getColorList = function() {
+	return this.colorList;
 };
 Graph.prototype.setYScaleMaxValue = function(data) {
 	this.yScaleMaxValue = data;
@@ -136,7 +154,7 @@ Graph.prototype.render = function() {
 	this._container = svgNode.append("g")
     						.attr("transform", "translate(" + this.getLeftGap() + "," + this.getTopGap() + ")");
 	// this.detail = new Frost.Detail({container: rootNode}).render();
-	var colorList = Frost.Util.getColorList(this.getSeries());
+	this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries().length);
 	var actaulWidth = this.IsHasXAxis() ? (this.getWidth() - this.getLeftGap() - this.getRightGap()) : this.getWidth();
 	var actualHeight = this.IsHasYAxis() ? (this.getHeight() - this.getBottomGap() - this.getTopGap()) : this.getHeight();
 	var seriesName = Frost.Util.getSeriesName(this.getSeries());
@@ -158,7 +176,7 @@ Graph.prototype.render = function() {
 					data: this.getSeries()[0].data, 
 					container: this._container, 
 					parent: this,
-					color: colorList[0]
+					color: this.getColorList()[0]
 				}).render());
 			} else if (this.getSeries().length > 1) {
 				if(!this.IsStack()) {
@@ -169,7 +187,7 @@ Graph.prototype.render = function() {
 						container: this._container, 
 						parent: this,
 						seriesName: seriesName,
-						colorList: colorList,
+						colorList: this.getColorList(),
 						type: this.getCfg().barType
 					}).render());
 				} else {
@@ -180,12 +198,30 @@ Graph.prototype.render = function() {
 						container: this._container, 
 						parent: this,
 						seriesName: seriesName,
-						colorList: colorList,
+						colorList: this.getColorList(),
 						type: this.getCfg().barType
 					}).render());
 				}
 			}
 			
+			break;
+		case "area":
+		// this.xScale = d3.scale.ordinal()
+  //   			 		  .rangeRoundBands([0, actaulWidth],.001);
+			if(this.getSeries().length == 1) {
+				this.chartObject.push(new Frost.Area({
+					width: actaulWidth, 
+					height: actualHeight, 
+					data: this.getSeries()[0].data, 
+					container: this._container, 
+					parent: this,
+					color: this.getColorList()[0],
+					seriesName: seriesName,
+					type: this.getCfg().areaType
+				}).render());
+			} else if (this.getSeries().length > 1) {
+
+			}
 			break;
 // 		case "line":
 // 			this.chartObject.push(new Frost.Lines({
@@ -197,8 +233,8 @@ Graph.prototype.render = function() {
 // 				color: this.getSeries()[i].color
 // 			}).render());
 // 			break;
-// 		default: 
-// 			break;
+		default: 
+			break;
 	}
 	if(this.IsHasXAxis()) {
     	this.xAxisRender({
@@ -213,7 +249,8 @@ Graph.prototype.render = function() {
 			parent: this, 
 			container: this._container, 
 			xSpace: 0,
-			ySpace: 0
+			ySpace: 0,
+			width: actaulWidth
 		});
     }
     if(this.IsHasLegend()) {
@@ -221,7 +258,7 @@ Graph.prototype.render = function() {
     		parent: this, 
 			container: legnedRootNode,
 			seriesName: this.legendName,
-			colorList: colorList,
+			colorList: this.getColorList(),
 			xSpace: this.getWidth()
     	});
     }
@@ -240,7 +277,8 @@ Graph.prototype.yAxisRender = function(cfg) {
 		parent: cfg.parent, 
 		container: cfg.container, 
 		xSpace: cfg.xSpace,
-		ySpace: cfg.ySpace
+		ySpace: cfg.ySpace,
+		width: cfg.width
 	}).render();
 };
 Graph.prototype.legendRender = function(cfg) {

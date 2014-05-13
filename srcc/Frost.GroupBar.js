@@ -59,6 +59,8 @@ GroupBar.prototype.render = function() {
 		x.domain(this.getSeriesName());
 		formatData = this.getData();
 		this.getParent().setLegendName(this.getParent().getNameDomain());
+		colorList = Frost.Util.getColorList(this.getData(), this.getParent().getNameDomain().length);
+		this.getParent().setColorList(colorList);
 		x1.domain(this.getParent().getNameDomain()).rangeRoundBands([0, x.rangeBand()]);
 	}
 	var groupNode = this._groupContainer.selectAll(".frost_groupBar")

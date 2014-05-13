@@ -32,7 +32,7 @@ Util.getSeriesName = function(series) {
 	return list;
 };
 
-Util.getColorList = function(series) {
+Util.getColorList = function(series, length) {
 	if(series[0].color) {
 		var list = [];
 		for(var i = 0; i != series.length; i++) {
@@ -40,7 +40,7 @@ Util.getColorList = function(series) {
 		}
 		return list;
 	} else {
-		return Frost.ColorConst(series.length);
+		return Frost.ColorConst(length);
 	}
 };
 Util.getValue = function(name, data) {

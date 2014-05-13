@@ -132,16 +132,21 @@ Frost.ColorConst = function(n) {
 		'#649eb9',
 		'#387aa3'
 	];
-	if(n >= constColor.length) {
-		return constColor;
-	} else {
-		var returnColor = [];
-		for(var i = 0; i != n; i++) {
-			var index = Math.floor(Math.random() * constColor.length);
-			returnColor.push(constColor.splice(index, 1)[0]);
-		}
-		return returnColor;
+	var returnColor = [];
+	for(var i = 0; i != n; i++) {
+		returnColor.push(constColor[i%n]);
 	}
+	return returnColor;
+	// if(n >= constColor.length) {
+	// 	return constColor;
+	// } else {
+	// 	var returnColor = [];
+	// 	for(var i = 0; i != n; i++) {
+	// 		var index = Math.floor(Math.random() * constColor.length);
+	// 		returnColor.push(constColor.splice(index, 1)[0]);
+	// 	}
+	// 	return returnColor;
+	// }
 };
 Frost.namespace("Frost.SingleBar");
 function SingleBar (cfg) {
@@ -265,6 +270,8 @@ GroupBar.prototype.render = function() {
 		x.domain(this.getSeriesName());
 		formatData = this.getData();
 		this.getParent().setLegendName(this.getParent().getNameDomain());
+		colorList = Frost.Util.getColorList(this.getData(), this.getParent().getNameDomain().length);
+		this.getParent().setColorList(colorList);
 		x1.domain(this.getParent().getNameDomain()).rangeRoundBands([0, x.rangeBand()]);
 	}
 	var groupNode = this._groupContainer.selectAll(".frost_groupBar")
@@ -428,10 +435,14 @@ StackBar.prototype.render = function() {
 	if(this.getType() == 1) {
 		this.data = Frost.Util.formatDataForStackBar(this.getData(), 1);
 		// x.domain(this.getParent().getSeriesName());
+		colorList = Frost.Util.getColorList(this.getData(), this.getParent().getNameDomain().length);
+		this.getParent().setColorList(colorList);
 		this.getParent().setLegendName(this.getParent().getNameDomain());
 		x.domain(this.getSeriesName());
 	} else if(this.getType() == 2) {	
 		this.data = Frost.Util.formatDataForStackBar(this.getData(), 2);
+		colorList = Frost.Util.getColorList(this.getData(), this.getSeriesName().length);
+		this.getParent().setColorList(colorList);
 		this.getParent().setLegendName(this.getSeriesName());
 		x.domain(this.getParent().getNameDomain());
 	}
@@ -441,7 +452,7 @@ StackBar.prototype.render = function() {
 	var groupNode = this._groupContainer.selectAll(".frost_stackBar")
       									.data(data)
    										.enter().append("g")
-									    .attr("class", "frost_stackBarg")
+									    .attr("class", "frost_stackBar")
 									    .attr("transform", function(d) { return "translate(" + x(d.name) + ",0)"; });
 
   	groupNode.selectAll("rect")
@@ -454,6 +465,101 @@ StackBar.prototype.render = function() {
 };
 
 Frost.StackBar = StackBar;
+Frost.namespace("Frost.Area");
+
+function Area(cfg) {
+	this.color = cfg.color;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.data = cfg.data;
+	this.height = cfg.height;
+	this.width = cfg.width;
+	this._seriesName = cfg.seriesName;
+	this.type = cfg.type || 1;
+}
+Area.prototype.getHeight = function() {
+	return this.height;
+};
+
+Area.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+Area.prototype.getWidth = function() {
+	return this.width;
+};
+
+Area.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+Area.prototype.getContainer = function() {
+	return this._container;
+};
+
+Area.prototype.setContainer = function(data) {
+	this._container = data;
+};
+Area.prototype.getParent = function() {
+	return this._parent;
+};
+Area.prototype.getColor = function() {
+	return this.color;
+};
+Area.prototype.getData = function() {
+	return this.data;
+};
+Area.prototype.getGroupContainer = function() {
+	return this._groupContainer;
+};
+Area.prototype.getSeriesName = function() {
+	return this._seriesName;
+};
+Area.prototype.render = function() {
+	var x = this.getParent().getXScale();
+	var y = this.getParent().getYScale();
+	var height = this.getHeight();
+	this._groupContainer = this._container.append("g");
+	if(this.type == 1) {
+		x = d3.scale.linear().range([0, this.getWidth()])
+	    x.domain([0,this.getParent().getNameDomain().length]);
+	    this.getParent().setXScale(x);
+	    var area = d3.svg.area()
+			     .x(function(d, i) { 
+			     	return x(i); 
+			     })
+			     .y0(height)
+			     .y1(function(d) { return y(d.value); })
+			     .interpolate("basis");
+	} else {
+		var area = d3.svg.area()
+			     .x(function(d, i) { 
+			     	return x(d.name) + x.rangeBand() / 2; 
+			     })
+			     .y0(height)
+			     .y1(function(d) { return y(d.value); })
+			     .interpolate("basis");
+	}
+			     // .interpolate("basis");
+    this._groupContainer.append("path")
+				        .datum(this.getData())
+				        .attr("class", "frost_area")
+				        .attr("d", area)
+				        .attr("fill", this.getColor());
+	return this;
+};
+
+Frost.Area = Area;
+Frost.namespace("Frost.StackArea");
+
+function StackArea(cfg) {
+
+}
+
+StackArea.prototype.render = function() {
+	
+};
+
+Frost.StackArea = StackArea;
 Frost.namespace("Frost.XAxis");
 
 function XAxis(cfg) {
@@ -529,7 +635,7 @@ Util.getSeriesName = function(series) {
 	return list;
 };
 
-Util.getColorList = function(series) {
+Util.getColorList = function(series, length) {
 	if(series[0].color) {
 		var list = [];
 		for(var i = 0; i != series.length; i++) {
@@ -537,7 +643,7 @@ Util.getColorList = function(series) {
 		}
 		return list;
 	} else {
-		return Frost.ColorConst(series.length);
+		return Frost.ColorConst(length);
 	}
 };
 Util.getValue = function(name, data) {
@@ -619,6 +725,7 @@ function YAxis(cfg) {
 	this._container = cfg.container;
 	this.xSpace = cfg.xSpace || 0;
 	this.ySpace = cfg.ySpace || 0;
+	this.width = cfg.width;
 }
 
 
@@ -637,6 +744,9 @@ YAxis.prototype.getySpace = function() {
 YAxis.prototype.getxSpace = function() {
 	return this.xSpace;
 };
+YAxis.prototype.getWidth = function() {
+	return this.width;
+};
 
 YAxis.prototype.render = function() {
 	this.yAxisNode = this._container.append("g")
@@ -644,7 +754,8 @@ YAxis.prototype.render = function() {
 							  .attr("transform", "translate("+ this.getxSpace() +", "+this.getySpace()+")");    
 	var yAxis = d3.svg.axis()
 	    .scale(this.getParent().getYScale())
-	    .tickSize(1)
+	    // .tickSize(-this.getWidth())
+	    .tickSize(-4)
 	    .tickPadding(4)
 	    .orient("left");
 	this.yAxisNode.call(yAxis)
@@ -653,7 +764,7 @@ YAxis.prototype.render = function() {
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("");;
+      .text("");
 	return this;
 }
 
@@ -728,6 +839,12 @@ Graph.prototype.getXScale = function() {
 Graph.prototype.getYScale = function() {
 	return this.yScale;
 };
+Graph.prototype.setXScale = function(data) {
+	this.xScale = data;
+};
+Graph.prototype.setYScale = function(data) {
+	this.yScale = data;
+};
 // Graph.prototype.getDetail = function() {
 // 	return this.detail;
 // };
@@ -764,6 +881,12 @@ Graph.prototype.getXAxis = function() {
 Graph.prototype.getYAxis = function() {
 	return this.yAxis;
 };
+Graph.prototype.setXAxis = function(data) {
+	this.xAxis = data;
+};
+Graph.prototype.setYAxis = function(data) {
+	this.yAxis = data;
+};
 Graph.prototype.getLegend = function() {
 	return this.legend;
 };
@@ -772,6 +895,12 @@ Graph.prototype.setNameDomain = function(data) {
 };
 Graph.prototype.getNameDomain = function() {
 	return this.nameDomain;
+};
+Graph.prototype.setColorList = function(data) {
+	this.colorList = data;
+};
+Graph.prototype.getColorList = function() {
+	return this.colorList;
 };
 Graph.prototype.setYScaleMaxValue = function(data) {
 	this.yScaleMaxValue = data;
@@ -796,7 +925,7 @@ Graph.prototype.render = function() {
 	this._container = svgNode.append("g")
     						.attr("transform", "translate(" + this.getLeftGap() + "," + this.getTopGap() + ")");
 	// this.detail = new Frost.Detail({container: rootNode}).render();
-	var colorList = Frost.Util.getColorList(this.getSeries());
+	this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries().length);
 	var actaulWidth = this.IsHasXAxis() ? (this.getWidth() - this.getLeftGap() - this.getRightGap()) : this.getWidth();
 	var actualHeight = this.IsHasYAxis() ? (this.getHeight() - this.getBottomGap() - this.getTopGap()) : this.getHeight();
 	var seriesName = Frost.Util.getSeriesName(this.getSeries());
@@ -818,7 +947,7 @@ Graph.prototype.render = function() {
 					data: this.getSeries()[0].data, 
 					container: this._container, 
 					parent: this,
-					color: colorList[0]
+					color: this.getColorList()[0]
 				}).render());
 			} else if (this.getSeries().length > 1) {
 				if(!this.IsStack()) {
@@ -829,7 +958,7 @@ Graph.prototype.render = function() {
 						container: this._container, 
 						parent: this,
 						seriesName: seriesName,
-						colorList: colorList,
+						colorList: this.getColorList(),
 						type: this.getCfg().barType
 					}).render());
 				} else {
@@ -840,12 +969,30 @@ Graph.prototype.render = function() {
 						container: this._container, 
 						parent: this,
 						seriesName: seriesName,
-						colorList: colorList,
+						colorList: this.getColorList(),
 						type: this.getCfg().barType
 					}).render());
 				}
 			}
 			
+			break;
+		case "area":
+		// this.xScale = d3.scale.ordinal()
+  //   			 		  .rangeRoundBands([0, actaulWidth],.001);
+			if(this.getSeries().length == 1) {
+				this.chartObject.push(new Frost.Area({
+					width: actaulWidth, 
+					height: actualHeight, 
+					data: this.getSeries()[0].data, 
+					container: this._container, 
+					parent: this,
+					color: this.getColorList()[0],
+					seriesName: seriesName,
+					type: this.getCfg().areaType
+				}).render());
+			} else if (this.getSeries().length > 1) {
+
+			}
 			break;
 // 		case "line":
 // 			this.chartObject.push(new Frost.Lines({
@@ -857,8 +1004,8 @@ Graph.prototype.render = function() {
 // 				color: this.getSeries()[i].color
 // 			}).render());
 // 			break;
-// 		default: 
-// 			break;
+		default: 
+			break;
 	}
 	if(this.IsHasXAxis()) {
     	this.xAxisRender({
@@ -873,7 +1020,8 @@ Graph.prototype.render = function() {
 			parent: this, 
 			container: this._container, 
 			xSpace: 0,
-			ySpace: 0
+			ySpace: 0,
+			width: actaulWidth
 		});
     }
     if(this.IsHasLegend()) {
@@ -881,7 +1029,7 @@ Graph.prototype.render = function() {
     		parent: this, 
 			container: legnedRootNode,
 			seriesName: this.legendName,
-			colorList: colorList,
+			colorList: this.getColorList(),
 			xSpace: this.getWidth()
     	});
     }
@@ -900,7 +1048,8 @@ Graph.prototype.yAxisRender = function(cfg) {
 		parent: cfg.parent, 
 		container: cfg.container, 
 		xSpace: cfg.xSpace,
-		ySpace: cfg.ySpace
+		ySpace: cfg.ySpace,
+		width: cfg.width
 	}).render();
 };
 Graph.prototype.legendRender = function(cfg) {

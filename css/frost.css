@@ -24,7 +24,11 @@
   stroke: #000;
   shape-rendering: crispEdges;
 }
-
-.x.frost_axis path {
+/*.frost_yAxis line {
+  stroke: #fff;
+  stroke-opacity: .2;
+  shape-rendering: crispEdges;
+}*/
+.frost_xAxis path{
   display: none;
 }

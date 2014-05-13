@@ -5,6 +5,7 @@ function YAxis(cfg) {
 	this._container = cfg.container;
 	this.xSpace = cfg.xSpace || 0;
 	this.ySpace = cfg.ySpace || 0;
+	this.width = cfg.width;
 }
 
 
@@ -23,6 +24,9 @@ YAxis.prototype.getySpace = function() {
 YAxis.prototype.getxSpace = function() {
 	return this.xSpace;
 };
+YAxis.prototype.getWidth = function() {
+	return this.width;
+};
 
 YAxis.prototype.render = function() {
 	this.yAxisNode = this._container.append("g")
@@ -30,7 +34,8 @@ YAxis.prototype.render = function() {
 							  .attr("transform", "translate("+ this.getxSpace() +", "+this.getySpace()+")");    
 	var yAxis = d3.svg.axis()
 	    .scale(this.getParent().getYScale())
-	    .tickSize(1)
+	    // .tickSize(-this.getWidth())
+	    .tickSize(-4)
 	    .tickPadding(4)
 	    .orient("left");
 	this.yAxisNode.call(yAxis)
@@ -39,7 +44,7 @@ YAxis.prototype.render = function() {
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("");;
+      .text("");
 	return this;
 }
 
