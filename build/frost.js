@@ -373,6 +373,87 @@ Legend.prototype._bindUI = function() {
 };
 
 Frost.Legend = Legend;
+Frost.namespace("Frost.StackBar");
+
+function StackBar(cfg) {
+	this.height = cfg.height;
+	this.width = cfg.width;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.data = cfg.data;
+	this.colorList = cfg.colorList;
+	this._seriesName = cfg.seriesName;
+	this.type = cfg.type || 1;
+}
+StackBar.prototype.getType = function() {
+	return this.type;
+};
+StackBar.prototype.getHeight = function() {
+	return this.height;
+};
+
+StackBar.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+StackBar.prototype.getWidth = function() {
+	return this.width;
+};
+
+StackBar.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+StackBar.prototype.getContainer = function() {
+	return this._container;
+};
+StackBar.prototype.setContainer = function(data) {
+	this._container = data;
+};
+StackBar.prototype.getParent = function() {
+	return this._parent;
+};
+StackBar.prototype.getData = function() {
+	return this.data;
+};
+StackBar.prototype.getColorList = function() {
+	return this.colorList;
+};
+StackBar.prototype.getSeriesName = function() {
+	return this._seriesName;
+};
+StackBar.prototype.render = function() {
+	var x = this.getParent().getXScale();
+	var y = this.getParent().getYScale();
+	var colorList = this.getColorList();
+	if(this.getType() == 1) {
+		this.data = Frost.Util.formatDataForStackBar(this.getData(), 1);
+		// x.domain(this.getParent().getSeriesName());
+		this.getParent().setLegendName(this.getParent().getNameDomain());
+		x.domain(this.getSeriesName());
+	} else if(this.getType() == 2) {	
+		this.data = Frost.Util.formatDataForStackBar(this.getData(), 2);
+		this.getParent().setLegendName(this.getSeriesName());
+		x.domain(this.getParent().getNameDomain());
+	}
+	var data = this.data;
+	y.domain([0, d3.max(this.data, function(d) { return d.total; })]);
+	this._groupContainer = this._container.append("g");
+	var groupNode = this._groupContainer.selectAll(".frost_stackBar")
+      									.data(data)
+   										.enter().append("g")
+									    .attr("class", "frost_stackBarg")
+									    .attr("transform", function(d) { return "translate(" + x(d.name) + ",0)"; });
+
+  	groupNode.selectAll("rect")
+		     .data(function(d) { return d.data; })
+		     .enter().append("rect")
+		     .attr("width", x.rangeBand())
+		     .attr("y", function(d) { return y(d.y1); })
+		     .attr("height", function(d) { return y(d.y0) - y(d.y1); })
+		     .style("fill", function(d, i) { return colorList[i]; });
+};
+
+Frost.StackBar = StackBar;
 Frost.namespace("Frost.XAxis");
 
 function XAxis(cfg) {
@@ -459,19 +540,18 @@ Util.getColorList = function(series) {
 		return Frost.ColorConst(series.length);
 	}
 };
-
+Util.getValue = function(name, data) {
+	var result = 0;
+	for(var k = 0; k != data.length; k++) {
+		if(data[k].name == name) {
+			result = data[k].value;
+			return result;
+		}
+	}
+	return result;
+};
 Util.formatDataForGroupBar = function(series) {
 	// 根据name找到其相对应的值
-	var getValue = function(name, data) {
-		var result = 0;
-		for(var k = 0; k != data.length; k++) {
-			if(data[k].name == name) {
-				result = data[k].value;
-				return result;
-			}
-		}
-		return result;
-	};
 	var objList = [];
 	var seriesName = this.getNameDomain(series);
 	for(var i = 0; i != seriesName.length; i++) {
@@ -481,7 +561,7 @@ Util.formatDataForGroupBar = function(series) {
 		for(var j = 0; j != series.length; j++) {
 			var tempObj = {};
 			tempObj["name"] = series[j].name;
-			tempObj["value"] = getValue(obj["name"], series[j].data)
+			tempObj["value"] = this.getValue(obj["name"], series[j].data);
 			obj["data"].push(tempObj);
 		}
 		objList.push(obj);
@@ -489,9 +569,46 @@ Util.formatDataForGroupBar = function(series) {
 	return objList;
 };
 
-Util.formatDataForStackBar = function(series) {
-	
-	return;
+Util.formatDataForStackBar = function(series, type) {
+	var objList = [];
+	if(type == 1) {
+		for(var i = 0; i != series.length; i++) {
+			var obj = {};
+			obj["name"] = series[i].name;
+			obj["data"] = [];
+			var start = 0;
+			for(var j = 0; j != series[i].data.length; j++) {
+				var tempObj = {};
+				tempObj["name"] = series[i].data[j].name;
+				tempObj["y0"] = start;
+				start = start + series[i].data[j].value;
+				tempObj["y1"] = start;
+				obj["data"].push(tempObj);
+			}
+			obj["total"] = start;
+			objList.push(obj);
+		}
+	} else if(type == 2) {
+		var seriesName = this.getNameDomain(series);
+		for(var i = 0; i != seriesName.length; i++) {
+			var obj = {};
+			obj["name"] = seriesName[i];
+			obj["data"] = [];
+			var start = 0;
+			for(var j = 0; j != series.length; j++) {
+				var tempObj = {};
+				var value = this.getValue(obj["name"], series[j].data);
+				tempObj["name"] = series[j].name;
+				tempObj["y0"] = start;
+				start = start + value;
+				tempObj["y1"] = start;
+				obj["data"].push(tempObj);
+			}
+			obj["total"] = start;
+			objList.push(obj);
+		}
+	}
+	return objList;
 };
 
 Frost.Util = Util;
@@ -543,7 +660,7 @@ YAxis.prototype.render = function() {
 Frost.YAxis = YAxis;
 Frost.namespace("Frost.Graph");
 var ySpaceRate = 20 / 300;
-var xSpaceRate = 20 / 500;
+var xSpaceRate = 40 / 500;
 
 function Graph(cfg) {
 	this.node = cfg.element || "body";
@@ -704,10 +821,19 @@ Graph.prototype.render = function() {
 					color: colorList[0]
 				}).render());
 			} else if (this.getSeries().length > 1) {
-				if(this.IsStack()) {
-					console.log(Frost.Util.formatDataForStackBar(this.getSeries()));
-				} else {
+				if(!this.IsStack()) {
 					this.chartObject.push(new Frost.GroupBar({
+						width: actaulWidth, 
+						height: actualHeight,
+						data: this.getSeries(), 
+						container: this._container, 
+						parent: this,
+						seriesName: seriesName,
+						colorList: colorList,
+						type: this.getCfg().barType
+					}).render());
+				} else {
+					this.chartObject.push(new Frost.StackBar({
 						width: actaulWidth, 
 						height: actualHeight,
 						data: this.getSeries(), 

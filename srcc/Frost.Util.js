@@ -43,19 +43,18 @@ Util.getColorList = function(series) {
 		return Frost.ColorConst(series.length);
 	}
 };
-
+Util.getValue = function(name, data) {
+	var result = 0;
+	for(var k = 0; k != data.length; k++) {
+		if(data[k].name == name) {
+			result = data[k].value;
+			return result;
+		}
+	}
+	return result;
+};
 Util.formatDataForGroupBar = function(series) {
 	// 根据name找到其相对应的值
-	var getValue = function(name, data) {
-		var result = 0;
-		for(var k = 0; k != data.length; k++) {
-			if(data[k].name == name) {
-				result = data[k].value;
-				return result;
-			}
-		}
-		return result;
-	};
 	var objList = [];
 	var seriesName = this.getNameDomain(series);
 	for(var i = 0; i != seriesName.length; i++) {
@@ -65,7 +64,7 @@ Util.formatDataForGroupBar = function(series) {
 		for(var j = 0; j != series.length; j++) {
 			var tempObj = {};
 			tempObj["name"] = series[j].name;
-			tempObj["value"] = getValue(obj["name"], series[j].data)
+			tempObj["value"] = this.getValue(obj["name"], series[j].data);
 			obj["data"].push(tempObj);
 		}
 		objList.push(obj);
@@ -73,9 +72,46 @@ Util.formatDataForGroupBar = function(series) {
 	return objList;
 };
 
-Util.formatDataForStackBar = function(series) {
-	
-	return;
+Util.formatDataForStackBar = function(series, type) {
+	var objList = [];
+	if(type == 1) {
+		for(var i = 0; i != series.length; i++) {
+			var obj = {};
+			obj["name"] = series[i].name;
+			obj["data"] = [];
+			var start = 0;
+			for(var j = 0; j != series[i].data.length; j++) {
+				var tempObj = {};
+				tempObj["name"] = series[i].data[j].name;
+				tempObj["y0"] = start;
+				start = start + series[i].data[j].value;
+				tempObj["y1"] = start;
+				obj["data"].push(tempObj);
+			}
+			obj["total"] = start;
+			objList.push(obj);
+		}
+	} else if(type == 2) {
+		var seriesName = this.getNameDomain(series);
+		for(var i = 0; i != seriesName.length; i++) {
+			var obj = {};
+			obj["name"] = seriesName[i];
+			obj["data"] = [];
+			var start = 0;
+			for(var j = 0; j != series.length; j++) {
+				var tempObj = {};
+				var value = this.getValue(obj["name"], series[j].data);
+				tempObj["name"] = series[j].name;
+				tempObj["y0"] = start;
+				start = start + value;
+				tempObj["y1"] = start;
+				obj["data"].push(tempObj);
+			}
+			obj["total"] = start;
+			objList.push(obj);
+		}
+	}
+	return objList;
 };
 
 Frost.Util = Util;

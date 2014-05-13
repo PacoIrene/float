@@ -1,6 +1,6 @@
 Frost.namespace("Frost.Graph");
 var ySpaceRate = 20 / 300;
-var xSpaceRate = 20 / 500;
+var xSpaceRate = 40 / 500;
 
 function Graph(cfg) {
 	this.node = cfg.element || "body";
@@ -161,10 +161,19 @@ Graph.prototype.render = function() {
 					color: colorList[0]
 				}).render());
 			} else if (this.getSeries().length > 1) {
-				if(this.IsStack()) {
-					console.log(Frost.Util.formatDataForStackBar(this.getSeries()));
-				} else {
+				if(!this.IsStack()) {
 					this.chartObject.push(new Frost.GroupBar({
+						width: actaulWidth, 
+						height: actualHeight,
+						data: this.getSeries(), 
+						container: this._container, 
+						parent: this,
+						seriesName: seriesName,
+						colorList: colorList,
+						type: this.getCfg().barType
+					}).render());
+				} else {
+					this.chartObject.push(new Frost.StackBar({
 						width: actaulWidth, 
 						height: actualHeight,
 						data: this.getSeries(), 
