@@ -1,6 +1,3 @@
-// http://bl.ocks.org/mbostock/882152
-// http://bl.ocks.org/mbostock/3887051
-// http://bl.ocks.org/mbostock/3943967
 Frost.namespace("Frost.GroupBar");
 
 function GroupBar (cfg) {
@@ -11,7 +8,11 @@ function GroupBar (cfg) {
 	this.data = cfg.data;
 	this.colorList = cfg.colorList;
 	this._seriesName = cfg.seriesName;
+	this.type = cfg.type || 1;
 }
+GroupBar.prototype.getType = function() {
+	return this.type;
+};
 GroupBar.prototype.getHeight = function() {
 	return this.height;
 };
@@ -49,11 +50,17 @@ GroupBar.prototype.render = function() {
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
 	var x1 = d3.scale.ordinal();
-	x1.domain(this.getSeriesName()).rangeRoundBands([0, x.rangeBand()]);
 	var height = this.getHeight();
 	var colorList = this.getColorList();
 	var formatData = Frost.Util.formatDataForGroupBar(this.getData());
 	this._groupContainer = this._container.append("g");
+	x1.domain(this.getSeriesName()).rangeRoundBands([0, x.rangeBand()]);
+	if(this.getType() == 1) {
+		x.domain(this.getSeriesName());
+		formatData = this.getData();
+		this.getParent().setLegendName(this.getParent().getNameDomain());
+		x1.domain(this.getParent().getNameDomain()).rangeRoundBands([0, x.rangeBand()]);
+	}
 	var groupNode = this._groupContainer.selectAll(".frost_groupBar")
 									    .data(formatData)
 									    .enter().append("g")

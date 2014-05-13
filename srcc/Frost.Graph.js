@@ -20,8 +20,11 @@ function Graph(cfg) {
 	this.topGap = this.height * ySpaceRate / 2;
 	this.xScale = null;
 	this.yScale = null;
+	this.cfg = cfg;
 }
-
+Graph.prototype.getCfg = function() {
+	return this.cfg;
+};
 Graph.prototype.getNode = function() {
 	return this.node;
 };
@@ -95,6 +98,27 @@ Graph.prototype.getTopGap = function() {
 Graph.prototype.getRightGap = function() {
 	return this.rightGap;
 };
+Graph.prototype.getXAxis = function() {
+	return this.xAxis;
+};
+Graph.prototype.getYAxis = function() {
+	return this.yAxis;
+};
+Graph.prototype.getLegend = function() {
+	return this.legend;
+};
+Graph.prototype.setNameDomain = function(data) {
+	this.nameDomain = data;
+};
+Graph.prototype.getNameDomain = function() {
+	return this.nameDomain;
+};
+Graph.prototype.setYScaleMaxValue = function(data) {
+	this.yScaleMaxValue = data;
+};
+Graph.prototype.setLegendName = function(data) {
+	this.legendName = data;
+};
 /**
  * Render the Chart.
  * @method Frost.Graph.render
@@ -116,13 +140,58 @@ Graph.prototype.render = function() {
 	var actaulWidth = this.IsHasXAxis() ? (this.getWidth() - this.getLeftGap() - this.getRightGap()) : this.getWidth();
 	var actualHeight = this.IsHasYAxis() ? (this.getHeight() - this.getBottomGap() - this.getTopGap()) : this.getHeight();
 	var seriesName = Frost.Util.getSeriesName(this.getSeries());
+	this.legendName = seriesName;
 	this.xScale = d3.scale.ordinal()
     			 		  .rangeRoundBands([0, actaulWidth], .1);
     this.yScale = d3.scale.linear()
     					  .range([actualHeight, 0]);
-    this.xScale.domain(Frost.Util.getNameDomain(this.getSeries()));
-    this.yScale.domain([0, Frost.Util.getMaxValue(this.getSeries())]);
-    if(this.IsHasXAxis()) {
+    this.nameDomain = Frost.Util.getNameDomain(this.getSeries());
+    this.yScaleMaxValue = Frost.Util.getMaxValue(this.getSeries());
+    this.xScale.domain(this.nameDomain);
+    this.yScale.domain([0, this.yScaleMaxValue]);
+	switch(this.getType().toLowerCase()) {
+		case "bar":
+			if(this.getSeries().length == 1) {
+				this.chartObject.push(new Frost.SingleBar({
+					width: actaulWidth, 
+					height: actualHeight, 
+					data: this.getSeries()[0].data, 
+					container: this._container, 
+					parent: this,
+					color: colorList[0]
+				}).render());
+			} else if (this.getSeries().length > 1) {
+				if(this.IsStack()) {
+					console.log(Frost.Util.formatDataForStackBar(this.getSeries()));
+				} else {
+					this.chartObject.push(new Frost.GroupBar({
+						width: actaulWidth, 
+						height: actualHeight,
+						data: this.getSeries(), 
+						container: this._container, 
+						parent: this,
+						seriesName: seriesName,
+						colorList: colorList,
+						type: this.getCfg().barType
+					}).render());
+				}
+			}
+			
+			break;
+// 		case "line":
+// 			this.chartObject.push(new Frost.Lines({
+// 				x: this.getWidth(), 
+// 				y: this.getHeight(), 
+// 				data: this.getSeries()[i].data, 
+// 				container: this.container, 
+// 				parent: this,
+// 				color: this.getSeries()[i].color
+// 			}).render());
+// 			break;
+// 		default: 
+// 			break;
+	}
+	if(this.IsHasXAxis()) {
     	this.xAxisRender({
 			parent: this, 
 			container: this._container, 
@@ -142,52 +211,11 @@ Graph.prototype.render = function() {
     	this.legendRender({
     		parent: this, 
 			container: legnedRootNode,
-			seriesName: seriesName,
+			seriesName: this.legendName,
 			colorList: colorList,
 			xSpace: this.getWidth()
     	});
     }
-	switch(this.getType().toLowerCase()) {
-		case "bar":
-			if(this.getSeries().length == 1) {
-				this.chartObject.push(new Frost.SingleBar({
-					width: actaulWidth, 
-					height: actualHeight, 
-					data: this.getSeries()[0].data, 
-					container: this._container, 
-					parent: this,
-					color: colorList[0]
-				}).render());
-			} else if (this.getSeries().length > 1) {
-				if(this.IsStack()) {
-
-				} else {
-					this.chartObject.push(new Frost.GroupBar({
-						width: actaulWidth, 
-						height: actualHeight,
-						data: this.getSeries(), 
-						container: this._container, 
-						parent: this,
-						seriesName: seriesName,
-						colorList: colorList
-					}).render());
-				}
-			}
-			
-			break;
-// 		case "line":
-// 			this.chartObject.push(new Frost.Lines({
-// 				x: this.getWidth(), 
-// 				y: this.getHeight(), 
-// 				data: this.getSeries()[i].data, 
-// 				container: this.container, 
-// 				parent: this,
-// 				color: this.getSeries()[i].color
-// 			}).render());
-// 			break;
-// 		default: 
-// 			break;
-	}
 	return this;
 };
 Graph.prototype.xAxisRender = function(cfg) {

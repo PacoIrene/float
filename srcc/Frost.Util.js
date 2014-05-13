@@ -45,6 +45,7 @@ Util.getColorList = function(series) {
 };
 
 Util.formatDataForGroupBar = function(series) {
+	// 根据name找到其相对应的值
 	var getValue = function(name, data) {
 		var result = 0;
 		for(var k = 0; k != data.length; k++) {
@@ -69,7 +70,12 @@ Util.formatDataForGroupBar = function(series) {
 		}
 		objList.push(obj);
 	}
-	return objList
+	return objList;
+};
+
+Util.formatDataForStackBar = function(series) {
+	
+	return;
 };
 
 Frost.Util = Util;

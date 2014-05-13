@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>关于我爱你</title>
+		<link rel="stylesheet" type="text/css" href="../css/frost.css">
+	</head>
+	<body>
+		<div id="node"></div>
+		<script type="text/javascript" src="../lib/d3.v3.min.js"></script>
+		<script type="text/javascript" src="../build/frost.js" charset="utf-8"></script>
+		<script type="text/javascript">
+			var frost = new Frost.Graph({
+				element: "#node",
+				width: 500,
+				height: 300,
+				type: "bar",
+				stack: true,
+				series: [
+				{
+					// color: "steelblue",
+					data: [
+						{value: 10,name: "Jan"},
+						{value: 13,name: "Feb"}, 
+						{value: 10,name: "Mar"},
+	 					{value: 40,name: "Apr"},
+						{value: 13,name: "May"},
+					],
+					name: "Country"
+				},
+				{
+					// color: '#b2a470',
+					data: [
+						{value: 6,name: "Jan"},
+						{value: 20,name: "Feb"}, 
+						{value: 33,name: "Mar"},
+	 					{value: 50,name: "May"}
+					],
+					name: "Village"
+				},
+				{
+					// color: '#b2a470',
+					data: [
+						{value: 3,name: "Jan"},
+						{value: 24,name: "Feb"}, 
+						{value: 22,name: "Mar"},
+	 					{value: 13,name: "Apr"},
+						{value: 33,name: "May"},
+					],
+					name: "Mark"
+				},
+				{
+					// color: '#b2a470',
+					data: [
+						{value: 6,name: "Jan"},
+						{value: 12,name: "Feb"}, 
+						{value: 43,name: "Mar"},
+	 					{value: 55,name: "May"}
+					],
+					name: "Luka"
+				},
+				{
+					// color: '#b2a470',
+					data: [
+						{value: 2,name: "Jan"},
+						{value: 37,name: "Feb"}, 
+						{value: 5,name: "Mar"},
+	 					{value: 30,name: "Apr"},
+						{value: 22,name: "May"},
+					],
+					name: "Fake"
+				}
+				],
+				xAxis: true,
+				yAxis: true,
+				legend: false
+			});
+			frost.render();
+		</script>
+	</body>
+</html>
