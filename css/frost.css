@@ -42,3 +42,6 @@
 .frost_pie text {
 	font: 10px Helvetica,Arial,sans-serif;
 }
+.frost_pie path {
+  stroke: #fff;
+}
