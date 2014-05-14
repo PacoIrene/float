@@ -54,7 +54,6 @@ Util.getValue = function(name, data) {
 	return result;
 };
 Util.formatDataForGroupBar = function(series) {
-	// 根据name找到其相对应的值
 	var objList = [];
 	var seriesName = this.getNameDomain(series);
 	for(var i = 0; i != seriesName.length; i++) {
@@ -108,6 +107,20 @@ Util.formatDataForStackBar = function(series, type) {
 				obj["data"].push(tempObj);
 			}
 			obj["total"] = start;
+			objList.push(obj);
+		}
+	}
+	return objList;
+};
+
+Util.formatDataForStackArea = function(series) {
+	var objList = [];
+	for(var i = 0; i != series.length; i++) {
+		for(var j = 0; j != series[i].data.length; j++) {
+			var obj = {};
+			obj["key"] = series[i].name;
+			obj["name"] = series[i].data[j].name;
+			obj["value"] = series[i].data[j].value;
 			objList.push(obj);
 		}
 	}

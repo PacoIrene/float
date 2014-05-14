@@ -217,22 +217,40 @@ Graph.prototype.render = function() {
 					parent: this,
 					color: this.getColorList()[0],
 					seriesName: seriesName,
-					type: this.getCfg().areaType
+					isXLinear: this.getCfg().isXLinear,
+					lineType: this.getCfg().lineType
+				}).render());
+			} else if (this.getSeries().length > 1) {
+				this.chartObject.push(new Frost.StackArea({
+						width: actaulWidth, 
+						height: actualHeight,
+						data: this.getSeries(), 
+						container: this._container, 
+						parent: this,
+						seriesName: seriesName,
+						colorList: this.getColorList(),
+						isXLinear: this.getCfg().isXLinear,
+						lineType: this.getCfg().lineType
+					}).render());
+			}
+			break;
+		case "line":
+			if(this.getSeries().length == 1) {
+				this.chartObject.push(new Frost.Line({
+					width: actaulWidth, 
+					height: actualHeight, 
+					data: this.getSeries()[0].data, 
+					container: this._container, 
+					parent: this,
+					color: this.getColorList()[0],
+					seriesName: seriesName,
+					isXLinear: this.getCfg().isXLinear,
+					lineType: this.getCfg().lineType
 				}).render());
 			} else if (this.getSeries().length > 1) {
 
 			}
 			break;
-// 		case "line":
-// 			this.chartObject.push(new Frost.Lines({
-// 				x: this.getWidth(), 
-// 				y: this.getHeight(), 
-// 				data: this.getSeries()[i].data, 
-// 				container: this.container, 
-// 				parent: this,
-// 				color: this.getSeries()[i].color
-// 			}).render());
-// 			break;
 		default: 
 			break;
 	}

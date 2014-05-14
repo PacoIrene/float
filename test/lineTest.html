@@ -15,6 +15,8 @@
 				width: 500,
 				height: 300,
 				type: "line",
+				lineType: "monotone",
+				isXLinear: false,
 				series: [
 				{
 					color: "steelblue",
@@ -23,22 +25,24 @@
 						{x: 1, value: 13,name: "李卫"}, 
 						{x: 2, value: 10,name: "孙伟"},
 	 					{x: 3, value: 30,name: "张伟"},
-						{x: 1, value: 13,name: "李卫"},
-					]
+						{x: 4, value: 13,name: "李麻痹"},
+					],
+					name: "Country"
 				},
-				{
-					color: "green",
-					data: [
-						{x: 0, value: 6,name: "王伟"},
-						{x: 1, value: 20,name: "李卫"}, 
-						{x: 2, value: 50,name: "孙伟"},
-	 					{x: 3, value: 18,name: "张伟"},
-						{x: 1, value: 30,name: "李卫"},
-					]
-				}
+				// {
+				// 	color: "green",
+				// 	data: [
+				// 		{x: 0, value: 6,name: "王伟"},
+				// 		{x: 1, value: 20,name: "李卫"}, 
+				// 		{x: 2, value: 50,name: "孙伟"},
+	 		// 			{x: 3, value: 18,name: "张伟"},
+				// 		{x: 1, value: 30,name: "李卫"},
+				// 	]
+				// }
 				],
 				xAxis: true,
-				yAxis: true
+				yAxis: true,
+				legend: true
 			});
 			frost.render();
 		</script>

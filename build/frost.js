@@ -462,6 +462,7 @@ StackBar.prototype.render = function() {
 		     .attr("y", function(d) { return y(d.y1); })
 		     .attr("height", function(d) { return y(d.y0) - y(d.y1); })
 		     .style("fill", function(d, i) { return colorList[i]; });
+	return this;
 };
 
 Frost.StackBar = StackBar;
@@ -475,7 +476,8 @@ function Area(cfg) {
 	this.height = cfg.height;
 	this.width = cfg.width;
 	this._seriesName = cfg.seriesName;
-	this.type = cfg.type || 1;
+	this.isXLinear = cfg.isXLinear || true;
+	this.lineType = cfg.lineType || "linear";
 }
 Area.prototype.getHeight = function() {
 	return this.height;
@@ -514,32 +516,34 @@ Area.prototype.getGroupContainer = function() {
 Area.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
+Area.prototype.getIsStright = function() {
+	return this.isStright;
+};
 Area.prototype.render = function() {
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
 	var height = this.getHeight();
 	this._groupContainer = this._container.append("g");
-	if(this.type == 1) {
+	if(this.isXLinear == true) {
 		x = d3.scale.linear().range([0, this.getWidth()])
-	    x.domain([0,this.getParent().getNameDomain().length]);
+	    x.domain([0,this.getParent().getNameDomain().length - 1]);
 	    this.getParent().setXScale(x);
 	    var area = d3.svg.area()
 			     .x(function(d, i) { 
 			     	return x(i); 
 			     })
 			     .y0(height)
-			     .y1(function(d) { return y(d.value); })
-			     .interpolate("basis");
+			     .y1(function(d) { return y(d.value); });
 	} else {
 		var area = d3.svg.area()
 			     .x(function(d, i) { 
 			     	return x(d.name) + x.rangeBand() / 2; 
 			     })
 			     .y0(height)
-			     .y1(function(d) { return y(d.value); })
-			     .interpolate("basis");
+			     .y1(function(d) { return y(d.value); });
 	}
-			     // .interpolate("basis");
+	area.interpolate(this.lineType);
+			     // 
     this._groupContainer.append("path")
 				        .datum(this.getData())
 				        .attr("class", "frost_area")
@@ -552,14 +556,173 @@ Frost.Area = Area;
 Frost.namespace("Frost.StackArea");
 
 function StackArea(cfg) {
-
+	this.height = cfg.height;
+	this.width = cfg.width;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.data = cfg.data;
+	this.colorList = cfg.colorList;
+	this._seriesName = cfg.seriesName;
+	this.isXLinear = cfg.isXLinear || false;
+	this.lineType = cfg.lineType || "linear";
 }
+StackArea.prototype.getType = function() {
+	return this.type;
+};
+StackArea.prototype.getHeight = function() {
+	return this.height;
+};
 
+StackArea.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+StackArea.prototype.getWidth = function() {
+	return this.width;
+};
+
+StackArea.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+StackArea.prototype.getContainer = function() {
+	return this._container;
+};
+StackArea.prototype.setContainer = function(data) {
+	this._container = data;
+};
+StackArea.prototype.getParent = function() {
+	return this._parent;
+};
+StackArea.prototype.getData = function() {
+	return this.data;
+};
+StackArea.prototype.getColorList = function() {
+	return this.colorList;
+};
+StackArea.prototype.getSeriesName = function() {
+	return this._seriesName;
+};
 StackArea.prototype.render = function() {
-	
+	var x = this.getParent().getXScale();
+	var y = this.getParent().getYScale();
+	this._groupContainer = this._container.append("g");
+	if(this.isXLinear == true) {
+		x = d3.scale.linear().range([0, this.getWidth()])
+	    x.domain([0,this.getParent().getNameDomain().length - 1]);
+	    this.getParent().setXScale(x);
+	    var area = d3.svg.area()
+	    .x(function(d, i) { return x(i); })
+	    .y0(function(d) { return y(d.y0); })
+	    .y1(function(d) { return y(d.y0 + d.y); });
+	} else {
+		var area = d3.svg.area()
+	    .x(function(d) { return x(d.name) + x.rangeBand() / 2 })
+	    .y0(function(d) { return y(d.y0); })
+	    .y1(function(d) { return y(d.y0 + d.y); });
+	}
+	area.interpolate(this.lineType);
+	var formatData = Frost.Util.formatDataForStackArea(this.getData());
+	var stack = d3.layout.stack()
+					    .offset("zero")
+					    .values(function(d) { return d.values; })
+					    .x(function(d) { return d.name; })
+					    .y(function(d) { return d.value; });
+
+	var nest = d3.nest()
+	    .key(function(d) { return d.key; });
+
+	var layers = stack(nest.entries(formatData));
+	 // x.domain(d3.extent(data, function(d) { return d.date; }));
+	y.domain([0, d3.max(formatData, function(d) { return d.y0 + d.y; })]);
+	var colorList = Frost.Util.getColorList(this.getData(), layers.length);
+	this._groupContainer.selectAll(".frost_stackArea")
+				      	.data(layers)
+				    	.enter().append("path")
+			        	.attr("class", "frost_stackArea")
+				        .attr("d", function(d) { return area(d.values); })
+				        .style("fill", function(d, i) { return colorList[i]; });
+	return this;
 };
 
 Frost.StackArea = StackArea;
+Frost.namespace("Frost.Line");
+
+function Line(cfg) {
+	this.color = cfg.color;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.data = cfg.data;
+	this.height = cfg.height;
+	this.width = cfg.width;
+	this._seriesName = cfg.seriesName;
+	this.isXLinear = cfg.isXLinear || false;
+	this.lineType = cfg.lineType || "linear";
+}
+Line.prototype.getHeight = function() {
+	return this.height;
+};
+
+Line.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+Line.prototype.getWidth = function() {
+	return this.width;
+};
+
+Line.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+Line.prototype.getContainer = function() {
+	return this._container;
+};
+
+Line.prototype.setContainer = function(data) {
+	this._container = data;
+};
+Line.prototype.getParent = function() {
+	return this._parent;
+};
+Line.prototype.getColor = function() {
+	return this.color;
+};
+Line.prototype.getData = function() {
+	return this.data;
+};
+Line.prototype.getGroupContainer = function() {
+	return this._groupContainer;
+};
+Line.prototype.getSeriesName = function() {
+	return this._seriesName;
+};
+
+Line.prototype.render = function() {
+	var x = this.getParent().getXScale();
+	var y = this.getParent().getYScale();
+	if(this.isXLinear == true) {
+		x = d3.scale.linear().range([0, this.getWidth()])
+	    x.domain([0,this.getParent().getNameDomain().length - 1]);
+	    this.getParent().setXScale(x);
+	    var line = d3.svg.line()
+				    	 .x(function(d, i) { return x(i); })
+				    	 .y(function(d) { return y(d.value); });
+	} else {
+		var line = d3.svg.line()
+			     .x(function(d, i) { 
+			     	console.log(x(d.name) + x.rangeBand() / 2);
+			     	return x(d.name) + x.rangeBand() / 2; })
+			     .y(function(d) { return y(d.value); });
+	}
+	line.interpolate(this.lineType);
+	this._groupContainer = this._container.append("g");
+    this._groupContainer.append("path")
+					    .datum(this.getData())
+					    .attr("class", "frost_line")
+					    .attr("d", line)
+					    .style("stroke", this.getColor());
+};
+
+Frost.Line = Line;
 Frost.namespace("Frost.XAxis");
 
 function XAxis(cfg) {
@@ -657,7 +820,6 @@ Util.getValue = function(name, data) {
 	return result;
 };
 Util.formatDataForGroupBar = function(series) {
-	// 根据name找到其相对应的值
 	var objList = [];
 	var seriesName = this.getNameDomain(series);
 	for(var i = 0; i != seriesName.length; i++) {
@@ -711,6 +873,20 @@ Util.formatDataForStackBar = function(series, type) {
 				obj["data"].push(tempObj);
 			}
 			obj["total"] = start;
+			objList.push(obj);
+		}
+	}
+	return objList;
+};
+
+Util.formatDataForStackArea = function(series) {
+	var objList = [];
+	for(var i = 0; i != series.length; i++) {
+		for(var j = 0; j != series[i].data.length; j++) {
+			var obj = {};
+			obj["key"] = series[i].name;
+			obj["name"] = series[i].data[j].name;
+			obj["value"] = series[i].data[j].value;
 			objList.push(obj);
 		}
 	}
@@ -988,22 +1164,40 @@ Graph.prototype.render = function() {
 					parent: this,
 					color: this.getColorList()[0],
 					seriesName: seriesName,
-					type: this.getCfg().areaType
+					isXLinear: this.getCfg().isXLinear,
+					lineType: this.getCfg().lineType
+				}).render());
+			} else if (this.getSeries().length > 1) {
+				this.chartObject.push(new Frost.StackArea({
+						width: actaulWidth, 
+						height: actualHeight,
+						data: this.getSeries(), 
+						container: this._container, 
+						parent: this,
+						seriesName: seriesName,
+						colorList: this.getColorList(),
+						isXLinear: this.getCfg().isXLinear,
+						lineType: this.getCfg().lineType
+					}).render());
+			}
+			break;
+		case "line":
+			if(this.getSeries().length == 1) {
+				this.chartObject.push(new Frost.Line({
+					width: actaulWidth, 
+					height: actualHeight, 
+					data: this.getSeries()[0].data, 
+					container: this._container, 
+					parent: this,
+					color: this.getColorList()[0],
+					seriesName: seriesName,
+					isXLinear: this.getCfg().isXLinear,
+					lineType: this.getCfg().lineType
 				}).render());
 			} else if (this.getSeries().length > 1) {
 
 			}
 			break;
-// 		case "line":
-// 			this.chartObject.push(new Frost.Lines({
-// 				x: this.getWidth(), 
-// 				y: this.getHeight(), 
-// 				data: this.getSeries()[i].data, 
-// 				container: this.container, 
-// 				parent: this,
-// 				color: this.getSeries()[i].color
-// 			}).render());
-// 			break;
 		default: 
 			break;
 	}

@@ -32,3 +32,7 @@
 .frost_xAxis path{
   display: none;
 }
+.frost_line {
+  fill: none;
+  stroke-width: 1.5px;
+}

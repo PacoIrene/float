@@ -8,7 +8,8 @@ function Area(cfg) {
 	this.height = cfg.height;
 	this.width = cfg.width;
 	this._seriesName = cfg.seriesName;
-	this.type = cfg.type || 1;
+	this.isXLinear = cfg.isXLinear || true;
+	this.lineType = cfg.lineType || "linear";
 }
 Area.prototype.getHeight = function() {
 	return this.height;
@@ -47,32 +48,34 @@ Area.prototype.getGroupContainer = function() {
 Area.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
+Area.prototype.getIsStright = function() {
+	return this.isStright;
+};
 Area.prototype.render = function() {
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
 	var height = this.getHeight();
 	this._groupContainer = this._container.append("g");
-	if(this.type == 1) {
+	if(this.isXLinear == true) {
 		x = d3.scale.linear().range([0, this.getWidth()])
-	    x.domain([0,this.getParent().getNameDomain().length]);
+	    x.domain([0,this.getParent().getNameDomain().length - 1]);
 	    this.getParent().setXScale(x);
 	    var area = d3.svg.area()
 			     .x(function(d, i) { 
 			     	return x(i); 
 			     })
 			     .y0(height)
-			     .y1(function(d) { return y(d.value); })
-			     .interpolate("basis");
+			     .y1(function(d) { return y(d.value); });
 	} else {
 		var area = d3.svg.area()
 			     .x(function(d, i) { 
 			     	return x(d.name) + x.rangeBand() / 2; 
 			     })
 			     .y0(height)
-			     .y1(function(d) { return y(d.value); })
-			     .interpolate("basis");
+			     .y1(function(d) { return y(d.value); });
 	}
-			     // .interpolate("basis");
+	area.interpolate(this.lineType);
+			     // 
     this._groupContainer.append("path")
 				        .datum(this.getData())
 				        .attr("class", "frost_area")

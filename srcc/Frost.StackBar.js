@@ -80,6 +80,7 @@ StackBar.prototype.render = function() {
 		     .attr("y", function(d) { return y(d.y1); })
 		     .attr("height", function(d) { return y(d.y0) - y(d.y1); })
 		     .style("fill", function(d, i) { return colorList[i]; });
+	return this;
 };
 
 Frost.StackBar = StackBar;
