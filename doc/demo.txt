@@ -27,6 +27,9 @@ stackArea:
 http://bl.ocks.org/mbostock/3020685
 http://bl.ocks.org/mbostock/3885211
 
+mouseover:
+http://bl.ocks.org/mbostock/3902569
+
 transion:
 http://bl.ocks.org/mbostock/1256572
 http://bl.ocks.org/mbostock/1642874
@@ -35,3 +38,48 @@ http://bl.ocks.org/mbostock/1642989
 focus+brush
 http://bl.ocks.org/mbostock/1667367
 http://bl.ocks.org/mbostock/4349509
+
+scatter:
+http://bl.ocks.org/mbostock/3213173
+http://bl.ocks.org/mbostock/4063663
+http://bl.ocks.org/mbostock/3887118
+
+pie:
+http://bl.ocks.org/mbostock/3887235
+http://bl.ocks.org/mbostock/1346395
+http://bl.ocks.org/mbostock/1346410
+http://bl.ocks.org/mbostock/3888852
+http://bl.ocks.org/mbostock/3887193
+http://bl.ocks.org/mbostock/4341574
+http://bl.ocks.org/mbostock/4341417
+http://bl.ocks.org/mbostock/4063423
+http://bl.ocks.org/mbostock/5944371
+http://bl.ocks.org/mbostock/5872848
+http://bl.ocks.org/mbostock/5682158
+http://bl.ocks.org/mbostock/5681974
+http://bl.ocks.org/mbostock/5681842
+
+pie multiple:
+http://bl.ocks.org/mbostock/1305337
+http://bl.ocks.org/mbostock/1305111
+
+force layout:
+http://bl.ocks.org/mbostock/1804919
+http://bl.ocks.org/mbostock/1804889
+http://bl.ocks.org/mbostock/1748247
+http://bl.ocks.org/mbostock/7881887
+http://bl.ocks.org/mbostock/7882658
+
+collision:
+http://bl.ocks.org/mbostock/3231298
+
+drag:
+http://bl.ocks.org/mbostock/9631744
+http://bl.ocks.org/mbostock/9669633
+
+circle in circle:
+http://bl.ocks.org/mbostock/4063530
+http://bl.ocks.org/mbostock/7607535
+
+bubble:
+http://bl.ocks.org/mbostock/4063269

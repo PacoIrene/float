@@ -134,7 +134,7 @@ Frost.ColorConst = function(n) {
 	];
 	var returnColor = [];
 	for(var i = 0; i != n; i++) {
-		returnColor.push(constColor[i%n]);
+		returnColor.push(constColor[i%constColor.length]);
 	}
 	return returnColor;
 	// if(n >= constColor.length) {
@@ -323,11 +323,11 @@ Legend.prototype.getXSpace = function() {
 };
 Legend.prototype.show = function() {
 	this._isShow = true;
-	this._containerSVGNode.style("display", "block");
+	this._container.style("display", "block");
 };
 Legend.prototype.hide = function() {
 	this._isShow = false;
-	this._containerSVGNode.style("display", "none");
+	this._container.style("display", "none");
 };
 Legend.prototype.render = function() {
 	var color = d3.scale.ordinal()
@@ -354,11 +354,11 @@ Legend.prototype.render = function() {
 	      .style("text-anchor", "end")
 	      .text(function(d) { return d; });
 	var boundingRect = document.querySelector(".frost_legend").getBoundingClientRect();
-	this._containerSVGNode.attr("width", 100)
+	this._containerSVGNode.attr("width", 120)
 				   		.attr("height", boundingRect.height);
 	this._container.style("top",20 + "px")
 					.style("left",(this.getXSpace() - 100 )+ "px")
-					.style("width", "100px")
+					.style("width", "120px")
 					.style("height", boundingRect.height + "px");
 	this._bindUI();
 	return this;
@@ -476,7 +476,7 @@ function Area(cfg) {
 	this.height = cfg.height;
 	this.width = cfg.width;
 	this._seriesName = cfg.seriesName;
-	this.isXLinear = cfg.isXLinear || true;
+	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
 }
 Area.prototype.getHeight = function() {
@@ -799,6 +799,85 @@ Lines.prototype.render = function() {
 };
 
 Frost.Lines = Lines;
+Frost.namespace("Frost.Pie");
+
+function Pie(cfg) {
+	this.height = cfg.height;
+	this.width = cfg.width;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.data = cfg.data;
+	this.colorList = cfg.colorList;
+	this._seriesName = cfg.seriesName;
+}
+Pie.prototype.getType = function() {
+	return this.type;
+};
+Pie.prototype.getHeight = function() {
+	return this.height;
+};
+
+Pie.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+Pie.prototype.getWidth = function() {
+	return this.width;
+};
+
+Pie.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+Pie.prototype.getContainer = function() {
+	return this._container;
+};
+Pie.prototype.setContainer = function(data) {
+	this._container = data;
+};
+Pie.prototype.getParent = function() {
+	return this._parent;
+};
+Pie.prototype.getData = function() {
+	return this.data;
+};
+Pie.prototype.getColorList = function() {
+	return this.colorList;
+};
+Pie.prototype.getSeriesName = function() {
+	return this._seriesName;
+};
+Pie.prototype.render = function() {
+	var width = this.getWidth();
+	var height = this.getHeight();
+	var radius = Math.min(width, height) / 2;
+	var colorList = this.getColorList();
+	this._groupContainer = this._container.append("g")
+										  .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+	var arc = d3.svg.arc()
+				    .outerRadius(radius - 10)
+				    .innerRadius(0);
+
+	var pie = d3.layout.pie()
+			    .sort(null)
+			    .value(function(d) { return d.value; });
+	var g = this._groupContainer.selectAll(".frost_pie")
+			      				.data(pie(this.getData()))
+			    				.enter().append("g")
+			      				.attr("class", "frost_pie");
+
+	g.append("path").attr("d", arc)
+	      			.style("fill", function(d, i) { return colorList[i]; });
+
+	g.append("text")
+	 .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+	 .attr("dy", ".35em")
+	 .style("text-anchor", "middle")
+	 .text(function(d) { 
+	 	return d.data.name; 
+	 });
+};
+
+Frost.Pie = Pie;
 Frost.namespace("Frost.XAxis");
 
 function XAxis(cfg) {
@@ -1229,8 +1308,6 @@ Graph.prototype.render = function() {
 			
 			break;
 		case "area":
-		// this.xScale = d3.scale.ordinal()
-  //   			 		  .rangeRoundBands([0, actaulWidth],.001);
 			if(this.getSeries().length == 1) {
 				this.chartObject.push(new Frost.Area({
 					width: actaulWidth, 
@@ -1270,6 +1347,22 @@ Graph.prototype.render = function() {
 				lineType: this.getCfg().lineType
 			}).render());
 			break;
+		case "pie":
+			if(this.getSeries().length == 1) {
+				this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries()[0].data.length);
+				this.setLegendName(this.getNameDomain());
+				this.chartObject.push(new Frost.Pie({
+					width: actaulWidth, 
+					height: actualHeight,
+					data: this.getSeries()[0].data, 
+					container: this._container, 
+					parent: this,
+					seriesName: seriesName,
+					colorList: this.getColorList()
+				}).render());
+			} else {
+
+			}
 		default: 
 			break;
 	}

@@ -206,8 +206,6 @@ Graph.prototype.render = function() {
 			
 			break;
 		case "area":
-		// this.xScale = d3.scale.ordinal()
-  //   			 		  .rangeRoundBands([0, actaulWidth],.001);
 			if(this.getSeries().length == 1) {
 				this.chartObject.push(new Frost.Area({
 					width: actaulWidth, 
@@ -247,6 +245,22 @@ Graph.prototype.render = function() {
 				lineType: this.getCfg().lineType
 			}).render());
 			break;
+		case "pie":
+			if(this.getSeries().length == 1) {
+				this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries()[0].data.length);
+				this.setLegendName(this.getNameDomain());
+				this.chartObject.push(new Frost.Pie({
+					width: actaulWidth, 
+					height: actualHeight,
+					data: this.getSeries()[0].data, 
+					container: this._container, 
+					parent: this,
+					seriesName: seriesName,
+					colorList: this.getColorList()
+				}).render());
+			} else {
+
+			}
 		default: 
 			break;
 	}

@@ -19,7 +19,7 @@ Frost.ColorConst = function(n) {
 	];
 	var returnColor = [];
 	for(var i = 0; i != n; i++) {
-		returnColor.push(constColor[i%n]);
+		returnColor.push(constColor[i%constColor.length]);
 	}
 	return returnColor;
 	// if(n >= constColor.length) {

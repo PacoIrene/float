@@ -8,7 +8,7 @@ function Area(cfg) {
 	this.height = cfg.height;
 	this.width = cfg.width;
 	this._seriesName = cfg.seriesName;
-	this.isXLinear = cfg.isXLinear || true;
+	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
 }
 Area.prototype.getHeight = function() {

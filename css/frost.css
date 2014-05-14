@@ -13,11 +13,14 @@
 .frost_legendRootNode {
 	position: absolute;
 	cursor: pointer;
+	/*max-height: 200px;*/
+	/*overflow-y: scroll;*/
+	/*max-width: 180px;*/
+	/*overflow-x: hidden;*/
 }
 .frost_axis text, .frost_legend_single text {
   font: 10px sans-serif;
 }
-
 .frost_axis path,
 .frost_axis line {
   fill: none;
@@ -35,4 +38,7 @@
 .frost_line {
   fill: none;
   stroke-width: 1.5px;
+}
+.frost_pie text {
+	font: 10px Helvetica,Arial,sans-serif;
 }
