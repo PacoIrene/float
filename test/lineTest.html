@@ -10,6 +10,7 @@
 		<script type="text/javascript" src="../lib/d3.v3.min.js"></script>
 		<script type="text/javascript" src="../build/frost.js" charset="utf-8"></script>
 		<script type="text/javascript">
+		
 			var frost = new Frost.Graph({
 				element: "#node",
 				width: 500,
@@ -19,7 +20,7 @@
 				isXLinear: false,
 				series: [
 				{
-					color: "steelblue",
+					// color: "steelblue",
 					data: [
 						{x: 0, value: 10,name: "王伟"},
 						{x: 1, value: 13,name: "李卫"}, 
@@ -29,8 +30,30 @@
 					],
 					name: "Country"
 				},
+				{
+					// color: "steelblue",
+					data: [
+						{x: 0, value: 11,name: "王伟"},
+						{x: 1, value: 21,name: "李卫"}, 
+						{x: 2, value: 32,name: "孙伟"},
+	 					{x: 3, value: 42,name: "张伟"},
+						{x: 4, value: 2,name: "李麻痹"},
+					],
+					name: "Village"
+				},
+				{
+					// color: "steelblue",
+					data: [
+						{x: 0, value: 22,name: "王伟"},
+						{x: 1, value: 13,name: "李卫"}, 
+						{x: 2, value: 33,name: "孙伟"},
+	 					{x: 3, value: 40,name: "张伟"},
+						{x: 4, value: 22,name: "李麻痹"},
+					],
+					name: "Luka"
+				},
 				// {
-				// 	color: "green",
+				// 	// color: "green",
 				// 	data: [
 				// 		{x: 0, value: 6,name: "王伟"},
 				// 		{x: 1, value: 20,name: "李卫"}, 

@@ -50,12 +50,12 @@ Line.prototype.getSeriesName = function() {
 };
 
 Line.prototype.render = function() {
-	var x = this.getParent().getXScale();
-	var y = this.getParent().getYScale();
+	var x = this.getParent().getParent().getXScale();
+	var y = this.getParent().getParent().getYScale();
 	if(this.isXLinear == true) {
 		x = d3.scale.linear().range([0, this.getWidth()])
-	    x.domain([0,this.getParent().getNameDomain().length - 1]);
-	    this.getParent().setXScale(x);
+	    x.domain([0,this.getParent().getParent().getNameDomain().length - 1]);
+	    this.getParent().getParent().setXScale(x);
 	    var line = d3.svg.line()
 				    	 .x(function(d, i) { return x(i); })
 				    	 .y(function(d) { return y(d.value); });

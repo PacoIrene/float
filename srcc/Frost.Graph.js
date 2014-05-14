@@ -235,21 +235,17 @@ Graph.prototype.render = function() {
 			}
 			break;
 		case "line":
-			if(this.getSeries().length == 1) {
-				this.chartObject.push(new Frost.Line({
-					width: actaulWidth, 
-					height: actualHeight, 
-					data: this.getSeries()[0].data, 
-					container: this._container, 
-					parent: this,
-					color: this.getColorList()[0],
-					seriesName: seriesName,
-					isXLinear: this.getCfg().isXLinear,
-					lineType: this.getCfg().lineType
-				}).render());
-			} else if (this.getSeries().length > 1) {
-
-			}
+			this.chartObject.push(new Frost.Lines({
+				width: actaulWidth, 
+				height: actualHeight, 
+				data: this.getSeries(), 
+				container: this._container, 
+				parent: this,
+				colorList: this.getColorList(),
+				seriesName: seriesName,
+				isXLinear: this.getCfg().isXLinear,
+				lineType: this.getCfg().lineType
+			}).render());
 			break;
 		default: 
 			break;

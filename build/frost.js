@@ -697,12 +697,12 @@ Line.prototype.getSeriesName = function() {
 };
 
 Line.prototype.render = function() {
-	var x = this.getParent().getXScale();
-	var y = this.getParent().getYScale();
+	var x = this.getParent().getParent().getXScale();
+	var y = this.getParent().getParent().getYScale();
 	if(this.isXLinear == true) {
 		x = d3.scale.linear().range([0, this.getWidth()])
-	    x.domain([0,this.getParent().getNameDomain().length - 1]);
-	    this.getParent().setXScale(x);
+	    x.domain([0,this.getParent().getParent().getNameDomain().length - 1]);
+	    this.getParent().getParent().setXScale(x);
 	    var line = d3.svg.line()
 				    	 .x(function(d, i) { return x(i); })
 				    	 .y(function(d) { return y(d.value); });
@@ -723,6 +723,82 @@ Line.prototype.render = function() {
 };
 
 Frost.Line = Line;
+Frost.namespace("Frost.Lines");
+
+function Lines(cfg) {
+	this.height = cfg.height;
+	this.width = cfg.width;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.data = cfg.data;
+	this.colorList = cfg.colorList;
+	this._seriesName = cfg.seriesName;
+	this.isXLinear = cfg.isXLinear || false;
+	this.lineType = cfg.lineType || "linear";
+	this._lineList = [];
+}
+Lines.prototype.getType = function() {
+	return this.type;
+};
+Lines.prototype.getHeight = function() {
+	return this.height;
+};
+
+Lines.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+Lines.prototype.getWidth = function() {
+	return this.width;
+};
+
+Lines.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+Lines.prototype.getContainer = function() {
+	return this._container;
+};
+Lines.prototype.setContainer = function(data) {
+	this._container = data;
+};
+Lines.prototype.getParent = function() {
+	return this._parent;
+};
+Lines.prototype.getData = function() {
+	return this.data;
+};
+Lines.prototype.getColorList = function() {
+	return this.colorList;
+};
+Lines.prototype.getSeriesName = function() {
+	return this._seriesName;
+};
+Lines.prototype.getLineList = function() {
+	return this._lineList;
+};
+Lines.prototype.getChildrenContainer = function() {
+	return this.childrenContainer;
+};
+Lines.prototype.render = function() {
+	this.childrenContainer = this._container.append("g")
+											.attr("class", "forst_linesContainer");
+	for(var i = 0; i != this.getData().length; i++) {
+		this._lineList.push(new Frost.Line({
+					width: this.getWidth(), 
+					height: this.getHeight(), 
+					data: this.getData()[i].data, 
+					container: this.childrenContainer, 
+					parent: this,
+					color: this.getColorList()[i],
+					seriesName: this.getSeriesName(),
+					isXLinear: this.isXLinear,
+					lineType: this.lineType
+				}).render());
+	}
+	return this;
+};
+
+Frost.Lines = Lines;
 Frost.namespace("Frost.XAxis");
 
 function XAxis(cfg) {
@@ -1182,21 +1258,17 @@ Graph.prototype.render = function() {
 			}
 			break;
 		case "line":
-			if(this.getSeries().length == 1) {
-				this.chartObject.push(new Frost.Line({
-					width: actaulWidth, 
-					height: actualHeight, 
-					data: this.getSeries()[0].data, 
-					container: this._container, 
-					parent: this,
-					color: this.getColorList()[0],
-					seriesName: seriesName,
-					isXLinear: this.getCfg().isXLinear,
-					lineType: this.getCfg().lineType
-				}).render());
-			} else if (this.getSeries().length > 1) {
-
-			}
+			this.chartObject.push(new Frost.Lines({
+				width: actaulWidth, 
+				height: actualHeight, 
+				data: this.getSeries(), 
+				container: this._container, 
+				parent: this,
+				colorList: this.getColorList(),
+				seriesName: seriesName,
+				isXLinear: this.getCfg().isXLinear,
+				lineType: this.getCfg().lineType
+			}).render());
 			break;
 		default: 
 			break;

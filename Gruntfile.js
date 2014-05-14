@@ -28,7 +28,7 @@ module.exports = function(grunt) {
 				'srcc/Frost.SingleBar.js', 'srcc/Frost.GroupBar.js',
 				'srcc/Frost.Legend.js', 'srcc/Frost.StackBar.js',
 				'srcc/Frost.Area.js', 'srcc/Frost.StackArea.js',
-				'srcc/Frost.Line.js',
+				'srcc/Frost.Line.js', 'srcc/Frost.Lines.js',
 				'srcc/Frost.XAxis.js','srcc/Frost.Util.js',  
 				'srcc/Frost.YAxis.js',  'srcc/Frost.Graph.js'],
 				dest: 'build/frost.js'
