@@ -878,6 +878,87 @@ Pie.prototype.render = function() {
 };
 
 Frost.Pie = Pie;
+Frost.namespace("Frost.Bubble");
+
+function Bubble(cfg) {
+this.height = cfg.height;
+	this.width = cfg.width;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.data = cfg.data;
+	this.colorList = cfg.colorList;
+	this._seriesName = cfg.seriesName;
+}
+Bubble.prototype.getType = function() {
+	return this.type;
+};
+Bubble.prototype.getHeight = function() {
+	return this.height;
+};
+
+Bubble.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+Bubble.prototype.getWidth = function() {
+	return this.width;
+};
+
+Bubble.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+Bubble.prototype.getContainer = function() {
+	return this._container;
+};
+Bubble.prototype.setContainer = function(data) {
+	this._container = data;
+};
+Bubble.prototype.getParent = function() {
+	return this._parent;
+};
+Bubble.prototype.getData = function() {
+	return this.data;
+};
+Bubble.prototype.getColorList = function() {
+	return this.colorList;
+};
+Bubble.prototype.getSeriesName = function() {
+	return this._seriesName;
+};
+Bubble.prototype.render = function() {
+	var width = this.getWidth();
+	var height = this.getHeight();
+	var colorList = Frost.Util.getColorListForBubble(this.getData(), this.getData().length);
+	var legendColor = []
+	var bubble = d3.layout.pack()
+	    .sort(null)
+	    .size([width, height])
+	    .padding(1.5);
+	this._groupContainer = this._container.append("g").attr("class", "frost_bubble");
+	var formatData = Frost.Util.formatDataForBubble(this.getData());
+	var node = this._groupContainer.selectAll(".forst_bubble_node")
+      			  .data(bubble.nodes(formatData)
+      			  .filter(function(d) { return !d.children; }))
+    			  .enter().append("g")
+      			  .attr("class", "forst_bubble_node")
+      			  .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+ 	node.append("title")
+      	.text(function(d) { return d.name + ": " + d.value});
+
+  	node.append("circle")
+      	.attr("r", function(d) { return d.r; })
+      	.style("fill", function(d, i) { legendColor.push(colorList[d.package]); return colorList[d.package]; });
+
+  	node.append("text")
+      	.attr("dy", ".3em")
+      	.style("text-anchor", "middle")
+      	.text(function(d) { return d.name.substring(0, d.r / 3);});
+    this.getParent().setColorList(Frost.Util.filterSome(legendColor));
+    return this;
+};
+
+Frost.Bubble = Bubble;
 Frost.namespace("Frost.XAxis");
 
 function XAxis(cfg) {
@@ -956,13 +1037,27 @@ Util.getSeriesName = function(series) {
 Util.getColorList = function(series, length) {
 	if(series[0].color) {
 		var list = [];
-		for(var i = 0; i != series.length; i++) {
+ 		for(var i = 0; i != series.length; i++) {
 			list.push(series[i].color);
-		}
-		return list;
+ 		}
+ 		return list;
 	} else {
 		return Frost.ColorConst(length);
 	}
+};
+Util.getColorListForBubble = function(series, length) {
+	var list = {};
+	if(series[0].color) {
+		for(var i = 0; i != series.length; i++) {
+			list[series[i].name] = series[i].color;
+		}
+	} else {
+		var colors = Frost.ColorConst(length);
+		for(var i = 0; i != series.length; i++) {
+			list[series[i].name] = colors[i];
+		}
+	}
+	return list;
 };
 Util.getValue = function(name, data) {
 	var result = 0;
@@ -1046,6 +1141,30 @@ Util.formatDataForStackArea = function(series) {
 		}
 	}
 	return objList;
+};
+Util.formatDataForBubble = function(series) {
+	var objList = {children: []};
+	for(var i = 0; i != series.length; i++) {
+		for(var j = 0; j != series[i].data.length; j++) {
+			var obj = {};
+			obj["package"] = series[i].name;
+			obj["name"] = series[i].data[j].name;
+			obj["value"] = series[i].data[j].value;
+			objList.children.push(obj);
+		}
+	}
+	return objList;
+};
+Util.filterSome = function(array) {
+	var temp = {};
+	var returnArray = [];
+	for(var i = 0; i != array.length; i++) {
+		if(temp[array[i]] != 1) {
+			temp[array[i]] = 1;
+			returnArray.push(array[i]);
+		}
+	}
+	return returnArray;
 };
 
 Frost.Util = Util;
@@ -1363,6 +1482,18 @@ Graph.prototype.render = function() {
 			} else {
 
 			}
+		case "bubble":
+			this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries().length);
+			this.setLegendName(seriesName);
+			this.chartObject.push(new Frost.Bubble({
+				width: actaulWidth, 
+				height: actualHeight,
+				data: this.getSeries(), 
+				container: this._container, 
+				parent: this,
+				seriesName: seriesName,
+				colorList: this.getColorList()
+			}).render());
 		default: 
 			break;
 	}

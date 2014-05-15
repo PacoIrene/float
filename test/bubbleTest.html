@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>关于我爱你</title>
+		<link rel="stylesheet" type="text/css" href="../css/frost.css">
+	</head>
+	<body>
+		<div id="node"></div>
+		<script type="text/javascript" src="../lib/d3.v3.min.js"></script>
+		<script type="text/javascript" src="../build/frost.js" charset="utf-8"></script>
+		<script type="text/javascript">
+		// var dataList = [];
+		// for(var i = 0; i !=200; i++) {
+		// 	var obj = {};
+		// 	obj["name"] = Math.random();
+		// 	obj["value"] = Math.random()*10+20;
+		// 	dataList.push(obj);
+		// }
+		// for(var i = 0; i !=200; i++) {
+		// 	var obj = {};
+		// 	obj["name"] = Math.random();
+		// 	obj["value"] = Math.random()*10+20;
+		// 	dataList.push(obj);
+		// }
+		// for(var i = 0; i !=200; i++) {
+		// 	var obj = {};
+		// 	obj["name"] = Math.random();
+		// 	obj["value"] = Math.random()*10+30;
+		// 	dataList.push(obj);
+		// }
+		// for(var i = 0; i !=200; i++) {
+		// 	var obj = {};
+		// 	obj["name"] = Math.random();
+		// 	obj["value"] = Math.random()*10+45;
+		// 	dataList.push(obj);
+		// }
+		// for(var i = 0; i !=200; i++) {
+		// 	var obj = {};
+		// 	obj["name"] = Math.random();
+		// 	obj["value"] = Math.random()*10+50;
+		// 	dataList.push(obj);
+		// }
+		// for(var i = 0; i !=4000; i++) {
+		// 	var obj = {};
+		// 	obj["name"] = Math.random();
+		// 	obj["value"] = Math.random()*10+55;
+		// 	dataList.push(obj);
+		// }
+			var frost = new Frost.Graph({
+				element: "#node",
+				width: 960,
+				height: 500,
+				type: "bubble",
+				series: [
+				{
+					// color: "#9ecae1",
+					data: [
+						{name: "a1", value: 1},
+						{name: "b1", value: 2},
+						{name: "c1", value: 3},
+						{name: "d1", value: 4}
+					],
+					// data: dataList,
+					name: "Group1"
+				},
+				{
+					// color: "#6bafd6",
+					data: [
+						{name: "a2", value: 2},
+						{name: "b2", value: 4},
+						{name: "c2", value: 6},
+						{name: "d2", value: 8}
+					],
+					// data: dataList,
+					name: "Group2"
+				},
+				{
+					// color: "#3283bd",
+					data: [
+						{name: "a3", value: 3},
+						{name: "b3", value: 6},
+						{name: "c3", value: 9},
+						{name: "d3", value: 12}
+					],
+					// data: dataList,
+					name: "Group3"
+				}],
+				xAxis: false,
+				yAxis: false,
+				legend: true
+			});
+			frost.render();
+		</script>
+	</body>
+</html>

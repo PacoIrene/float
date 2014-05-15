@@ -261,6 +261,18 @@ Graph.prototype.render = function() {
 			} else {
 
 			}
+		case "bubble":
+			this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries().length);
+			this.setLegendName(seriesName);
+			this.chartObject.push(new Frost.Bubble({
+				width: actaulWidth, 
+				height: actualHeight,
+				data: this.getSeries(), 
+				container: this._container, 
+				parent: this,
+				seriesName: seriesName,
+				colorList: this.getColorList()
+			}).render());
 		default: 
 			break;
 	}

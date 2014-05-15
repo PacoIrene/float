@@ -35,13 +35,27 @@ Util.getSeriesName = function(series) {
 Util.getColorList = function(series, length) {
 	if(series[0].color) {
 		var list = [];
-		for(var i = 0; i != series.length; i++) {
+ 		for(var i = 0; i != series.length; i++) {
 			list.push(series[i].color);
-		}
-		return list;
+ 		}
+ 		return list;
 	} else {
 		return Frost.ColorConst(length);
 	}
+};
+Util.getColorListForBubble = function(series, length) {
+	var list = {};
+	if(series[0].color) {
+		for(var i = 0; i != series.length; i++) {
+			list[series[i].name] = series[i].color;
+		}
+	} else {
+		var colors = Frost.ColorConst(length);
+		for(var i = 0; i != series.length; i++) {
+			list[series[i].name] = colors[i];
+		}
+	}
+	return list;
 };
 Util.getValue = function(name, data) {
 	var result = 0;
@@ -125,6 +139,30 @@ Util.formatDataForStackArea = function(series) {
 		}
 	}
 	return objList;
+};
+Util.formatDataForBubble = function(series) {
+	var objList = {children: []};
+	for(var i = 0; i != series.length; i++) {
+		for(var j = 0; j != series[i].data.length; j++) {
+			var obj = {};
+			obj["package"] = series[i].name;
+			obj["name"] = series[i].data[j].name;
+			obj["value"] = series[i].data[j].value;
+			objList.children.push(obj);
+		}
+	}
+	return objList;
+};
+Util.filterSome = function(array) {
+	var temp = {};
+	var returnArray = [];
+	for(var i = 0; i != array.length; i++) {
+		if(temp[array[i]] != 1) {
+			temp[array[i]] = 1;
+			returnArray.push(array[i]);
+		}
+	}
+	return returnArray;
 };
 
 Frost.Util = Util;
