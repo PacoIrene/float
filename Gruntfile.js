@@ -33,7 +33,8 @@ module.exports = function(grunt) {
 				'src/Frost.Area.js', 'src/Frost.StackArea.js',
 				'src/Frost.Line.js', 'src/Frost.Lines.js',
 				'src/Frost.Pie.js', 'src/Frost.Bubble.js',
-				'src/Frost.Force.js',
+				'src/Frost.Arc.js',
+				'src/Frost.Force.js', 'src/Frost.Detail.js',
 				'src/Frost.XAxis.js','src/Frost.Util.js',  
 				'src/Frost.YAxis.js',  'src/Frost.Graph.js'],
 				dest: 'build/frost.js'

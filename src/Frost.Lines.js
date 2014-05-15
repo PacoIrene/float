@@ -11,6 +11,7 @@ function Lines(cfg) {
 	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
 	this._lineList = [];
+	this.detail = cfg.detail;
 }
 Lines.prototype.getType = function() {
 	return this.type;

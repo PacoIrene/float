@@ -6,6 +6,7 @@ function Legend (cfg) {
 	this._colorList = cfg.colorList;
 	this.xSpace = cfg.xSpace;
 	this._isShow = true;
+	this.detail = cfg.detail;
 }
 
 Legend.prototype.getParent = function() {

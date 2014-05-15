@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8"/>
-		<title>Single Area</title>
+		<title>Arc</title>
 		<link rel="stylesheet" type="text/css" href="../css/frost.css">
 	</head>
 	<body>
@@ -49,14 +49,11 @@
 		}
 			var frost = new Frost.Graph({
 				element: "#node",
-				width: 1200,
+				width: 500,
 				height: 300,
-				type: "area",
-				isXLinear: false,
-				lineType: "monotone",
+				type: "arc",
 				series: [
 				{
-					color: "steelblue",
 					data: [
 						{x: 0, value: 10,name: "王伟"},
 						{x: 1, value: 11,name: "李卫"}, 
@@ -84,9 +81,9 @@
 					// data: dataList,
 					name: "Country"
 				}],
-				xAxis: true,
-				yAxis: true,
-				legend: false
+				xAxis: false,
+				yAxis: false,
+				legend: true
 			});
 			frost.render();
 		</script>

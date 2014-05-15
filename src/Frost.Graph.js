@@ -153,7 +153,7 @@ Graph.prototype.render = function() {
 							.attr("height", this.getHeight());
 	this._container = svgNode.append("g")
     						.attr("transform", "translate(" + this.getLeftGap() + "," + this.getTopGap() + ")");
-	// this.detail = new Frost.Detail({container: rootNode}).render();
+	this.detail = new Frost.Detail({container: rootNode}).render();
 	this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries().length);
 	var actaulWidth = this.IsHasXAxis() ? (this.getWidth() - this.getLeftGap() - this.getRightGap()) : this.getWidth();
 	var actualHeight = this.IsHasYAxis() ? (this.getHeight() - this.getBottomGap() - this.getTopGap()) : this.getHeight();
@@ -176,7 +176,8 @@ Graph.prototype.render = function() {
 					data: this.getSeries()[0].data, 
 					container: this._container, 
 					parent: this,
-					color: this.getColorList()[0]
+					color: this.getColorList()[0],
+					detail: this.detail
 				}).render());
 			} else if (this.getSeries().length > 1) {
 				if(!this.IsStack()) {
@@ -188,7 +189,8 @@ Graph.prototype.render = function() {
 						parent: this,
 						seriesName: seriesName,
 						colorList: this.getColorList(),
-						type: this.getCfg().barType
+						type: this.getCfg().barType,
+						detail: this.detail
 					}).render());
 				} else {
 					this.chartObject.push(new Frost.StackBar({
@@ -199,7 +201,8 @@ Graph.prototype.render = function() {
 						parent: this,
 						seriesName: seriesName,
 						colorList: this.getColorList(),
-						type: this.getCfg().barType
+						type: this.getCfg().barType,
+						detail: this.detail
 					}).render());
 				}
 			}
@@ -216,7 +219,8 @@ Graph.prototype.render = function() {
 					color: this.getColorList()[0],
 					seriesName: seriesName,
 					isXLinear: this.getCfg().isXLinear,
-					lineType: this.getCfg().lineType
+					lineType: this.getCfg().lineType,
+					detail: this.detail
 				}).render());
 			} else if (this.getSeries().length > 1) {
 				this.chartObject.push(new Frost.StackArea({
@@ -228,7 +232,8 @@ Graph.prototype.render = function() {
 						seriesName: seriesName,
 						colorList: this.getColorList(),
 						isXLinear: this.getCfg().isXLinear,
-						lineType: this.getCfg().lineType
+						lineType: this.getCfg().lineType,
+						detail: this.detail
 					}).render());
 			}
 			break;
@@ -242,7 +247,8 @@ Graph.prototype.render = function() {
 				colorList: this.getColorList(),
 				seriesName: seriesName,
 				isXLinear: this.getCfg().isXLinear,
-				lineType: this.getCfg().lineType
+				lineType: this.getCfg().lineType,
+				detail: this.detail
 			}).render());
 			break;
 		case "pie":
@@ -256,7 +262,26 @@ Graph.prototype.render = function() {
 					container: this._container, 
 					parent: this,
 					seriesName: seriesName,
-					colorList: this.getColorList()
+					colorList: this.getColorList(),
+					detail: this.detail
+				}).render());
+			} else {
+
+			}
+			break;
+		case "arc":
+			if(this.getSeries().length == 1) {
+				this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries()[0].data.length);
+				this.setLegendName(this.getNameDomain());
+				this.chartObject.push(new Frost.Arc({
+					width: actaulWidth, 
+					height: actualHeight,
+					data: this.getSeries()[0].data, 
+					container: this._container, 
+					parent: this,
+					seriesName: seriesName,
+					colorList: this.getColorList(),
+					detail: this.detail
 				}).render());
 			} else {
 
@@ -272,7 +297,8 @@ Graph.prototype.render = function() {
 				container: this._container, 
 				parent: this,
 				seriesName: seriesName,
-				colorList: this.getColorList()
+				colorList: this.getColorList(),
+				detail: this.detail
 			}).render());
 			break;
 		case "force":
@@ -285,7 +311,8 @@ Graph.prototype.render = function() {
 				container: this._container, 
 				parent: this,
 				seriesName: seriesName,
-				colorList: this.getColorList()
+				colorList: this.getColorList(),
+				detail: this.detail
 			}).render());
 			break;
 		default: 

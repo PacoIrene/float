@@ -10,6 +10,7 @@ function Area(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
+	this.detail = cfg.detail;
 }
 Area.prototype.getHeight = function() {
 	return this.height;
@@ -81,7 +82,47 @@ Area.prototype.render = function() {
 				        .attr("class", "frost_area")
 				        .attr("d", area)
 				        .attr("fill", this.getColor());
+	this._bindUI();
 	return this;
+};
+Area.prototype._bindUI = function() {
+	var that = this;
+	var x = this.getParent().getXScale();
+	var y = this.getParent().getYScale();
+	console.log(x.rangeBand());
+	var width = this.getWidth();
+	var height = this.getHeight();
+	var nameDomain = this.getParent().getNameDomain();
+	console.log(nameDomain);
+	var data = this.getData();
+	this._groupContainer.append("rect")
+       .attr("class", "frost_overlay")
+       .attr("width", width)
+       .attr("height", height)
+       // .on("mouseover", function() {that.detail.show(); })
+       // .on("mouseout", function() { that.detail.hide();})
+       .on("mousemove", mousemove);
+    function mousemove() {
+    	var x0 = d3.mouse(this)[0] / x.rangeBand();
+    	var name = "";
+    	var value = "";
+		// console.log(x0);
+		console.log(d3.mouse(this)[0]);
+		if(x0.toString().length == 1) {
+			console.log(x0);
+			name = nameDomain[x0 - 1];
+			value = Frost.Util.getValue(name, data);
+		}
+		console.log(name+": " +value);
+	    // var x0 = x.invert(d3.mouse(this)[0]),
+	    //     i = bisectDate(data, x0, 1),
+	    //     d0 = data[i - 1],
+	    //     d1 = data[i],
+	    //     d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+	    // focus.attr("transform", "translate(" + x(d.date) + "," + y(d.close) + ")");
+	    // focus.select("text").text(formatCurrency(d.close));
+	    // that.detail.setContent({position: {x: 200, y:100},name: "",value: ""})
+    }
 };
 
 Frost.Area = Area;

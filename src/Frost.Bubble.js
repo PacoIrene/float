@@ -8,6 +8,7 @@ function Bubble(cfg) {
 	this.data = cfg.data;
 	this.colorList = cfg.colorList;
 	this._seriesName = cfg.seriesName;
+	this.detail = cfg.detail;
 }
 Bubble.prototype.getType = function() {
 	return this.type;

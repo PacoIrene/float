@@ -6,6 +6,7 @@ function SingleBar (cfg) {
 	this.data = cfg.data;
 	this.height = cfg.height;
 	this.width = cfg.width;
+	this.detail = cfg.detail;
 }
 
 SingleBar.prototype.getHeight = function() {

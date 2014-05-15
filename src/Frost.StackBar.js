@@ -9,6 +9,7 @@ function StackBar(cfg) {
 	this.colorList = cfg.colorList;
 	this._seriesName = cfg.seriesName;
 	this.type = cfg.type || 1;
+	this.detail = cfg.detail;
 }
 StackBar.prototype.getType = function() {
 	return this.type;

@@ -1,6 +1,6 @@
-Frost.namespace("Frost.Pie");
+Frost.namespace("Frost.Arc");
 
-function Pie(cfg) {
+function Arc(cfg) {
 	this.height = cfg.height;
 	this.width = cfg.width;
 	this._container = cfg.container;
@@ -10,43 +10,44 @@ function Pie(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.detail = cfg.detail;
 }
-Pie.prototype.getType = function() {
+Arc.prototype.getType = function() {
 	return this.type;
 };
-Pie.prototype.getHeight = function() {
+Arc.prototype.getHeight = function() {
 	return this.height;
 };
 
-Pie.prototype.setHeight = function(data) {
+Arc.prototype.setHeight = function(data) {
 	this.height = data;
 };
 
-Pie.prototype.getWidth = function() {
+Arc.prototype.getWidth = function() {
 	return this.width;
 };
 
-Pie.prototype.setWidth = function(data) {
+Arc.prototype.setWidth = function(data) {
 	this.Width = data;
 };
-Pie.prototype.getContainer = function() {
+Arc.prototype.getContainer = function() {
 	return this._container;
 };
-Pie.prototype.setContainer = function(data) {
+Arc.prototype.setContainer = function(data) {
 	this._container = data;
 };
-Pie.prototype.getParent = function() {
+Arc.prototype.getParent = function() {
 	return this._parent;
 };
-Pie.prototype.getData = function() {
+Arc.prototype.getData = function() {
 	return this.data;
 };
-Pie.prototype.getColorList = function() {
+Arc.prototype.getColorList = function() {
 	return this.colorList;
 };
-Pie.prototype.getSeriesName = function() {
+Arc.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
-Pie.prototype.render = function() {
+
+Arc.prototype.render = function() {
 	var width = this.getWidth();
 	var height = this.getHeight();
 	var radius = Math.min(width, height) / 2;
@@ -54,8 +55,8 @@ Pie.prototype.render = function() {
 	this._groupContainer = this._container.append("g")
 										  .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 	var arc = d3.svg.arc()
-				    .outerRadius(radius - 10)
-				    .innerRadius(0);
+				    .outerRadius(radius - 100)
+				    .innerRadius(radius - 20);
 
 	var pie = d3.layout.pie()
 			    .sort(null)
@@ -77,4 +78,4 @@ Pie.prototype.render = function() {
 	 });
 };
 
-Frost.Pie = Pie;
+Frost.Arc = Arc;

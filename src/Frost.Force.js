@@ -11,6 +11,7 @@ function Force(cfg) {
 	this.padding = 1.5, // separation between same-color nodes
     this.clusterPadding = 6, // separation between different-color nodes
 	this.maxRadius = Math.min(this.width, this.height) * 0.25 /2;
+	this.detail = cfg.detail;
 }
 Force.prototype.getType = function() {
 	return this.type;
