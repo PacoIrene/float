@@ -23,16 +23,19 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON("package.json"),
 		concat: {
+			options: {
+				banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+			}, 
 			domop: {
-				src:['srcc/Frost.js', 'srcc/Frost.ColorConst.js', 
-				'srcc/Frost.SingleBar.js', 'srcc/Frost.GroupBar.js',
-				'srcc/Frost.Legend.js', 'srcc/Frost.StackBar.js',
-				'srcc/Frost.Area.js', 'srcc/Frost.StackArea.js',
-				'srcc/Frost.Line.js', 'srcc/Frost.Lines.js',
-				'srcc/Frost.Pie.js', 'srcc/Frost.Bubble.js',
-				'srcc/Frost.Force.js',
-				'srcc/Frost.XAxis.js','srcc/Frost.Util.js',  
-				'srcc/Frost.YAxis.js',  'srcc/Frost.Graph.js'],
+				src:['src/Frost.js', 'src/Frost.ColorConst.js', 
+				'src/Frost.SingleBar.js', 'src/Frost.GroupBar.js',
+				'src/Frost.Legend.js', 'src/Frost.StackBar.js',
+				'src/Frost.Area.js', 'src/Frost.StackArea.js',
+				'src/Frost.Line.js', 'src/Frost.Lines.js',
+				'src/Frost.Pie.js', 'src/Frost.Bubble.js',
+				'src/Frost.Force.js',
+				'src/Frost.XAxis.js','src/Frost.Util.js',  
+				'src/Frost.YAxis.js',  'src/Frost.Graph.js'],
 				dest: 'build/frost.js'
 			}
 		},

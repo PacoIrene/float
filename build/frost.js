@@ -1,3 +1,4 @@
+/*! Float.js 0.0.5 2014-05-15 */
 /**
  * The Frost Object is the Parent Object of all the sub Object
  * There are three main functions in Frost

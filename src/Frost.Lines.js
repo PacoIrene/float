@@ -1,28 +1,76 @@
 Frost.namespace("Frost.Lines");
 
-function Lines (cfg) {
-	Lines.superclass.constructor.apply(this, arguments);
-	this.type = cfg.lineType;
+function Lines(cfg) {
+	this.height = cfg.height;
+	this.width = cfg.width;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.data = cfg.data;
+	this.colorList = cfg.colorList;
+	this._seriesName = cfg.seriesName;
+	this.isXLinear = cfg.isXLinear || false;
+	this.lineType = cfg.lineType || "linear";
+	this._lineList = [];
 }
-Frost.extend(Lines, Frost.BaseChart);
-Lines.prototype.getLineType = function() {
-	return this.lineType;
+Lines.prototype.getType = function() {
+	return this.type;
+};
+Lines.prototype.getHeight = function() {
+	return this.height;
+};
+
+Lines.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+Lines.prototype.getWidth = function() {
+	return this.width;
+};
+
+Lines.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+Lines.prototype.getContainer = function() {
+	return this._container;
+};
+Lines.prototype.setContainer = function(data) {
+	this._container = data;
+};
+Lines.prototype.getParent = function() {
+	return this._parent;
+};
+Lines.prototype.getData = function() {
+	return this.data;
+};
+Lines.prototype.getColorList = function() {
+	return this.colorList;
+};
+Lines.prototype.getSeriesName = function() {
+	return this._seriesName;
+};
+Lines.prototype.getLineList = function() {
+	return this._lineList;
+};
+Lines.prototype.getChildrenContainer = function() {
+	return this.childrenContainer;
 };
 Lines.prototype.render = function() {
-	Lines.superclass.render.apply(this, arguments);
-	this._groupContainer = this._container.append("g");
-	var lineData = this.getData();
-	var lineFunction = d3.svg.line()
-	                        .x(function(d) { return d.x; })
-	                        .y(function(d) { return d.y; })
-	                        .interpolate(this.getLineType());
-
-	var lineGraph = this._groupContainer.append("path")
-			                            .attr("d", lineFunction(lineData))
-			                            .attr("stroke", this.getColor())
-			                            .attr("stroke-width", 2)
-			                            .attr("fill", "none");
-
+	this.childrenContainer = this._container.append("g")
+											.attr("class", "forst_linesContainer");
+	for(var i = 0; i != this.getData().length; i++) {
+		this._lineList.push(new Frost.Line({
+					width: this.getWidth(), 
+					height: this.getHeight(), 
+					data: this.getData()[i].data, 
+					container: this.childrenContainer, 
+					parent: this,
+					color: this.getColorList()[i],
+					seriesName: this.getSeriesName(),
+					isXLinear: this.isXLinear,
+					lineType: this.lineType
+				}).render());
+	}
+	return this;
 };
 
 Frost.Lines = Lines;
