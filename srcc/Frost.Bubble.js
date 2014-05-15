@@ -1,7 +1,7 @@
 Frost.namespace("Frost.Bubble");
 
 function Bubble(cfg) {
-this.height = cfg.height;
+	this.height = cfg.height;
 	this.width = cfg.width;
 	this._container = cfg.container;
 	this._parent = cfg.parent;
@@ -64,7 +64,7 @@ Bubble.prototype.render = function() {
       			  .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
  	node.append("title")
-      	.text(function(d) { return d.name + ": " + d.value});
+      	.text(function(d) { return d.name + ": " + d.value;});
 
   	node.append("circle")
       	.attr("r", function(d) { return d.r; })

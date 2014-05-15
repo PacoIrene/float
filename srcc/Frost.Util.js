@@ -153,6 +153,25 @@ Util.formatDataForBubble = function(series) {
 	}
 	return objList;
 };
+Util.formatDataForForce = function(series, width, height, maxRadius) {
+	var m = series.length;
+	var total = this.getMaxValue(series);
+	var objList = [];
+	var clusters = new Array(m);
+	for (var i = 0; i != series.length; i++) {
+		for(var j = 0; j != series[i].data.length; j++) {
+			var obj = {};
+			obj["name"] = series[i].data[j].name;
+			obj["value"] = series[i].data[j].value;
+			obj["package"] = series[i].name;
+			obj["cluster"] = i;
+			obj["radius"] = obj["value"] / total * maxRadius;
+			objList.push(obj);
+			if (!clusters[i] || (obj["radius"] > clusters[i].radius)) clusters[i] = obj;
+		}
+	}
+	return {data: objList, clusters: clusters}
+};
 Util.filterSome = function(array) {
 	var temp = {};
 	var returnArray = [];
@@ -163,6 +182,15 @@ Util.filterSome = function(array) {
 		}
 	}
 	return returnArray;
+};
+Util.getTotal = function(series) {
+	var number = 0;
+	for(var i = 0; i != series.length; i++) {
+		for(var j = 0; j != series[i].data.length; j++) {
+			number = number +series[i].data[j].value;
+		}
+	}
+	return number;
 };
 
 Frost.Util = Util;

@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8"/>
-		<title>Bubble</title>
+		<title>Force Layout</title>
 		<link rel="stylesheet" type="text/css" href="../css/frost.css">
 	</head>
 	<body>
@@ -49,23 +49,27 @@
 		// }
 			var frost = new Frost.Graph({
 				element: "#node",
-				width: 960,
-				height: 500,
-				type: "bubble",
+				width: 500,
+				height: 300,
+				type: "force",
 				series: [
 				{
-					// color: "#9ecae1",
+					color: "#9ecae1",
 					data: [
 						{name: "a1", value: 1},
 						{name: "b1", value: 2},
 						{name: "c1", value: 3},
-						{name: "d1", value: 4}
+						{name: "d1", value: 4},
+						{name: "e1", value: 4},
+						{name: "f1", value: 4},
+						{name: "g1", value: 4},
+						{name: "h1", value: 4}
 					],
 					// data: dataList,
 					name: "Group1"
 				},
 				{
-					// color: "#6bafd6",
+					color: '#bbe468',
 					data: [
 						{name: "a2", value: 2},
 						{name: "b2", value: 4},
@@ -76,7 +80,29 @@
 					name: "Group2"
 				},
 				{
-					// color: "#3283bd",
+					color: "#6bafd6",
+					data: [
+						{name: "a2", value: 2},
+						{name: "b2", value: 4},
+						{name: "c2", value: 6},
+						{name: "d2", value: 8}
+					],
+					// data: dataList,
+					name: "Group3"
+				},
+				{
+					color: '#92875a',
+					data: [
+						{name: "a2", value: 2},
+						{name: "b2", value: 4},
+						{name: "c2", value: 6},
+						{name: "d2", value: 8}
+					],
+					// data: dataList,
+					name: "Group4"
+				},
+				{
+					color: '#ecb796',
 					data: [
 						{name: "a3", value: 3},
 						{name: "b3", value: 6},
@@ -84,7 +110,7 @@
 						{name: "d3", value: 12}
 					],
 					// data: dataList,
-					name: "Group3"
+					name: "Group5"
 				}],
 				xAxis: false,
 				yAxis: false,

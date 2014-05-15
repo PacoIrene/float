@@ -261,6 +261,7 @@ Graph.prototype.render = function() {
 			} else {
 
 			}
+			break;
 		case "bubble":
 			this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries().length);
 			this.setLegendName(seriesName);
@@ -273,6 +274,20 @@ Graph.prototype.render = function() {
 				seriesName: seriesName,
 				colorList: this.getColorList()
 			}).render());
+			break;
+		case "force":
+			this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries().length);
+			this.setLegendName(seriesName);
+			this.chartObject.push(new Frost.Force({
+				width: actaulWidth, 
+				height: actualHeight,
+				data: this.getSeries(), 
+				container: this._container, 
+				parent: this,
+				seriesName: seriesName,
+				colorList: this.getColorList()
+			}).render());
+			break;
 		default: 
 			break;
 	}
