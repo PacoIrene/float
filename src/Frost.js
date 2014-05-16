@@ -111,5 +111,14 @@ var Frost = {
      */
 	isArray: function(obj) {
 		return Array.isArray(obj);
-	}
+	},
+	/**
+     * Guide Web Browswer is support SVG.
+     * @method Frost.isArray
+     * @param {Object} obj The Object to guide.
+     */
+	testSVG: function(){
+　　var ns = {'svg': 'http://www.w3.org/2000/svg'};
+　　return !!document.createElementNS && !!document.createElementNS(ns.svg, 'svg').createSVGRect;
+　　}
 };

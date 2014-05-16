@@ -60,7 +60,7 @@ Force.prototype.render = function() {
 	}
 	var width = this.getWidth();
 	var height = this.getHeight();
-	var formatData = Frost.Util.formatDataForForce(this.getData(), width, height, this.maxRadius);
+	var formatData = Frost.Util.formatDataForForce(this.getData(), this.maxRadius);
 	this._groupContainer = this._container.append("g").attr("class", "frost_force");
 	var colorList = Frost.Util.getColorListForBubble(this.getData(), this.getData().length);
 	// var legendColor = [];

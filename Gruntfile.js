@@ -1,25 +1,4 @@
 module.exports = function(grunt) {
-	// grunt.initConfig({
-	// 	pkg: grunt.file.readJSON("package.json"),
-	// 	concat: {
-	// 		domop: {
-	// 			src:['src/Frost.js', 'src/Frost.BaseChart.js','src/Frost.Title.js', 
-	// 			'src/Frost.XAxis.js','src/Frost.Util.js', 
-	// 			'src/Frost.Detail.js', 'src/Frost.YAxis.js', 'src/Frost.Lines.js',
-	// 			'src/Frost.Column.js','src/Frost.Columns.js', 'src/Frost.Graph.js'],
-	// 			dest: 'build/frost.js'
-	// 		}
-	// 	},
-	// 	uglify: {
-	// 		options: {
-	// 			banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-	// 		}, 
-	// 		build: {
-	// 			src: 'build/frost.js',
-	// 			dest: 'build/frost.min.js'
-	// 		}
-	// 	}
-	// });
 	grunt.initConfig({
 		pkg: grunt.file.readJSON("package.json"),
 		concat: {
@@ -33,7 +12,7 @@ module.exports = function(grunt) {
 				'src/Frost.Area.js', 'src/Frost.StackArea.js',
 				'src/Frost.Line.js', 'src/Frost.Lines.js',
 				'src/Frost.Pie.js', 'src/Frost.Bubble.js',
-				'src/Frost.Arc.js',
+				'src/Frost.Arc.js', 'src/Frost.Scatter.js',
 				'src/Frost.Force.js', 'src/Frost.Detail.js',
 				'src/Frost.XAxis.js','src/Frost.Util.js',  
 				'src/Frost.YAxis.js',  'src/Frost.Graph.js'],

@@ -153,7 +153,7 @@ Util.formatDataForBubble = function(series) {
 	}
 	return objList;
 };
-Util.formatDataForForce = function(series, width, height, maxRadius) {
+Util.formatDataForForce = function(series, maxRadius) {
 	var m = series.length;
 	var total = this.getMaxValue(series);
 	var objList = [];
@@ -170,7 +170,23 @@ Util.formatDataForForce = function(series, width, height, maxRadius) {
 			if (!clusters[i] || (obj["radius"] > clusters[i].radius)) clusters[i] = obj;
 		}
 	}
-	return {data: objList, clusters: clusters}
+	return {data: objList, clusters: clusters};
+};
+Util.formatDataForScatter = function(series, maxRadius) {
+	var m = series.length;
+	var total = this.getMaxValue(series);
+	var objList = [];
+	for (var i = 0; i != series.length; i++) {
+		for(var j = 0; j != series[i].data.length; j++) {
+			var obj = {};
+			obj["name"] = series[i].data[j].name;
+			obj["value"] = series[i].data[j].value;
+			obj["package"] = series[i].name;
+			obj["radius"] = obj["value"] / total * maxRadius;
+			objList.push(obj);
+		}
+	}
+	return objList;
 };
 Util.filterSome = function(array) {
 	var temp = {};

@@ -6,6 +6,7 @@ function YAxis(cfg) {
 	this.xSpace = cfg.xSpace || 0;
 	this.ySpace = cfg.ySpace || 0;
 	this.width = cfg.width;
+	this.hasStandard = cfg.hasStandard || false;
 }
 
 
@@ -34,10 +35,14 @@ YAxis.prototype.render = function() {
 							  .attr("transform", "translate("+ this.getxSpace() +", "+this.getySpace()+")");    
 	var yAxis = d3.svg.axis()
 	    .scale(this.getParent().getYScale())
-	    // .tickSize(-this.getWidth())
-	    .tickSize(-4)
 	    .tickPadding(4)
 	    .orient("left");
+	if(this.hasStandard) {
+		yAxis.tickSize(-this.getWidth());
+		this.yAxisNode.attr("class", "frost_axis frost_yAxis frost_yAxis_withStandard");
+	} else {
+		yAxis.tickSize(-4);
+	}
 	this.yAxisNode.call(yAxis)
 	.append("text")
       .attr("transform", "rotate(-90)")

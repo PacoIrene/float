@@ -1,4 +1,4 @@
-/*! Float.js 0.0.6 2014-05-16 */
+/*! Float.js 0.0.7 2014-05-16 */
 /**
  * The Frost Object is the Parent Object of all the sub Object
  * There are three main functions in Frost
@@ -112,7 +112,16 @@ var Frost = {
      */
 	isArray: function(obj) {
 		return Array.isArray(obj);
-	}
+	},
+	/**
+     * Guide Web Browswer is support SVG.
+     * @method Frost.isArray
+     * @param {Object} obj The Object to guide.
+     */
+	testSVG: function(){
+　　var ns = {'svg': 'http://www.w3.org/2000/svg'};
+　　return !!document.createElementNS && !!document.createElementNS(ns.svg, 'svg').createSVGRect;
+　　}
 };
 Frost.namespace("Frost.ColorConst");
 
@@ -306,6 +315,7 @@ function Legend (cfg) {
 	this.xSpace = cfg.xSpace;
 	this._isShow = true;
 	this.detail = cfg.detail;
+	this._focus = false;
 }
 
 Legend.prototype.getParent = function() {
@@ -324,6 +334,9 @@ Legend.prototype.getColorList = function() {
 };
 Legend.prototype.getXSpace = function() {
 	return this.xSpace;
+};
+Legend.prototype.hasFocus = function() {
+	return this._focus;
 };
 Legend.prototype.show = function() {
 	this._isShow = true;
@@ -364,6 +377,7 @@ Legend.prototype.render = function() {
 					.style("left",(this.getXSpace() - 100 )+ "px")
 					.style("width", "120px")
 					.style("height", boundingRect.height + "px");
+	
 	this._bindUI();
 	return this;
 };
@@ -375,14 +389,24 @@ Legend.prototype._bindUI = function() {
 	// 	this.hide();
 	// }.bind(this));
 	this._container.on("click", function() {
-		if(this._isShow) {
-			this.hide();
+		if(!this.hasFocus()) {
+			this._focus = true;
+			this._container.attr("class", "frost_legendRootNode frost_legendRootNode_focus");
 		} else {
-			this.show();
+			this._focus = false;
+			this._container.attr("class", "frost_legendRootNode");
 		}
+		
 	}.bind(this));
 };
-
+Legend.prototype.setPosition = function(x, y) {
+	if(this.hasFocus()) {
+		this._container.style("top",y + "px")
+					.style("left",(x -60) + "px");
+		this._focus = false;
+		this._container.attr("class", "frost_legendRootNode");
+	}
+}
 Frost.Legend = Legend;
 Frost.namespace("Frost.StackBar");
 
@@ -522,9 +546,6 @@ Area.prototype.getGroupContainer = function() {
 Area.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
-Area.prototype.getIsStright = function() {
-	return this.isStright;
-};
 Area.prototype.render = function() {
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
@@ -535,16 +556,16 @@ Area.prototype.render = function() {
 	    x.domain([0,this.getParent().getNameDomain().length - 1]);
 	    this.getParent().setXScale(x);
 	    var area = d3.svg.area()
-			     .x(function(d, i) { 
-			     	return x(i); 
-			     })
+			     .x(function(d, i) {return x(i);  })
 			     .y0(height)
 			     .y1(function(d) { return y(d.value); });
 	} else {
+		// x = d3.scale.ordinal()
+  //   			 		  .rangeRoundBands([0, this.getWidth()], .1, 0);
+  //   	x.domain[this.getParent().getNameDomain()];
+	 //    this.getParent().setXScale(x);
 		var area = d3.svg.area()
-			     .x(function(d, i) { 
-			     	return x(d.name) + x.rangeBand() / 2; 
-			     })
+			     .x(function(d, i) { return x(d.name) + x.rangeBand() / 2;})
 			     .y0(height)
 			     .y1(function(d) { return y(d.value); });
 	}
@@ -1090,6 +1111,78 @@ Arc.prototype.render = function() {
 };
 
 Frost.Arc = Arc;
+Frost.namespace("Frost.Scatter");
+
+function Scatter(cfg) {
+	this.height = cfg.height;
+	this.width = cfg.width;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.data = cfg.data;
+	this.colorList = cfg.colorList;
+	this._seriesName = cfg.seriesName;
+	this.maxRadius = Math.min(this.width, this.height) * 0.25 /2;
+	this.detail = cfg.detail;
+}
+Scatter.prototype.getType = function() {
+	return this.type;
+};
+Scatter.prototype.getHeight = function() {
+	return this.height;
+};
+
+Scatter.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+Scatter.prototype.getWidth = function() {
+	return this.width;
+};
+
+Scatter.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+Scatter.prototype.getContainer = function() {
+	return this._container;
+};
+Scatter.prototype.setContainer = function(data) {
+	this._container = data;
+};
+Scatter.prototype.getParent = function() {
+	return this._parent;
+};
+Scatter.prototype.getData = function() {
+	return this.data;
+};
+Scatter.prototype.getColorList = function() {
+	return this.colorList;
+};
+Scatter.prototype.getSeriesName = function() {
+	return this._seriesName;
+};
+
+Scatter.prototype.render = function() {
+	var that = this;
+	var x = this.getParent().getXScale();
+	var y = this.getParent().getYScale();
+	y.domain([0, this.getParent().getYScaleMaxValue() * 1.2]);
+	var width = this.getWidth();
+	var height = this.getHeight();
+	var colorList = Frost.Util.getColorListForBubble(this.getData(), this.getData().length);
+	this._formatData = Frost.Util.formatDataForScatter(this.getData(), this.maxRadius);
+	this._groupContainer = this._container.append("g").attr("class", "frost_scatter");
+	this._node = this._groupContainer.selectAll(".frost_scatter_dot")
+					      			 .data(this._formatData)
+					    			 .enter().append("circle")
+					      			 .attr("class", "frost_scatter_dot")
+							         .attr("r", function(d) {return d.radius;})
+							         .attr("cx", function(d) { return x(d.name) + x.rangeBand() / 2; })
+							         .attr("cy", function(d) { return y(d.value); })
+							         .style("fill", function(d) { return colorList[d.package]; });
+	return this;
+};
+
+Frost.Scatter = Scatter;
 Frost.namespace("Frost.Force");
 
 function Force(cfg) {
@@ -1152,7 +1245,7 @@ Force.prototype.render = function() {
 	}
 	var width = this.getWidth();
 	var height = this.getHeight();
-	var formatData = Frost.Util.formatDataForForce(this.getData(), width, height, this.maxRadius);
+	var formatData = Frost.Util.formatDataForForce(this.getData(), this.maxRadius);
 	this._groupContainer = this._container.append("g").attr("class", "frost_force");
 	var colorList = Frost.Util.getColorListForBubble(this.getData(), this.getData().length);
 	// var legendColor = [];
@@ -1302,13 +1395,15 @@ Frost.namespace("Frost.XAxis");
 
 function XAxis(cfg) {
 	// this.domainRange = cfg.length;
-	// this.width = cfg.width;
+	this.width = cfg.width;
 	this._parent = cfg.parent;
 	this.xSpace = cfg.xSpace || 0;
 	this.ySpace = cfg.ySpace || 0;
 	this._container = cfg.container;
 }
-
+XAxis.prototype.getWidth = function() {
+	return this.width;
+}
 XAxis.prototype.getySpace = function() {
 	return this.ySpace;
 };
@@ -1334,7 +1429,13 @@ XAxis.prototype.render = function() {
 	    .tickSize(1)
 	    .tickPadding(4)
 	    .orient("bottom");
-	this.xAxisNode.call(xAxis);
+	this.xAxisNode.call(xAxis)
+	.append("text")
+      .attr("class", "label")
+      .attr("x", this.getWidth())
+      .attr("y", -6)
+      .style("text-anchor", "end")
+      .text("");
 	return this;
 };
 
@@ -1494,7 +1595,7 @@ Util.formatDataForBubble = function(series) {
 	}
 	return objList;
 };
-Util.formatDataForForce = function(series, width, height, maxRadius) {
+Util.formatDataForForce = function(series, maxRadius) {
 	var m = series.length;
 	var total = this.getMaxValue(series);
 	var objList = [];
@@ -1511,7 +1612,23 @@ Util.formatDataForForce = function(series, width, height, maxRadius) {
 			if (!clusters[i] || (obj["radius"] > clusters[i].radius)) clusters[i] = obj;
 		}
 	}
-	return {data: objList, clusters: clusters}
+	return {data: objList, clusters: clusters};
+};
+Util.formatDataForScatter = function(series, maxRadius) {
+	var m = series.length;
+	var total = this.getMaxValue(series);
+	var objList = [];
+	for (var i = 0; i != series.length; i++) {
+		for(var j = 0; j != series[i].data.length; j++) {
+			var obj = {};
+			obj["name"] = series[i].data[j].name;
+			obj["value"] = series[i].data[j].value;
+			obj["package"] = series[i].name;
+			obj["radius"] = obj["value"] / total * maxRadius;
+			objList.push(obj);
+		}
+	}
+	return objList;
 };
 Util.filterSome = function(array) {
 	var temp = {};
@@ -1543,6 +1660,7 @@ function YAxis(cfg) {
 	this.xSpace = cfg.xSpace || 0;
 	this.ySpace = cfg.ySpace || 0;
 	this.width = cfg.width;
+	this.hasStandard = cfg.hasStandard || false;
 }
 
 
@@ -1571,10 +1689,14 @@ YAxis.prototype.render = function() {
 							  .attr("transform", "translate("+ this.getxSpace() +", "+this.getySpace()+")");    
 	var yAxis = d3.svg.axis()
 	    .scale(this.getParent().getYScale())
-	    // .tickSize(-this.getWidth())
-	    .tickSize(-4)
 	    .tickPadding(4)
 	    .orient("left");
+	if(this.hasStandard) {
+		yAxis.tickSize(-this.getWidth());
+		this.yAxisNode.attr("class", "frost_axis frost_yAxis frost_yAxis_withStandard");
+	} else {
+		yAxis.tickSize(-4);
+	}
 	this.yAxisNode.call(yAxis)
 	.append("text")
       .attr("transform", "rotate(-90)")
@@ -1722,6 +1844,9 @@ Graph.prototype.getColorList = function() {
 Graph.prototype.setYScaleMaxValue = function(data) {
 	this.yScaleMaxValue = data;
 };
+Graph.prototype.getYScaleMaxValue = function(data) {
+	return this.yScaleMaxValue;
+};
 Graph.prototype.setLegendName = function(data) {
 	this.legendName = data;
 };
@@ -1730,6 +1855,11 @@ Graph.prototype.setLegendName = function(data) {
  * @method Frost.Graph.render
  */
 Graph.prototype.render = function() {
+	if(!Frost.testSVG()) {
+		var node = document.getElementById(this.node.slice(1));
+		node.innerHTML = "Your Browser doesn't support SVG<br>Please Use Chrome or Firfox!";
+		return;
+	}
 	var rootNode = d3.select(this.node).append("div")
 									   .attr("class", "frost_rootNode")
 									   .style("height", this.getHeight() + "px")
@@ -1903,6 +2033,20 @@ Graph.prototype.render = function() {
 				detail: this.detail
 			}).render());
 			break;
+		case "scatter":
+			this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries().length);
+			this.setLegendName(seriesName);
+			this.chartObject.push(new Frost.Scatter({
+				width: actaulWidth, 
+				height: actualHeight,
+				data: this.getSeries(), 
+				container: this._container, 
+				parent: this,
+				seriesName: seriesName,
+				colorList: this.getColorList(),
+				detail: this.detail
+			}).render());
+			break;
 		default: 
 			break;
 	}
@@ -1911,7 +2055,8 @@ Graph.prototype.render = function() {
 			parent: this, 
 			container: this._container, 
 			xSpace: 0,
-			ySpace: this.getHeight()-this.getBottomGap() - this.topGap,
+			width: actaulWidth,
+			ySpace: this.getHeight()-this.getBottomGap() - this.topGap
 		});
     }
     if(this.IsHasYAxis()) {
@@ -1920,7 +2065,8 @@ Graph.prototype.render = function() {
 			container: this._container, 
 			xSpace: 0,
 			ySpace: 0,
-			width: actaulWidth
+			width: actaulWidth,
+			hasStandard: this.getCfg().hasStandard
 		});
     }
     if(this.IsHasLegend()) {
@@ -1932,7 +2078,18 @@ Graph.prototype.render = function() {
 			xSpace: this.getWidth()
     	});
     }
+    this._bindUI();
 	return this;
+};
+Graph.prototype._bindUI = function() {
+	if(this.legend) {
+		var legend = this.legend;
+	}
+	d3.select(".frost_rootNode").on("click", function() {
+		if(legend) {
+			legend.setPosition(d3.mouse(this)[0], d3.mouse(this)[1]);
+		}
+	}, true);
 };
 Graph.prototype.xAxisRender = function(cfg) {
 	this.xAxis = new Frost.XAxis({
@@ -1940,6 +2097,7 @@ Graph.prototype.xAxisRender = function(cfg) {
 		container: cfg.container, 
 		xSpace: cfg.xSpace,
 		ySpace: cfg.ySpace,
+		width: cfg.width
 	}).render();
 };
 Graph.prototype.yAxisRender = function(cfg) {
@@ -1948,7 +2106,8 @@ Graph.prototype.yAxisRender = function(cfg) {
 		container: cfg.container, 
 		xSpace: cfg.xSpace,
 		ySpace: cfg.ySpace,
-		width: cfg.width
+		width: cfg.width,
+		hasStandard: cfg.hasStandard
 	}).render();
 };
 Graph.prototype.legendRender = function(cfg) {

@@ -49,9 +49,6 @@ Area.prototype.getGroupContainer = function() {
 Area.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
-Area.prototype.getIsStright = function() {
-	return this.isStright;
-};
 Area.prototype.render = function() {
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
@@ -62,16 +59,16 @@ Area.prototype.render = function() {
 	    x.domain([0,this.getParent().getNameDomain().length - 1]);
 	    this.getParent().setXScale(x);
 	    var area = d3.svg.area()
-			     .x(function(d, i) { 
-			     	return x(i); 
-			     })
+			     .x(function(d, i) {return x(i);  })
 			     .y0(height)
 			     .y1(function(d) { return y(d.value); });
 	} else {
+		// x = d3.scale.ordinal()
+  //   			 		  .rangeRoundBands([0, this.getWidth()], .1, 0);
+  //   	x.domain[this.getParent().getNameDomain()];
+	 //    this.getParent().setXScale(x);
 		var area = d3.svg.area()
-			     .x(function(d, i) { 
-			     	return x(d.name) + x.rangeBand() / 2; 
-			     })
+			     .x(function(d, i) { return x(d.name) + x.rangeBand() / 2;})
 			     .y0(height)
 			     .y1(function(d) { return y(d.value); });
 	}

@@ -2,13 +2,15 @@ Frost.namespace("Frost.XAxis");
 
 function XAxis(cfg) {
 	// this.domainRange = cfg.length;
-	// this.width = cfg.width;
+	this.width = cfg.width;
 	this._parent = cfg.parent;
 	this.xSpace = cfg.xSpace || 0;
 	this.ySpace = cfg.ySpace || 0;
 	this._container = cfg.container;
 }
-
+XAxis.prototype.getWidth = function() {
+	return this.width;
+}
 XAxis.prototype.getySpace = function() {
 	return this.ySpace;
 };
@@ -34,7 +36,13 @@ XAxis.prototype.render = function() {
 	    .tickSize(1)
 	    .tickPadding(4)
 	    .orient("bottom");
-	this.xAxisNode.call(xAxis);
+	this.xAxisNode.call(xAxis)
+	.append("text")
+      .attr("class", "label")
+      .attr("x", this.getWidth())
+      .attr("y", -6)
+      .style("text-anchor", "end")
+      .text("");
 	return this;
 };
 

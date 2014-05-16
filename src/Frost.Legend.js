@@ -7,6 +7,7 @@ function Legend (cfg) {
 	this.xSpace = cfg.xSpace;
 	this._isShow = true;
 	this.detail = cfg.detail;
+	this._focus = false;
 }
 
 Legend.prototype.getParent = function() {
@@ -25,6 +26,9 @@ Legend.prototype.getColorList = function() {
 };
 Legend.prototype.getXSpace = function() {
 	return this.xSpace;
+};
+Legend.prototype.hasFocus = function() {
+	return this._focus;
 };
 Legend.prototype.show = function() {
 	this._isShow = true;
@@ -65,6 +69,7 @@ Legend.prototype.render = function() {
 					.style("left",(this.getXSpace() - 100 )+ "px")
 					.style("width", "120px")
 					.style("height", boundingRect.height + "px");
+	
 	this._bindUI();
 	return this;
 };
@@ -76,12 +81,22 @@ Legend.prototype._bindUI = function() {
 	// 	this.hide();
 	// }.bind(this));
 	this._container.on("click", function() {
-		if(this._isShow) {
-			this.hide();
+		if(!this.hasFocus()) {
+			this._focus = true;
+			this._container.attr("class", "frost_legendRootNode frost_legendRootNode_focus");
 		} else {
-			this.show();
+			this._focus = false;
+			this._container.attr("class", "frost_legendRootNode");
 		}
+		
 	}.bind(this));
 };
-
+Legend.prototype.setPosition = function(x, y) {
+	if(this.hasFocus()) {
+		this._container.style("top",y + "px")
+					.style("left",(x -60) + "px");
+		this._focus = false;
+		this._container.attr("class", "frost_legendRootNode");
+	}
+}
 Frost.Legend = Legend;

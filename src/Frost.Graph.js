@@ -134,6 +134,9 @@ Graph.prototype.getColorList = function() {
 Graph.prototype.setYScaleMaxValue = function(data) {
 	this.yScaleMaxValue = data;
 };
+Graph.prototype.getYScaleMaxValue = function(data) {
+	return this.yScaleMaxValue;
+};
 Graph.prototype.setLegendName = function(data) {
 	this.legendName = data;
 };
@@ -142,6 +145,11 @@ Graph.prototype.setLegendName = function(data) {
  * @method Frost.Graph.render
  */
 Graph.prototype.render = function() {
+	if(!Frost.testSVG()) {
+		var node = document.getElementById(this.node.slice(1));
+		node.innerHTML = "Your Browser doesn't support SVG<br>Please Use Chrome or Firfox!";
+		return;
+	}
 	var rootNode = d3.select(this.node).append("div")
 									   .attr("class", "frost_rootNode")
 									   .style("height", this.getHeight() + "px")
@@ -315,6 +323,20 @@ Graph.prototype.render = function() {
 				detail: this.detail
 			}).render());
 			break;
+		case "scatter":
+			this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries().length);
+			this.setLegendName(seriesName);
+			this.chartObject.push(new Frost.Scatter({
+				width: actaulWidth, 
+				height: actualHeight,
+				data: this.getSeries(), 
+				container: this._container, 
+				parent: this,
+				seriesName: seriesName,
+				colorList: this.getColorList(),
+				detail: this.detail
+			}).render());
+			break;
 		default: 
 			break;
 	}
@@ -323,7 +345,8 @@ Graph.prototype.render = function() {
 			parent: this, 
 			container: this._container, 
 			xSpace: 0,
-			ySpace: this.getHeight()-this.getBottomGap() - this.topGap,
+			width: actaulWidth,
+			ySpace: this.getHeight()-this.getBottomGap() - this.topGap
 		});
     }
     if(this.IsHasYAxis()) {
@@ -332,7 +355,8 @@ Graph.prototype.render = function() {
 			container: this._container, 
 			xSpace: 0,
 			ySpace: 0,
-			width: actaulWidth
+			width: actaulWidth,
+			hasStandard: this.getCfg().hasStandard
 		});
     }
     if(this.IsHasLegend()) {
@@ -344,7 +368,18 @@ Graph.prototype.render = function() {
 			xSpace: this.getWidth()
     	});
     }
+    this._bindUI();
 	return this;
+};
+Graph.prototype._bindUI = function() {
+	if(this.legend) {
+		var legend = this.legend;
+	}
+	d3.select(".frost_rootNode").on("click", function() {
+		if(legend) {
+			legend.setPosition(d3.mouse(this)[0], d3.mouse(this)[1]);
+		}
+	}, true);
 };
 Graph.prototype.xAxisRender = function(cfg) {
 	this.xAxis = new Frost.XAxis({
@@ -352,6 +387,7 @@ Graph.prototype.xAxisRender = function(cfg) {
 		container: cfg.container, 
 		xSpace: cfg.xSpace,
 		ySpace: cfg.ySpace,
+		width: cfg.width
 	}).render();
 };
 Graph.prototype.yAxisRender = function(cfg) {
@@ -360,7 +396,8 @@ Graph.prototype.yAxisRender = function(cfg) {
 		container: cfg.container, 
 		xSpace: cfg.xSpace,
 		ySpace: cfg.ySpace,
-		width: cfg.width
+		width: cfg.width,
+		hasStandard: cfg.hasStandard
 	}).render();
 };
 Graph.prototype.legendRender = function(cfg) {
