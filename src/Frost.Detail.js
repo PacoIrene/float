@@ -3,8 +3,7 @@ Frost.namespace("Frost.Detail");
 function Detail(cfg) {
 	this._container = cfg.container;
 	this.detailNode = null;
-	this.name = cfg.name || "name";
-	this.value = cfg.value || "value";
+	contentValue = cfg.contentValue || "name: value";
 }
 Detail.prototype.getContainer = function() {
 	return this._container;
@@ -28,38 +27,28 @@ Detail.prototype.show = function() {
 Detail.prototype.hide = function() {
 	this.detailNode.style("display", "none");
 };
-Detail.prototype.getName = function() {
-	return this.name;
+Detail.prototype.getContentValue = function() {
+	return this.contentValue;
 };
-Detail.prototype.setName = function(data) {
-	this.name = data;
-};
-Detail.prototype.getValue = function() {
-	return this.value;
-};
-Detail.prototype.setValue = function(data) {
-	this.value = data;
+Detail.prototype.setContentValue = function(data) {
+	this.contentValue = data;
 };
 Detail.prototype.render = function() {
 	this.detailNode = this._container.append("div")
 									 .attr("class", "frost_detail");
-	var svg = this.detailNode.append("svg")
-						.attr("width", 100)
-						.attr("height", 20);
-	var rect = svg.append("rect")
-				  .attr("fill", "#FAFAFA")
-				  .attr("width", 100)
-			      .attr("height", 20);
-	this._content = svg.append("text")
-		.attr("transform", "translate(10,15)")
-	   	.text(this.getName() + ": " + this.getValue());
+ 	this.detailWrapper = this.detailNode.append("div")
+ 							.attr("class", "frost_detail_wrapper")
+ 							.html(this.getContentValue());
 	return this;
 };
 Detail.prototype.setContent = function(obj) {
-	this.setName(obj.name);
-	this.setValue(obj.value);
-	this._content.text(this.getName() + ": " + this.getValue());
-	this.setPosition(obj.position)
+	this.setContentValue(obj.contentValue);
+	this.detailWrapper.html(obj.contentValue);
+	var boundingRect = document.querySelector(".frost_detail").getBoundingClientRect();
+	var position = {x: obj.position.x, y: obj.position.y};
+	position.x += 50;
+	position.y += 20;
+	this.setPosition(position);
 }
 
 Frost.Detail = Detail;

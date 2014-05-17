@@ -1,4 +1,4 @@
-/*! Float.js 0.0.7 2014-05-16 */
+/*! Float.js 0.1.0 2014-05-17 */
 /**
  * The Frost Object is the Parent Object of all the sub Object
  * There are three main functions in Frost
@@ -167,6 +167,7 @@ function SingleBar (cfg) {
 	this.height = cfg.height;
 	this.width = cfg.width;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 
 SingleBar.prototype.getHeight = function() {
@@ -204,21 +205,33 @@ SingleBar.prototype.getGroupContainer = function() {
 	return this._groupContainer;
 };
 SingleBar.prototype.render = function() {
+	var that = this;
+	function mousemove(d) {
+		var x0 = d3.mouse(this)[0];
+		var y0 = d3.mouse(this)[1];
+		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.name + ": "+d.value});
+	}
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
 	var height = this.getHeight();
 	this._groupContainer = this._container.append("g");
-	this._groupContainer.selectAll(".frost_bar")
-      					.data(this.getData())
-    					.enter().append("rect")
-      					.attr("class", "frost_bar")
-      					.attr("x", function(d) {return x(d.name); })
-      					.attr("y", function(d) { return y(d.value); })
-      					.attr("height", function(d) { return height - y(d.value); })
-      					.attr("width", x.rangeBand())
-      					.attr("fill", this.getColor());
-};
+	var node = this._groupContainer.selectAll(".frost_bar")
+		      					.data(this.getData())
+		    					.enter().append("rect")
+		      					.attr("class", "frost_bar")
+		      					.attr("x", function(d) {return x(d.name); })
+		      					.attr("y", function(d) { return y(d.value); })
+		      					.attr("height", function(d) { return height - y(d.value); })
+		      					.attr("width", x.rangeBand())
+		      					.attr("fill", this.getColor());
+    if(this.hasDetail) {
+		node.on("mouseover", function() {that.detail.show(); })
+	        .on("mouseout", function() { that.detail.hide();})
+	        .on("mousemove", mousemove);
+	}
+    return this;
 
+};
 Frost.SingleBar = SingleBar;
 Frost.namespace("Frost.GroupBar");
 
@@ -232,6 +245,7 @@ function GroupBar (cfg) {
 	this._seriesName = cfg.seriesName;
 	this.type = cfg.type || 1;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 GroupBar.prototype.getType = function() {
 	return this.type;
@@ -270,6 +284,13 @@ GroupBar.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 GroupBar.prototype.render = function() {
+	var that = this;
+	function mousemove(d) {
+		var x0 = d3.mouse(this)[0]+groupNodeMouseX;
+		var y0 = d3.mouse(this)[1];
+		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.name + ": "+d.value});
+	}
+	var groupNodeMouseX = 0;
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
 	var x1 = d3.scale.ordinal();
@@ -293,15 +314,20 @@ GroupBar.prototype.render = function() {
 									    .attr("transform", function(d,i) {
 									    	return "translate(" + x(d.name) + ",0)"; 
 									    });
-
-	groupNode.selectAll("rect")
-	     .data(function(d) { return d.data; })
-	     .enter().append("rect")
-	     .attr("width", x1.rangeBand())
-	     .attr("x", function(d) { return x1(d.name); })
-	     .attr("y", function(d) { return y(d.value); })
-	     .attr("height", function(d) { return height - y(d.value); })
-	     .style("fill", function(d,i) { return colorList[i]; });
+	groupNode.on("mousemove", function(d) {groupNodeMouseX = x(d.name);});
+	var node = groupNode.selectAll("rect")
+				     .data(function(d) { return d.data; })
+				     .enter().append("rect")
+				     .attr("width", x1.rangeBand())
+				     .attr("x", function(d) { return x1(d.name); })
+				     .attr("y", function(d) { return y(d.value); })
+				     .attr("height", function(d) { return height - y(d.value); })
+				     .style("fill", function(d,i) { return colorList[i]; });
+	if(this.hasDetail) {
+		node.on("mouseover", function() {that.detail.show(); })
+	        .on("mouseout", function() { that.detail.hide();})
+	        .on("mousemove", mousemove);
+	}
 	return this;
 }
 
@@ -420,6 +446,7 @@ function StackBar(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.type = cfg.type || 1;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 StackBar.prototype.getType = function() {
 	return this.type;
@@ -458,6 +485,17 @@ StackBar.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 StackBar.prototype.render = function() {
+	var that = this;
+	function mousemove(d) {
+		var x0 = x(d.name) + d3.mouse(this)[0];
+		var y0 = d3.mouse(this)[1];
+		var content = d.name + ": " +d.total +"<br><br>";
+		for(var i = 0; i != d.data.length; i++) {
+			content += d.data[i].name+ ": " + (d.data[i].y1 - d.data[i].y0) + "<br>";
+		}
+		that.detail.setContent({position: {x: x0, y:y0},contentValue: content});
+	}
+	var groupNodeMouseX = 0;
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
 	var colorList = this.getColorList();
@@ -483,14 +521,18 @@ StackBar.prototype.render = function() {
    										.enter().append("g")
 									    .attr("class", "frost_stackBar")
 									    .attr("transform", function(d) { return "translate(" + x(d.name) + ",0)"; });
-
-  	groupNode.selectAll("rect")
-		     .data(function(d) { return d.data; })
-		     .enter().append("rect")
-		     .attr("width", x.rangeBand())
-		     .attr("y", function(d) { return y(d.y1); })
-		     .attr("height", function(d) { return y(d.y0) - y(d.y1); })
-		     .style("fill", function(d, i) { return colorList[i]; });
+  	var node = groupNode.selectAll("rect")
+					     .data(function(d) { return d.data; })
+					     .enter().append("rect")
+					     .attr("width", x.rangeBand())
+					     .attr("y", function(d) { return y(d.y1); })
+					     .attr("height", function(d) { return y(d.y0) - y(d.y1); })
+					     .style("fill", function(d, i) { return colorList[i]; });
+	if(this.hasDetail) {
+		groupNode.on("mouseover", function() {that.detail.show(); })
+	        .on("mouseout", function() { that.detail.hide();})
+	        .on("mousemove", mousemove);
+	}
 	return this;
 };
 
@@ -879,6 +921,7 @@ function Pie(cfg) {
 	this.colorList = cfg.colorList;
 	this._seriesName = cfg.seriesName;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 Pie.prototype.getType = function() {
 	return this.type;
@@ -917,8 +960,14 @@ Pie.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 Pie.prototype.render = function() {
+	var that = this;
 	var width = this.getWidth();
 	var height = this.getHeight();
+	function mousemove(d) {
+		var x0 = d3.mouse(this)[0] + width / 2;
+		var y0 = d3.mouse(this)[1] + height / 2;
+		that.detail.setContent({position: {x: x0, y: y0},contentValue: d.data.name + ": "+d.data.value});
+	}
 	var radius = Math.min(width, height) / 2;
 	var colorList = this.getColorList();
 	this._groupContainer = this._container.append("g")
@@ -935,15 +984,19 @@ Pie.prototype.render = function() {
 			    				.enter().append("g")
 			      				.attr("class", "frost_pie");
 
-	g.append("path").attr("d", arc)
-	      			.style("fill", function(d, i) { return colorList[i]; });
-
+	var node = g.append("path").attr("d", arc)
+	      					.style("fill", function(d, i) { return colorList[i]; });
+	if(this.hasDetail) {
+		node.on("mouseover", function() {that.detail.show(); })
+	        .on("mouseout", function() { that.detail.hide();})
+	        .on("mousemove", mousemove);
+	}
 	g.append("text")
 	 .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
 	 .attr("dy", ".35em")
 	 .style("text-anchor", "middle")
 	 .text(function(d) { 
-	 	return d.data.name + ": " +d.data.value; 
+	 	return d.data.name; 
 	 });
 };
 
@@ -959,6 +1012,7 @@ function Bubble(cfg) {
 	this.colorList = cfg.colorList;
 	this._seriesName = cfg.seriesName;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 Bubble.prototype.getType = function() {
 	return this.type;
@@ -997,6 +1051,12 @@ Bubble.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 Bubble.prototype.render = function() {
+	var that = this;
+	function mousemove(d) {
+		var x0 = d3.mouse(this)[0] + d.x + 30;
+		var y0 = d3.mouse(this)[1] + d.y;
+		that.detail.setContent({position: {x: x0, y: y0},contentValue: d.name + ": "+d.value});
+	}
 	var width = this.getWidth();
 	var height = this.getHeight();
 	var colorList = Frost.Util.getColorListForBubble(this.getData(), this.getData().length);
@@ -1014,8 +1074,8 @@ Bubble.prototype.render = function() {
       			  .attr("class", "forst_bubble_node")
       			  .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
- 	node.append("title")
-      	.text(function(d) { return d.name + ": " + d.value;});
+ 	// node.append("title")
+  //     	.text(function(d) { return d.name + ": " + d.value;});
 
   	node.append("circle")
       	.attr("r", function(d) { return d.r; })
@@ -1026,6 +1086,11 @@ Bubble.prototype.render = function() {
       	.style("text-anchor", "middle")
       	.text(function(d) { return d.name.substring(0, d.r / 3);});
     this.getParent().setColorList(Frost.Util.filterSome(legendColor));
+    if(this.hasDetail) {
+		node.on("mouseover", function() {that.detail.show(); })
+	        .on("mouseout", function() { that.detail.hide();})
+	        .on("mousemove", mousemove);
+	}
     return this;
 };
 
@@ -1041,6 +1106,7 @@ function Arc(cfg) {
 	this.colorList = cfg.colorList;
 	this._seriesName = cfg.seriesName;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 Arc.prototype.getType = function() {
 	return this.type;
@@ -1080,8 +1146,14 @@ Arc.prototype.getSeriesName = function() {
 };
 
 Arc.prototype.render = function() {
+	var that = this;
 	var width = this.getWidth();
 	var height = this.getHeight();
+	function mousemove(d) {
+		var x0 = d3.mouse(this)[0] + width / 2;
+		var y0 = d3.mouse(this)[1] + height / 2;
+		that.detail.setContent({position: {x: x0, y: y0},contentValue: d.data.name + ": "+d.data.value});
+	}
 	var radius = Math.min(width, height) / 2;
 	var colorList = this.getColorList();
 	this._groupContainer = this._container.append("g")
@@ -1098,15 +1170,19 @@ Arc.prototype.render = function() {
 			    				.enter().append("g")
 			      				.attr("class", "frost_pie");
 
-	g.append("path").attr("d", arc)
-	      			.style("fill", function(d, i) { return colorList[i]; });
-
+	var node = g.append("path").attr("d", arc)
+	      				    	.style("fill", function(d, i) { return colorList[i]; });
+	if(this.hasDetail) {
+		node.on("mouseover", function() {that.detail.show(); })
+	        .on("mouseout", function() { that.detail.hide();})
+	        .on("mousemove", mousemove);
+	}
 	g.append("text")
 	 .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
 	 .attr("dy", ".35em")
 	 .style("text-anchor", "middle")
 	 .text(function(d) { 
-	 	return d.data.name + ": " +d.data.value; 
+	 	return d.data.name; 
 	 });
 };
 
@@ -1123,6 +1199,7 @@ function Scatter(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.maxRadius = Math.min(this.width, this.height) * 0.25 /2;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 Scatter.prototype.getType = function() {
 	return this.type;
@@ -1163,6 +1240,11 @@ Scatter.prototype.getSeriesName = function() {
 
 Scatter.prototype.render = function() {
 	var that = this;
+	function mousemove(d) {
+		var x0 = d3.mouse(this)[0] + 50;
+		var y0 = d3.mouse(this)[1];
+		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.package + ": "+d.value});
+	}
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
 	y.domain([0, this.getParent().getYScaleMaxValue() * 1.2]);
@@ -1179,6 +1261,11 @@ Scatter.prototype.render = function() {
 							         .attr("cx", function(d) { return x(d.name) + x.rangeBand() / 2; })
 							         .attr("cy", function(d) { return y(d.value); })
 							         .style("fill", function(d) { return colorList[d.package]; });
+	if(this.hasDetail) {
+		this._node.on("mouseover", function() {that.detail.show(); })
+		        .on("mouseout", function() { that.detail.hide();})
+		        .on("mousemove", mousemove);
+	}
 	return this;
 };
 
@@ -1197,6 +1284,7 @@ function Force(cfg) {
     this.clusterPadding = 6, // separation between different-color nodes
 	this.maxRadius = Math.min(this.width, this.height) * 0.25 /2;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 Force.prototype.getType = function() {
 	return this.type;
@@ -1237,6 +1325,11 @@ Force.prototype.getSeriesName = function() {
 
 Force.prototype.render = function() {
 	var that = this;
+	function mousemove(d) {
+		var x0 = d3.mouse(this)[0];
+		var y0 = d3.mouse(this)[1];
+		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.package + "->" + d.name +": "+d.value});
+	}
 	function tick(e) {
 	  node.each(that.cluster(10 * e.alpha * e.alpha))
 	      .each(that.collide(.5))
@@ -1263,6 +1356,11 @@ Force.prototype.render = function() {
 		  			  .enter().append("circle")
 		    		  .style("fill", function(d) { return colorList[d.package]; })
 		    		  .call(force.drag);
+	if(this.hasDetail) {
+		node.on("mouseover", function() {that.detail.show(); })
+	        .on("mouseout", function() { that.detail.hide();})
+	        .on("mousemove", mousemove);
+	}
     node.append("text")
       	.attr("dy", ".3em")
       	// .style("text-anchor", "middle")
@@ -1331,8 +1429,7 @@ Frost.namespace("Frost.Detail");
 function Detail(cfg) {
 	this._container = cfg.container;
 	this.detailNode = null;
-	this.name = cfg.name || "name";
-	this.value = cfg.value || "value";
+	contentValue = cfg.contentValue || "name: value";
 }
 Detail.prototype.getContainer = function() {
 	return this._container;
@@ -1356,38 +1453,28 @@ Detail.prototype.show = function() {
 Detail.prototype.hide = function() {
 	this.detailNode.style("display", "none");
 };
-Detail.prototype.getName = function() {
-	return this.name;
+Detail.prototype.getContentValue = function() {
+	return this.contentValue;
 };
-Detail.prototype.setName = function(data) {
-	this.name = data;
-};
-Detail.prototype.getValue = function() {
-	return this.value;
-};
-Detail.prototype.setValue = function(data) {
-	this.value = data;
+Detail.prototype.setContentValue = function(data) {
+	this.contentValue = data;
 };
 Detail.prototype.render = function() {
 	this.detailNode = this._container.append("div")
 									 .attr("class", "frost_detail");
-	var svg = this.detailNode.append("svg")
-						.attr("width", 100)
-						.attr("height", 20);
-	var rect = svg.append("rect")
-				  .attr("fill", "#FAFAFA")
-				  .attr("width", 100)
-			      .attr("height", 20);
-	this._content = svg.append("text")
-		.attr("transform", "translate(10,15)")
-	   	.text(this.getName() + ": " + this.getValue());
+ 	this.detailWrapper = this.detailNode.append("div")
+ 							.attr("class", "frost_detail_wrapper")
+ 							.html(this.getContentValue());
 	return this;
 };
 Detail.prototype.setContent = function(obj) {
-	this.setName(obj.name);
-	this.setValue(obj.value);
-	this._content.text(this.getName() + ": " + this.getValue());
-	this.setPosition(obj.position)
+	this.setContentValue(obj.contentValue);
+	this.detailWrapper.html(obj.contentValue);
+	var boundingRect = document.querySelector(".frost_detail").getBoundingClientRect();
+	var position = {x: obj.position.x, y: obj.position.y};
+	position.x += 50;
+	position.y += 20;
+	this.setPosition(position);
 }
 
 Frost.Detail = Detail;
@@ -1895,7 +1982,8 @@ Graph.prototype.render = function() {
 					container: this._container, 
 					parent: this,
 					color: this.getColorList()[0],
-					detail: this.detail
+					detail: this.detail,
+					hasDetail: this.getCfg().hasDetail
 				}).render());
 			} else if (this.getSeries().length > 1) {
 				if(!this.IsStack()) {
@@ -1908,7 +1996,8 @@ Graph.prototype.render = function() {
 						seriesName: seriesName,
 						colorList: this.getColorList(),
 						type: this.getCfg().barType,
-						detail: this.detail
+						detail: this.detail,
+						hasDetail: this.getCfg().hasDetail
 					}).render());
 				} else {
 					this.chartObject.push(new Frost.StackBar({
@@ -1920,7 +2009,8 @@ Graph.prototype.render = function() {
 						seriesName: seriesName,
 						colorList: this.getColorList(),
 						type: this.getCfg().barType,
-						detail: this.detail
+						detail: this.detail,
+						hasDetail: this.getCfg().hasDetail
 					}).render());
 				}
 			}
@@ -1981,7 +2071,8 @@ Graph.prototype.render = function() {
 					parent: this,
 					seriesName: seriesName,
 					colorList: this.getColorList(),
-					detail: this.detail
+					detail: this.detail,
+					hasDetail: this.getCfg().hasDetail
 				}).render());
 			} else {
 
@@ -1999,7 +2090,8 @@ Graph.prototype.render = function() {
 					parent: this,
 					seriesName: seriesName,
 					colorList: this.getColorList(),
-					detail: this.detail
+					detail: this.detail,
+					hasDetail: this.getCfg().hasDetail
 				}).render());
 			} else {
 
@@ -2016,7 +2108,8 @@ Graph.prototype.render = function() {
 				parent: this,
 				seriesName: seriesName,
 				colorList: this.getColorList(),
-				detail: this.detail
+				detail: this.detail,
+				hasDetail: this.getCfg().hasDetail
 			}).render());
 			break;
 		case "force":
@@ -2030,7 +2123,8 @@ Graph.prototype.render = function() {
 				parent: this,
 				seriesName: seriesName,
 				colorList: this.getColorList(),
-				detail: this.detail
+				detail: this.detail,
+				hasDetail: this.getCfg().hasDetail
 			}).render());
 			break;
 		case "scatter":
@@ -2044,7 +2138,8 @@ Graph.prototype.render = function() {
 				parent: this,
 				seriesName: seriesName,
 				colorList: this.getColorList(),
-				detail: this.detail
+				detail: this.detail,
+				hasDetail: this.getCfg().hasDetail
 			}).render());
 			break;
 		default: 

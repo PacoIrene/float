@@ -12,6 +12,7 @@ function Force(cfg) {
     this.clusterPadding = 6, // separation between different-color nodes
 	this.maxRadius = Math.min(this.width, this.height) * 0.25 /2;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 Force.prototype.getType = function() {
 	return this.type;
@@ -52,6 +53,11 @@ Force.prototype.getSeriesName = function() {
 
 Force.prototype.render = function() {
 	var that = this;
+	function mousemove(d) {
+		var x0 = d3.mouse(this)[0];
+		var y0 = d3.mouse(this)[1];
+		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.package + "->" + d.name +": "+d.value});
+	}
 	function tick(e) {
 	  node.each(that.cluster(10 * e.alpha * e.alpha))
 	      .each(that.collide(.5))
@@ -78,6 +84,11 @@ Force.prototype.render = function() {
 		  			  .enter().append("circle")
 		    		  .style("fill", function(d) { return colorList[d.package]; })
 		    		  .call(force.drag);
+	if(this.hasDetail) {
+		node.on("mouseover", function() {that.detail.show(); })
+	        .on("mouseout", function() { that.detail.hide();})
+	        .on("mousemove", mousemove);
+	}
     node.append("text")
       	.attr("dy", ".3em")
       	// .style("text-anchor", "middle")

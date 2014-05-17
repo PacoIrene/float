@@ -10,6 +10,7 @@ function Scatter(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.maxRadius = Math.min(this.width, this.height) * 0.25 /2;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 Scatter.prototype.getType = function() {
 	return this.type;
@@ -50,6 +51,11 @@ Scatter.prototype.getSeriesName = function() {
 
 Scatter.prototype.render = function() {
 	var that = this;
+	function mousemove(d) {
+		var x0 = d3.mouse(this)[0] + 50;
+		var y0 = d3.mouse(this)[1];
+		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.package + ": "+d.value});
+	}
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
 	y.domain([0, this.getParent().getYScaleMaxValue() * 1.2]);
@@ -66,6 +72,11 @@ Scatter.prototype.render = function() {
 							         .attr("cx", function(d) { return x(d.name) + x.rangeBand() / 2; })
 							         .attr("cy", function(d) { return y(d.value); })
 							         .style("fill", function(d) { return colorList[d.package]; });
+	if(this.hasDetail) {
+		this._node.on("mouseover", function() {that.detail.show(); })
+		        .on("mouseout", function() { that.detail.hide();})
+		        .on("mousemove", mousemove);
+	}
 	return this;
 };
 

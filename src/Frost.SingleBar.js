@@ -7,6 +7,7 @@ function SingleBar (cfg) {
 	this.height = cfg.height;
 	this.width = cfg.width;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 
 SingleBar.prototype.getHeight = function() {
@@ -44,19 +45,31 @@ SingleBar.prototype.getGroupContainer = function() {
 	return this._groupContainer;
 };
 SingleBar.prototype.render = function() {
+	var that = this;
+	function mousemove(d) {
+		var x0 = d3.mouse(this)[0];
+		var y0 = d3.mouse(this)[1];
+		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.name + ": "+d.value});
+	}
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
 	var height = this.getHeight();
 	this._groupContainer = this._container.append("g");
-	this._groupContainer.selectAll(".frost_bar")
-      					.data(this.getData())
-    					.enter().append("rect")
-      					.attr("class", "frost_bar")
-      					.attr("x", function(d) {return x(d.name); })
-      					.attr("y", function(d) { return y(d.value); })
-      					.attr("height", function(d) { return height - y(d.value); })
-      					.attr("width", x.rangeBand())
-      					.attr("fill", this.getColor());
-};
+	var node = this._groupContainer.selectAll(".frost_bar")
+		      					.data(this.getData())
+		    					.enter().append("rect")
+		      					.attr("class", "frost_bar")
+		      					.attr("x", function(d) {return x(d.name); })
+		      					.attr("y", function(d) { return y(d.value); })
+		      					.attr("height", function(d) { return height - y(d.value); })
+		      					.attr("width", x.rangeBand())
+		      					.attr("fill", this.getColor());
+    if(this.hasDetail) {
+		node.on("mouseover", function() {that.detail.show(); })
+	        .on("mouseout", function() { that.detail.hide();})
+	        .on("mousemove", mousemove);
+	}
+    return this;
 
+};
 Frost.SingleBar = SingleBar;

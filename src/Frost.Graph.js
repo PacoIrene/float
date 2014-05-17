@@ -185,7 +185,8 @@ Graph.prototype.render = function() {
 					container: this._container, 
 					parent: this,
 					color: this.getColorList()[0],
-					detail: this.detail
+					detail: this.detail,
+					hasDetail: this.getCfg().hasDetail
 				}).render());
 			} else if (this.getSeries().length > 1) {
 				if(!this.IsStack()) {
@@ -198,7 +199,8 @@ Graph.prototype.render = function() {
 						seriesName: seriesName,
 						colorList: this.getColorList(),
 						type: this.getCfg().barType,
-						detail: this.detail
+						detail: this.detail,
+						hasDetail: this.getCfg().hasDetail
 					}).render());
 				} else {
 					this.chartObject.push(new Frost.StackBar({
@@ -210,7 +212,8 @@ Graph.prototype.render = function() {
 						seriesName: seriesName,
 						colorList: this.getColorList(),
 						type: this.getCfg().barType,
-						detail: this.detail
+						detail: this.detail,
+						hasDetail: this.getCfg().hasDetail
 					}).render());
 				}
 			}
@@ -271,7 +274,8 @@ Graph.prototype.render = function() {
 					parent: this,
 					seriesName: seriesName,
 					colorList: this.getColorList(),
-					detail: this.detail
+					detail: this.detail,
+					hasDetail: this.getCfg().hasDetail
 				}).render());
 			} else {
 
@@ -289,7 +293,8 @@ Graph.prototype.render = function() {
 					parent: this,
 					seriesName: seriesName,
 					colorList: this.getColorList(),
-					detail: this.detail
+					detail: this.detail,
+					hasDetail: this.getCfg().hasDetail
 				}).render());
 			} else {
 
@@ -306,7 +311,8 @@ Graph.prototype.render = function() {
 				parent: this,
 				seriesName: seriesName,
 				colorList: this.getColorList(),
-				detail: this.detail
+				detail: this.detail,
+				hasDetail: this.getCfg().hasDetail
 			}).render());
 			break;
 		case "force":
@@ -320,7 +326,8 @@ Graph.prototype.render = function() {
 				parent: this,
 				seriesName: seriesName,
 				colorList: this.getColorList(),
-				detail: this.detail
+				detail: this.detail,
+				hasDetail: this.getCfg().hasDetail
 			}).render());
 			break;
 		case "scatter":
@@ -334,7 +341,8 @@ Graph.prototype.render = function() {
 				parent: this,
 				seriesName: seriesName,
 				colorList: this.getColorList(),
-				detail: this.detail
+				detail: this.detail,
+				hasDetail: this.getCfg().hasDetail
 			}).render());
 			break;
 		default: 

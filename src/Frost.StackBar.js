@@ -10,6 +10,7 @@ function StackBar(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.type = cfg.type || 1;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 StackBar.prototype.getType = function() {
 	return this.type;
@@ -48,6 +49,17 @@ StackBar.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 StackBar.prototype.render = function() {
+	var that = this;
+	function mousemove(d) {
+		var x0 = x(d.name) + d3.mouse(this)[0];
+		var y0 = d3.mouse(this)[1];
+		var content = d.name + ": " +d.total +"<br><br>";
+		for(var i = 0; i != d.data.length; i++) {
+			content += d.data[i].name+ ": " + (d.data[i].y1 - d.data[i].y0) + "<br>";
+		}
+		that.detail.setContent({position: {x: x0, y:y0},contentValue: content});
+	}
+	var groupNodeMouseX = 0;
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
 	var colorList = this.getColorList();
@@ -73,14 +85,18 @@ StackBar.prototype.render = function() {
    										.enter().append("g")
 									    .attr("class", "frost_stackBar")
 									    .attr("transform", function(d) { return "translate(" + x(d.name) + ",0)"; });
-
-  	groupNode.selectAll("rect")
-		     .data(function(d) { return d.data; })
-		     .enter().append("rect")
-		     .attr("width", x.rangeBand())
-		     .attr("y", function(d) { return y(d.y1); })
-		     .attr("height", function(d) { return y(d.y0) - y(d.y1); })
-		     .style("fill", function(d, i) { return colorList[i]; });
+  	var node = groupNode.selectAll("rect")
+					     .data(function(d) { return d.data; })
+					     .enter().append("rect")
+					     .attr("width", x.rangeBand())
+					     .attr("y", function(d) { return y(d.y1); })
+					     .attr("height", function(d) { return y(d.y0) - y(d.y1); })
+					     .style("fill", function(d, i) { return colorList[i]; });
+	if(this.hasDetail) {
+		groupNode.on("mouseover", function() {that.detail.show(); })
+	        .on("mouseout", function() { that.detail.hide();})
+	        .on("mousemove", mousemove);
+	}
 	return this;
 };
 

@@ -9,6 +9,7 @@ function Arc(cfg) {
 	this.colorList = cfg.colorList;
 	this._seriesName = cfg.seriesName;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 Arc.prototype.getType = function() {
 	return this.type;
@@ -48,8 +49,14 @@ Arc.prototype.getSeriesName = function() {
 };
 
 Arc.prototype.render = function() {
+	var that = this;
 	var width = this.getWidth();
 	var height = this.getHeight();
+	function mousemove(d) {
+		var x0 = d3.mouse(this)[0] + width / 2;
+		var y0 = d3.mouse(this)[1] + height / 2;
+		that.detail.setContent({position: {x: x0, y: y0},contentValue: d.data.name + ": "+d.data.value});
+	}
 	var radius = Math.min(width, height) / 2;
 	var colorList = this.getColorList();
 	this._groupContainer = this._container.append("g")
@@ -66,15 +73,19 @@ Arc.prototype.render = function() {
 			    				.enter().append("g")
 			      				.attr("class", "frost_pie");
 
-	g.append("path").attr("d", arc)
-	      			.style("fill", function(d, i) { return colorList[i]; });
-
+	var node = g.append("path").attr("d", arc)
+	      				    	.style("fill", function(d, i) { return colorList[i]; });
+	if(this.hasDetail) {
+		node.on("mouseover", function() {that.detail.show(); })
+	        .on("mouseout", function() { that.detail.hide();})
+	        .on("mousemove", mousemove);
+	}
 	g.append("text")
 	 .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
 	 .attr("dy", ".35em")
 	 .style("text-anchor", "middle")
 	 .text(function(d) { 
-	 	return d.data.name + ": " +d.data.value; 
+	 	return d.data.name; 
 	 });
 };
 

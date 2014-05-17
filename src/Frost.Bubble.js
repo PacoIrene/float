@@ -9,6 +9,7 @@ function Bubble(cfg) {
 	this.colorList = cfg.colorList;
 	this._seriesName = cfg.seriesName;
 	this.detail = cfg.detail;
+	this.hasDetail = cfg.hasDetail || false;
 }
 Bubble.prototype.getType = function() {
 	return this.type;
@@ -47,6 +48,12 @@ Bubble.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 Bubble.prototype.render = function() {
+	var that = this;
+	function mousemove(d) {
+		var x0 = d3.mouse(this)[0] + d.x + 30;
+		var y0 = d3.mouse(this)[1] + d.y;
+		that.detail.setContent({position: {x: x0, y: y0},contentValue: d.name + ": "+d.value});
+	}
 	var width = this.getWidth();
 	var height = this.getHeight();
 	var colorList = Frost.Util.getColorListForBubble(this.getData(), this.getData().length);
@@ -64,8 +71,8 @@ Bubble.prototype.render = function() {
       			  .attr("class", "forst_bubble_node")
       			  .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
- 	node.append("title")
-      	.text(function(d) { return d.name + ": " + d.value;});
+ 	// node.append("title")
+  //     	.text(function(d) { return d.name + ": " + d.value;});
 
   	node.append("circle")
       	.attr("r", function(d) { return d.r; })
@@ -76,6 +83,11 @@ Bubble.prototype.render = function() {
       	.style("text-anchor", "middle")
       	.text(function(d) { return d.name.substring(0, d.r / 3);});
     this.getParent().setColorList(Frost.Util.filterSome(legendColor));
+    if(this.hasDetail) {
+		node.on("mouseover", function() {that.detail.show(); })
+	        .on("mouseout", function() { that.detail.hide();})
+	        .on("mousemove", mousemove);
+	}
     return this;
 };
 
