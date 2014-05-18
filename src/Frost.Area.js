@@ -50,14 +50,14 @@ Area.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 Area.prototype.render = function() {
-	var x = this.getParent().getXScale();
-	var y = this.getParent().getYScale();
+	var x = this.getParent().getParent().getXScale();
+	var y = this.getParent().getParent().getYScale();
 	var height = this.getHeight();
 	this._groupContainer = this._container.append("g");
 	if(this.isXLinear == true) {
 		x = d3.scale.linear().range([0, this.getWidth()])
-	    x.domain([0,this.getParent().getNameDomain().length - 1]);
-	    this.getParent().setXScale(x);
+	    x.domain([0,this.getParent().getParent().getNameDomain().length - 1]);
+	    this.getParent().getParent().setXScale(x);
 	    var area = d3.svg.area()
 			     .x(function(d, i) {return x(i);  })
 			     .y0(height)
@@ -79,18 +79,16 @@ Area.prototype.render = function() {
 				        .attr("class", "frost_area")
 				        .attr("d", area)
 				        .attr("fill", this.getColor());
-	this._bindUI();
+	// this._bindUI();
 	return this;
 };
 Area.prototype._bindUI = function() {
 	var that = this;
-	var x = this.getParent().getXScale();
-	var y = this.getParent().getYScale();
-	console.log(x.rangeBand());
+	var x = this.getParent().getParent().getXScale();
+	var y = this.getParent().getParent().getYScale();
 	var width = this.getWidth();
 	var height = this.getHeight();
-	var nameDomain = this.getParent().getNameDomain();
-	console.log(nameDomain);
+	var nameDomain = this.getParent().getParent().getNameDomain();
 	var data = this.getData();
 	this._groupContainer.append("rect")
        .attr("class", "frost_overlay")
@@ -104,13 +102,11 @@ Area.prototype._bindUI = function() {
     	var name = "";
     	var value = "";
 		// console.log(x0);
-		console.log(d3.mouse(this)[0]);
 		if(x0.toString().length == 1) {
 			console.log(x0);
 			name = nameDomain[x0 - 1];
 			value = Frost.Util.getValue(name, data);
 		}
-		console.log(name+": " +value);
 	    // var x0 = x.invert(d3.mouse(this)[0]),
 	    //     i = bisectDate(data, x0, 1),
 	    //     d0 = data[i - 1],

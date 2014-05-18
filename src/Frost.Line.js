@@ -10,6 +10,7 @@ function Line(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
+	this.detail = cfg.detail;
 }
 Line.prototype.getHeight = function() {
 	return this.height;

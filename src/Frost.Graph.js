@@ -220,20 +220,20 @@ Graph.prototype.render = function() {
 			
 			break;
 		case "area":
-			if(this.getSeries().length == 1) {
-				this.chartObject.push(new Frost.Area({
+			if(!this.IsStack()) {
+				this.chartObject.push(new Frost.Areas({
 					width: actaulWidth, 
 					height: actualHeight, 
-					data: this.getSeries()[0].data, 
+					data: this.getSeries(), 
 					container: this._container, 
 					parent: this,
-					color: this.getColorList()[0],
+					colorList: this.getColorList(),
 					seriesName: seriesName,
 					isXLinear: this.getCfg().isXLinear,
 					lineType: this.getCfg().lineType,
 					detail: this.detail
 				}).render());
-			} else if (this.getSeries().length > 1) {
+			} else {
 				this.chartObject.push(new Frost.StackArea({
 						width: actaulWidth, 
 						height: actualHeight,

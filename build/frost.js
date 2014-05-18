@@ -1,4 +1,4 @@
-/*! Float.js 0.1.0 2014-05-17 */
+/*! Float.js 0.1.1 2014-05-18 */
 /**
  * The Frost Object is the Parent Object of all the sub Object
  * There are three main functions in Frost
@@ -589,14 +589,14 @@ Area.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 Area.prototype.render = function() {
-	var x = this.getParent().getXScale();
-	var y = this.getParent().getYScale();
+	var x = this.getParent().getParent().getXScale();
+	var y = this.getParent().getParent().getYScale();
 	var height = this.getHeight();
 	this._groupContainer = this._container.append("g");
 	if(this.isXLinear == true) {
 		x = d3.scale.linear().range([0, this.getWidth()])
-	    x.domain([0,this.getParent().getNameDomain().length - 1]);
-	    this.getParent().setXScale(x);
+	    x.domain([0,this.getParent().getParent().getNameDomain().length - 1]);
+	    this.getParent().getParent().setXScale(x);
 	    var area = d3.svg.area()
 			     .x(function(d, i) {return x(i);  })
 			     .y0(height)
@@ -618,18 +618,16 @@ Area.prototype.render = function() {
 				        .attr("class", "frost_area")
 				        .attr("d", area)
 				        .attr("fill", this.getColor());
-	this._bindUI();
+	// this._bindUI();
 	return this;
 };
 Area.prototype._bindUI = function() {
 	var that = this;
-	var x = this.getParent().getXScale();
-	var y = this.getParent().getYScale();
-	console.log(x.rangeBand());
+	var x = this.getParent().getParent().getXScale();
+	var y = this.getParent().getParent().getYScale();
 	var width = this.getWidth();
 	var height = this.getHeight();
-	var nameDomain = this.getParent().getNameDomain();
-	console.log(nameDomain);
+	var nameDomain = this.getParent().getParent().getNameDomain();
 	var data = this.getData();
 	this._groupContainer.append("rect")
        .attr("class", "frost_overlay")
@@ -643,13 +641,11 @@ Area.prototype._bindUI = function() {
     	var name = "";
     	var value = "";
 		// console.log(x0);
-		console.log(d3.mouse(this)[0]);
 		if(x0.toString().length == 1) {
 			console.log(x0);
 			name = nameDomain[x0 - 1];
 			value = Frost.Util.getValue(name, data);
 		}
-		console.log(name+": " +value);
 	    // var x0 = x.invert(d3.mouse(this)[0]),
 	    //     i = bisectDate(data, x0, 1),
 	    //     d0 = data[i - 1],
@@ -662,6 +658,84 @@ Area.prototype._bindUI = function() {
 };
 
 Frost.Area = Area;
+Frost.namespace("Frost.Areas");
+
+function Areas(cfg) {
+	this.height = cfg.height;
+	this.width = cfg.width;
+	this._container = cfg.container;
+	this._parent = cfg.parent;
+	this.data = cfg.data;
+	this.colorList = cfg.colorList;
+	this._seriesName = cfg.seriesName;
+	this.isXLinear = cfg.isXLinear || false;
+	this.lineType = cfg.lineType || "linear";
+	this._areaList = [];
+	this.detail = cfg.detail;
+}
+Areas.prototype.getType = function() {
+	return this.type;
+};
+Areas.prototype.getHeight = function() {
+	return this.height;
+};
+
+Areas.prototype.setHeight = function(data) {
+	this.height = data;
+};
+
+Areas.prototype.getWidth = function() {
+	return this.width;
+};
+
+Areas.prototype.setWidth = function(data) {
+	this.Width = data;
+};
+Areas.prototype.getContainer = function() {
+	return this._container;
+};
+Areas.prototype.setContainer = function(data) {
+	this._container = data;
+};
+Areas.prototype.getParent = function() {
+	return this._parent;
+};
+Areas.prototype.getData = function() {
+	return this.data;
+};
+Areas.prototype.getColorList = function() {
+	return this.colorList;
+};
+Areas.prototype.getSeriesName = function() {
+	return this._seriesName;
+};
+Areas.prototype.getAreaList = function() {
+	return this._areaList;
+};
+Areas.prototype.getChildrenContainer = function() {
+	return this.childrenContainer;
+};
+Areas.prototype.render = function() {
+	this.childrenContainer = this._container.append("g")
+											.attr("class", "forst_AreasContainer");
+	for(var i = 0; i != this.getData().length; i++) {
+		this._areaList.push(new Frost.Area({
+					width: this.getWidth(), 
+					height: this.getHeight(), 
+					data: this.getData()[i].data, 
+					container: this.childrenContainer, 
+					parent: this,
+					color: this.getColorList()[i],
+					seriesName: this.getSeriesName(),
+					isXLinear: this.isXLinear,
+					lineType: this.lineType,
+					detail: this.detail
+				}).render());
+	}
+	return this;
+};
+
+Frost.Areas = Areas;
 Frost.namespace("Frost.StackArea");
 
 function StackArea(cfg) {
@@ -767,6 +841,7 @@ function Line(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
+	this.detail = cfg.detail;
 }
 Line.prototype.getHeight = function() {
 	return this.height;
@@ -903,7 +978,8 @@ Lines.prototype.render = function() {
 					color: this.getColorList()[i],
 					seriesName: this.getSeriesName(),
 					isXLinear: this.isXLinear,
-					lineType: this.lineType
+					lineType: this.lineType,
+					detail: this.detail
 				}).render());
 	}
 	return this;
@@ -2017,20 +2093,20 @@ Graph.prototype.render = function() {
 			
 			break;
 		case "area":
-			if(this.getSeries().length == 1) {
-				this.chartObject.push(new Frost.Area({
+			if(!this.IsStack()) {
+				this.chartObject.push(new Frost.Areas({
 					width: actaulWidth, 
 					height: actualHeight, 
-					data: this.getSeries()[0].data, 
+					data: this.getSeries(), 
 					container: this._container, 
 					parent: this,
-					color: this.getColorList()[0],
+					colorList: this.getColorList(),
 					seriesName: seriesName,
 					isXLinear: this.getCfg().isXLinear,
 					lineType: this.getCfg().lineType,
 					detail: this.detail
 				}).render());
-			} else if (this.getSeries().length > 1) {
+			} else {
 				this.chartObject.push(new Frost.StackArea({
 						width: actaulWidth, 
 						height: actualHeight,

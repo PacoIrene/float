@@ -36,6 +36,9 @@
 .frost_legendRootNode_focus {
 	opacity: 0.5;
 }
+.forst_AreasContainer g path {
+  opacity: 0.8;
+}
 .frost_axis text, .frost_legend_single text {
   font: 10px sans-serif;
 }

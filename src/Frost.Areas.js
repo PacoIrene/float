@@ -1,6 +1,6 @@
-Frost.namespace("Frost.Lines");
+Frost.namespace("Frost.Areas");
 
-function Lines(cfg) {
+function Areas(cfg) {
 	this.height = cfg.height;
 	this.width = cfg.width;
 	this._container = cfg.container;
@@ -10,56 +10,56 @@ function Lines(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
-	this._lineList = [];
+	this._areaList = [];
 	this.detail = cfg.detail;
 }
-Lines.prototype.getType = function() {
+Areas.prototype.getType = function() {
 	return this.type;
 };
-Lines.prototype.getHeight = function() {
+Areas.prototype.getHeight = function() {
 	return this.height;
 };
 
-Lines.prototype.setHeight = function(data) {
+Areas.prototype.setHeight = function(data) {
 	this.height = data;
 };
 
-Lines.prototype.getWidth = function() {
+Areas.prototype.getWidth = function() {
 	return this.width;
 };
 
-Lines.prototype.setWidth = function(data) {
+Areas.prototype.setWidth = function(data) {
 	this.Width = data;
 };
-Lines.prototype.getContainer = function() {
+Areas.prototype.getContainer = function() {
 	return this._container;
 };
-Lines.prototype.setContainer = function(data) {
+Areas.prototype.setContainer = function(data) {
 	this._container = data;
 };
-Lines.prototype.getParent = function() {
+Areas.prototype.getParent = function() {
 	return this._parent;
 };
-Lines.prototype.getData = function() {
+Areas.prototype.getData = function() {
 	return this.data;
 };
-Lines.prototype.getColorList = function() {
+Areas.prototype.getColorList = function() {
 	return this.colorList;
 };
-Lines.prototype.getSeriesName = function() {
+Areas.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
-Lines.prototype.getLineList = function() {
-	return this._lineList;
+Areas.prototype.getAreaList = function() {
+	return this._areaList;
 };
-Lines.prototype.getChildrenContainer = function() {
+Areas.prototype.getChildrenContainer = function() {
 	return this.childrenContainer;
 };
-Lines.prototype.render = function() {
+Areas.prototype.render = function() {
 	this.childrenContainer = this._container.append("g")
-											.attr("class", "forst_linesContainer");
+											.attr("class", "forst_AreasContainer");
 	for(var i = 0; i != this.getData().length; i++) {
-		this._lineList.push(new Frost.Line({
+		this._areaList.push(new Frost.Area({
 					width: this.getWidth(), 
 					height: this.getHeight(), 
 					data: this.getData()[i].data, 
@@ -75,4 +75,4 @@ Lines.prototype.render = function() {
 	return this;
 };
 
-Frost.Lines = Lines;
+Frost.Areas = Areas;
