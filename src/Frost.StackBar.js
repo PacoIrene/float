@@ -72,7 +72,7 @@ StackBar.prototype.render = function() {
 		x.domain(this.getSeriesName());
 	} else if(this.getType() == 2) {	
 		this.data = Frost.Util.formatDataForStackBar(this.getData(), 2);
-		colorList = Frost.Util.getColorList(this.getData(), this.getSeriesName().length);
+		// colorList = Frost.Util.getColorList(this.getData(), this.getSeriesName().length);
 		this.getParent().setColorList(colorList);
 		this.getParent().setLegendName(this.getSeriesName());
 		x.domain(this.getParent().getNameDomain());

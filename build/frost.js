@@ -1,4 +1,4 @@
-/*! Float.js 0.1.1 2014-05-18 */
+/*! Float.js 0.1.2 2014-05-23 */
 /**
  * The Frost Object is the Parent Object of all the sub Object
  * There are three main functions in Frost
@@ -58,28 +58,24 @@ var Frost = {
      * @param {Object} SubClass The Object to extend.
      * @param {Object} SuperClass The Object for extend.
      */
-	extend: function(subClz,superClz){
-	    var subClzPrototype = subClz.prototype;
-
-        // add the superclass prototype to the subclass definition
-        subClz.superclass = superClz.prototype;
-
-        // copy prototype
+	extend: function(subClass,superClass){
+	    var subClzPrototype = subClass.prototype;
+        subClass.superclass = superClass.prototype;
         var F = function() {
         };
-        F.prototype = superClz.prototype;
+        F.prototype = superClass.prototype;
 
-        subClz.prototype = new F();
+        subClass.prototype = new F();
         for(var prop in subClzPrototype) {
             if(subClzPrototype.hasOwnProperty(prop)) {
-                subClz.prototype[prop] = subClzPrototype[prop];
+                subClass.prototype[prop] = subClzPrototype[prop];
             }
         }
-        subClz.prototype.constructor = subClz;
-        if(superClz.prototype.constructor == Object.prototype.constructor) {
-            superClz.prototype.constructor = superClz;
+        subClass.prototype.constructor = subClass;
+        if(superClass.prototype.constructor == Object.prototype.constructor) {
+            superClass.prototype.constructor = superClass;
         }
-        return subClz;
+        return subClass;
 	},
 	/**
      * Guide is obj a String.
@@ -508,7 +504,7 @@ StackBar.prototype.render = function() {
 		x.domain(this.getSeriesName());
 	} else if(this.getType() == 2) {	
 		this.data = Frost.Util.formatDataForStackBar(this.getData(), 2);
-		colorList = Frost.Util.getColorList(this.getData(), this.getSeriesName().length);
+		// colorList = Frost.Util.getColorList(this.getData(), this.getSeriesName().length);
 		this.getParent().setColorList(colorList);
 		this.getParent().setLegendName(this.getSeriesName());
 		x.domain(this.getParent().getNameDomain());
@@ -894,7 +890,6 @@ Line.prototype.render = function() {
 	} else {
 		var line = d3.svg.line()
 			     .x(function(d, i) { 
-			     	console.log(x(d.name) + x.rangeBand() / 2);
 			     	return x(d.name) + x.rangeBand() / 2; })
 			     .y(function(d) { return y(d.value); });
 	}
@@ -1036,6 +1031,8 @@ Pie.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 Pie.prototype.render = function() {
+	this.getParent().hasXAxis = false;
+	this.getParent().hasYAxis = false;
 	var that = this;
 	var width = this.getWidth();
 	var height = this.getHeight();
@@ -1127,6 +1124,8 @@ Bubble.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 Bubble.prototype.render = function() {
+	this.getParent().hasXAxis = false;
+	this.getParent().hasYAxis = false;
 	var that = this;
 	function mousemove(d) {
 		var x0 = d3.mouse(this)[0] + d.x + 30;
@@ -1222,6 +1221,8 @@ Arc.prototype.getSeriesName = function() {
 };
 
 Arc.prototype.render = function() {
+	this.getParent().hasXAxis = false;
+	this.getParent().hasYAxis = false;
 	var that = this;
 	var width = this.getWidth();
 	var height = this.getHeight();
@@ -1320,6 +1321,7 @@ Scatter.prototype.render = function() {
 		var x0 = d3.mouse(this)[0] + 50;
 		var y0 = d3.mouse(this)[1];
 		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.package + ": "+d.value});
+		// d.style("stroke", "#123456");
 	}
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
@@ -1399,7 +1401,9 @@ Force.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 
-Force.prototype.render = function() {
+Force.prototype.render = function() {	
+	this.getParent().hasXAxis = false;
+	this.getParent().hasYAxis = false;
 	var that = this;
 	function mousemove(d) {
 		var x0 = d3.mouse(this)[0];
@@ -1505,6 +1509,7 @@ Frost.namespace("Frost.Detail");
 function Detail(cfg) {
 	this._container = cfg.container;
 	this.detailNode = null;
+	this._parent = cfg.parent;
 	contentValue = cfg.contentValue || "name: value";
 }
 Detail.prototype.getContainer = function() {
@@ -1559,10 +1564,12 @@ Frost.namespace("Frost.XAxis");
 function XAxis(cfg) {
 	// this.domainRange = cfg.length;
 	this.width = cfg.width;
+	this.height = cfg.height;
 	this._parent = cfg.parent;
 	this.xSpace = cfg.xSpace || 0;
 	this.ySpace = cfg.ySpace || 0;
 	this._container = cfg.container;
+	this.hasStandard = cfg.hasStandard || false;
 }
 XAxis.prototype.getWidth = function() {
 	return this.width;
@@ -1589,9 +1596,14 @@ XAxis.prototype.render = function() {
 							  .attr("transform", "translate("+ this.getxSpace() + ","+ this.getySpace() +")");
 	var xAxis = d3.svg.axis()
 	    .scale(this.getParent().getXScale())
-	    .tickSize(1)
 	    .tickPadding(4)
 	    .orient("bottom");
+	if(this.hasStandard) {
+		xAxis.tickSize(-this.height);
+		this.xAxisNode.attr("class", "frost_axis frost_xAxis frost_xAxis_withStandard");
+	} else {
+		xAxis.tickSize(1);
+	}
 	this.xAxisNode.call(xAxis)
 	.append("text")
       .attr("class", "label")
@@ -1877,9 +1889,9 @@ var xSpaceRate = 40 / 500;
 
 function Graph(cfg) {
 	this.node = cfg.element || "body";
-	this.series = cfg.series;
-	this.width = cfg.width;
-	this.height = cfg.height;
+	this.series = cfg.series || {};
+	this.width = cfg.width || 0;
+	this.height = cfg.height || 0;
 	this.type = cfg.type || "column";
 	this.chartObject = [];
 	// this.detail = null;
@@ -2034,7 +2046,7 @@ Graph.prototype.render = function() {
 							.attr("height", this.getHeight());
 	this._container = svgNode.append("g")
     						.attr("transform", "translate(" + this.getLeftGap() + "," + this.getTopGap() + ")");
-	this.detail = new Frost.Detail({container: rootNode}).render();
+	this.detail = new Frost.Detail({container: rootNode, parent: this}).render();
 	this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries().length);
 	var actaulWidth = this.IsHasXAxis() ? (this.getWidth() - this.getLeftGap() - this.getRightGap()) : this.getWidth();
 	var actualHeight = this.IsHasYAxis() ? (this.getHeight() - this.getBottomGap() - this.getTopGap()) : this.getHeight();
@@ -2223,11 +2235,13 @@ Graph.prototype.render = function() {
 	}
 	if(this.IsHasXAxis()) {
     	this.xAxisRender({
+    		height: actualHeight,
 			parent: this, 
 			container: this._container, 
 			xSpace: 0,
 			width: actaulWidth,
-			ySpace: this.getHeight()-this.getBottomGap() - this.topGap
+			ySpace: this.getHeight()-this.getBottomGap() - this.topGap,
+			hasStandard: this.getCfg().hasStandard
 		});
     }
     if(this.IsHasYAxis()) {
@@ -2264,11 +2278,13 @@ Graph.prototype._bindUI = function() {
 };
 Graph.prototype.xAxisRender = function(cfg) {
 	this.xAxis = new Frost.XAxis({
+		height: cfg.height,
 		parent: cfg.parent, 
 		container: cfg.container, 
 		xSpace: cfg.xSpace,
 		ySpace: cfg.ySpace,
-		width: cfg.width
+		width: cfg.width,
+		hasStandard: cfg.hasStandard
 	}).render();
 };
 Graph.prototype.yAxisRender = function(cfg) {

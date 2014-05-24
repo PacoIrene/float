@@ -55,6 +55,7 @@ Scatter.prototype.render = function() {
 		var x0 = d3.mouse(this)[0] + 50;
 		var y0 = d3.mouse(this)[1];
 		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.package + ": "+d.value});
+		// d.style("stroke", "#123456");
 	}
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();

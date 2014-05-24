@@ -4,9 +4,9 @@ var xSpaceRate = 40 / 500;
 
 function Graph(cfg) {
 	this.node = cfg.element || "body";
-	this.series = cfg.series;
-	this.width = cfg.width;
-	this.height = cfg.height;
+	this.series = cfg.series || {};
+	this.width = cfg.width || 0;
+	this.height = cfg.height || 0;
 	this.type = cfg.type || "column";
 	this.chartObject = [];
 	// this.detail = null;
@@ -161,7 +161,7 @@ Graph.prototype.render = function() {
 							.attr("height", this.getHeight());
 	this._container = svgNode.append("g")
     						.attr("transform", "translate(" + this.getLeftGap() + "," + this.getTopGap() + ")");
-	this.detail = new Frost.Detail({container: rootNode}).render();
+	this.detail = new Frost.Detail({container: rootNode, parent: this}).render();
 	this.colorList = Frost.Util.getColorList(this.getSeries(), this.getSeries().length);
 	var actaulWidth = this.IsHasXAxis() ? (this.getWidth() - this.getLeftGap() - this.getRightGap()) : this.getWidth();
 	var actualHeight = this.IsHasYAxis() ? (this.getHeight() - this.getBottomGap() - this.getTopGap()) : this.getHeight();
@@ -350,11 +350,13 @@ Graph.prototype.render = function() {
 	}
 	if(this.IsHasXAxis()) {
     	this.xAxisRender({
+    		height: actualHeight,
 			parent: this, 
 			container: this._container, 
 			xSpace: 0,
 			width: actaulWidth,
-			ySpace: this.getHeight()-this.getBottomGap() - this.topGap
+			ySpace: this.getHeight()-this.getBottomGap() - this.topGap,
+			hasStandard: this.getCfg().hasStandard
 		});
     }
     if(this.IsHasYAxis()) {
@@ -391,11 +393,13 @@ Graph.prototype._bindUI = function() {
 };
 Graph.prototype.xAxisRender = function(cfg) {
 	this.xAxis = new Frost.XAxis({
+		height: cfg.height,
 		parent: cfg.parent, 
 		container: cfg.container, 
 		xSpace: cfg.xSpace,
 		ySpace: cfg.ySpace,
-		width: cfg.width
+		width: cfg.width,
+		hasStandard: cfg.hasStandard
 	}).render();
 };
 Graph.prototype.yAxisRender = function(cfg) {

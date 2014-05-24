@@ -63,7 +63,6 @@ Line.prototype.render = function() {
 	} else {
 		var line = d3.svg.line()
 			     .x(function(d, i) { 
-			     	console.log(x(d.name) + x.rangeBand() / 2);
 			     	return x(d.name) + x.rangeBand() / 2; })
 			     .y(function(d) { return y(d.value); });
 	}

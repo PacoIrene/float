@@ -48,6 +48,8 @@ Pie.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 Pie.prototype.render = function() {
+	this.getParent().hasXAxis = false;
+	this.getParent().hasYAxis = false;
 	var that = this;
 	var width = this.getWidth();
 	var height = this.getHeight();

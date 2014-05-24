@@ -57,28 +57,24 @@ var Frost = {
      * @param {Object} SubClass The Object to extend.
      * @param {Object} SuperClass The Object for extend.
      */
-	extend: function(subClz,superClz){
-	    var subClzPrototype = subClz.prototype;
-
-        // add the superclass prototype to the subclass definition
-        subClz.superclass = superClz.prototype;
-
-        // copy prototype
+	extend: function(subClass,superClass){
+	    var subClzPrototype = subClass.prototype;
+        subClass.superclass = superClass.prototype;
         var F = function() {
         };
-        F.prototype = superClz.prototype;
+        F.prototype = superClass.prototype;
 
-        subClz.prototype = new F();
+        subClass.prototype = new F();
         for(var prop in subClzPrototype) {
             if(subClzPrototype.hasOwnProperty(prop)) {
-                subClz.prototype[prop] = subClzPrototype[prop];
+                subClass.prototype[prop] = subClzPrototype[prop];
             }
         }
-        subClz.prototype.constructor = subClz;
-        if(superClz.prototype.constructor == Object.prototype.constructor) {
-            superClz.prototype.constructor = superClz;
+        subClass.prototype.constructor = subClass;
+        if(superClass.prototype.constructor == Object.prototype.constructor) {
+            superClass.prototype.constructor = superClass;
         }
-        return subClz;
+        return subClass;
 	},
 	/**
      * Guide is obj a String.

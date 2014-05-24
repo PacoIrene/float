@@ -3,6 +3,7 @@ Frost.namespace("Frost.Detail");
 function Detail(cfg) {
 	this._container = cfg.container;
 	this.detailNode = null;
+	this._parent = cfg.parent;
 	contentValue = cfg.contentValue || "name: value";
 }
 Detail.prototype.getContainer = function() {

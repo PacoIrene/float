@@ -49,15 +49,20 @@
   shape-rendering: crispEdges;
 }
 .frost_yAxis_withStandard line {
-  stroke: #fff;
+  stroke: #000;
   stroke-opacity: .2;
   shape-rendering: crispEdges;
 }
 .frost_yAxis_withStandard path {
   display: none;
 }
-.frost_xAxis path{
-  /*display: none;*/
+.frost_xAxis_withStandard line {
+  stroke: #000;
+  stroke-opacity: .2;
+  shape-rendering: crispEdges;
+}
+.frost_xAxis_withStandard path {
+  display: none;
 }
 /*.frost_yAxis line {
   stroke: #777;

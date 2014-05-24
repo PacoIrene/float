@@ -51,7 +51,9 @@ Force.prototype.getSeriesName = function() {
 	return this._seriesName;
 };
 
-Force.prototype.render = function() {
+Force.prototype.render = function() {	
+	this.getParent().hasXAxis = false;
+	this.getParent().hasYAxis = false;
 	var that = this;
 	function mousemove(d) {
 		var x0 = d3.mouse(this)[0];
