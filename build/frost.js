@@ -1,4 +1,4 @@
-/*! Float.js 0.1.2 2014-05-23 */
+/*! Float.js 0.1.2 2014-05-26 */
 /**
  * The Frost Object is the Parent Object of all the sub Object
  * There are three main functions in Frost
@@ -1254,13 +1254,13 @@ Arc.prototype.render = function() {
 	        .on("mouseout", function() { that.detail.hide();})
 	        .on("mousemove", mousemove);
 	}
-	g.append("text")
-	 .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
-	 .attr("dy", ".35em")
-	 .style("text-anchor", "middle")
-	 .text(function(d) { 
-	 	return d.data.name; 
-	 });
+	// g.append("text")
+	//  .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+	//  .attr("dy", ".35em")
+	//  .style("text-anchor", "middle")
+	//  .text(function(d) { 
+	//  	return d.data.name; 
+	//  });
 };
 
 Frost.Arc = Arc;
