@@ -159,6 +159,12 @@ Graph.prototype.render = function() {
 	var svgNode = rootNode.append("svg")
 							.attr("width", this.getWidth())
 							.attr("height", this.getHeight());
+	if(!this.IsHasXAxis()) {
+		this.leftGap = 0;
+	}
+	if(!this.IsHasYAxis()) {
+		this.topGap = 0;
+	}
 	this._container = svgNode.append("g")
     						.attr("transform", "translate(" + this.getLeftGap() + "," + this.getTopGap() + ")");
 	this.detail = new Frost.Detail({container: rootNode, parent: this}).render();
