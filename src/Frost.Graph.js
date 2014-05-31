@@ -318,7 +318,8 @@ Graph.prototype.render = function() {
 				seriesName: seriesName,
 				colorList: this.getColorList(),
 				detail: this.detail,
-				hasDetail: this.getCfg().hasDetail
+				hasDetail: this.getCfg().hasDetail,
+				hasContent: this.getCfg().hasContent
 			}).render());
 			break;
 		case "force":

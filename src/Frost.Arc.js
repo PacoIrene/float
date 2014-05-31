@@ -64,8 +64,8 @@ Arc.prototype.render = function() {
 	this._groupContainer = this._container.append("g")
 										  .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 	var arc = d3.svg.arc()
-				    .outerRadius(radius - 100)
-				    .innerRadius(radius - 20);
+				    .outerRadius(radius/4)
+				    .innerRadius(radius/1.2);
 
 	var pie = d3.layout.pie()
 			    .sort(null)

@@ -1,4 +1,4 @@
-/*! Float.js 0.1.2 2014-05-30 */
+/*! Float.js 0.1.2 2014-05-31 */
 /**
  * The Frost Object is the Parent Object of all the sub Object
  * There are three main functions in Frost
@@ -1086,6 +1086,7 @@ function Bubble(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.detail = cfg.detail;
 	this.hasDetail = cfg.hasDetail || false;
+	this.hasContent = cfg.hasContent || false;
 }
 Bubble.prototype.getType = function() {
 	return this.type;
@@ -1155,11 +1156,12 @@ Bubble.prototype.render = function() {
   	node.append("circle")
       	.attr("r", function(d) { return d.r; })
       	.style("fill", function(d, i) { legendColor.push(colorList[d.package]); return colorList[d.package]; });
-
-  	node.append("text")
-      	.attr("dy", ".3em")
-      	.style("text-anchor", "middle")
-      	.text(function(d) { return d.name.substring(0, d.r / 3);});
+    if(this.hasContent) {
+    	node.append("text")
+	      	.attr("dy", ".3em")
+	      	.style("text-anchor", "middle")
+	      	.text(function(d) { return d.name.substring(0, d.r / 3);});
+	      }
     this.getParent().setColorList(Frost.Util.filterSome(legendColor));
     if(this.hasDetail) {
 		node.on("mouseover", function() {that.detail.show(); })
@@ -1236,8 +1238,8 @@ Arc.prototype.render = function() {
 	this._groupContainer = this._container.append("g")
 										  .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 	var arc = d3.svg.arc()
-				    .outerRadius(radius - 100)
-				    .innerRadius(radius - 20);
+				    .outerRadius(radius/4)
+				    .innerRadius(radius/1.2);
 
 	var pie = d3.layout.pie()
 			    .sort(null)
@@ -2203,7 +2205,8 @@ Graph.prototype.render = function() {
 				seriesName: seriesName,
 				colorList: this.getColorList(),
 				detail: this.detail,
-				hasDetail: this.getCfg().hasDetail
+				hasDetail: this.getCfg().hasDetail,
+				hasContent: this.getCfg().hasContent
 			}).render());
 			break;
 		case "force":
