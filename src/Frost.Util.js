@@ -91,6 +91,9 @@ Util.formatDataForStackBar = function(series, type) {
 		for(var i = 0; i != series.length; i++) {
 			var obj = {};
 			obj["name"] = series[i].name;
+			if(series[i].color) {
+				obj["color"] = series[i].color;
+			}
 			obj["data"] = [];
 			var start = 0;
 			for(var j = 0; j != series[i].data.length; j++) {

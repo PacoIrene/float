@@ -136,7 +136,26 @@ Frost.ColorConst = function(n) {
 		'#a888c2',
 		'#9dc2d3',
 		'#649eb9',
-		'#387aa3'
+		'#387aa3',
+		'#57306f',
+		'#514c76',
+		'#646583',
+		'#738394',
+		'#6b9c7d',
+		'#84b665',
+		'#a7ca50',
+		'#bfe746',
+		'#e2f528',
+		'#fff726',
+		'#ecdd00',
+		'#d4b11d',
+		'#de8800',
+		'#de4800',
+		'#c91515',
+		'#9a0000',
+		'#7b0429',
+		'#580839',
+		'#31082b'
 	];
 	var returnColor = [];
 	for(var i = 0; i != n; i++) {
@@ -372,13 +391,14 @@ Legend.prototype.render = function() {
 	var color = d3.scale.ordinal()
     					.range(this.getColorList());
     this._containerSVGNode = this._container.append("svg");
+    var maxHeight = 0;
     var containerNode = this._containerSVGNode.append("g")
     								   .attr("class", "frost_legend");
 	this._legend = containerNode.selectAll(".frost_legend_single")
 			      				.data(this.getSeriesName())
 			    				.enter().append("g")
 			      				.attr("class", "frost_legend_single")
-			      				.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+			      				.attr("transform", function(d, i) { maxHeight= i*20;return "translate(0," + i * 20 + ")"; });
 
 	this._legend.append("rect")
 	      .attr("x", 100 - 18)
@@ -394,11 +414,11 @@ Legend.prototype.render = function() {
 	      .text(function(d) { return d; });
 	var boundingRect = document.querySelector(".frost_legend").getBoundingClientRect();
 	this._containerSVGNode.attr("width", 120)
-				   		.attr("height", boundingRect.height);
+				   		.attr("height", maxHeight+20);
 	this._container.style("top",20 + "px")
 					.style("left",(this.getXSpace() - 100 )+ "px")
 					.style("width", "120px")
-					.style("height", boundingRect.height + "px");
+					.style("height", maxHeight+25 + "px");
 	
 	this._bindUI();
 	return this;
@@ -993,6 +1013,7 @@ function Pie(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.detail = cfg.detail;
 	this.hasDetail = cfg.hasDetail || false;
+	this.hasContent = cfg.hasContent || false;
 }
 Pie.prototype.getType = function() {
 	return this.type;
@@ -1065,13 +1086,15 @@ Pie.prototype.render = function() {
 	        .on("mouseout", function() { that.detail.hide();})
 	        .on("mousemove", mousemove);
 	}
-	g.append("text")
+	if(this.hasContent) {
+		g.append("text")
 	 .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
 	 .attr("dy", ".35em")
 	 .style("text-anchor", "middle")
 	 .text(function(d) { 
 	 	return d.data.name; 
 	 });
+	}
 };
 
 Frost.Pie = Pie;
@@ -1712,6 +1735,9 @@ Util.formatDataForStackBar = function(series, type) {
 		for(var i = 0; i != series.length; i++) {
 			var obj = {};
 			obj["name"] = series[i].name;
+			if(series[i].color) {
+				obj["color"] = series[i].color;
+			}
 			obj["data"] = [];
 			var start = 0;
 			for(var j = 0; j != series[i].data.length; j++) {
@@ -2170,7 +2196,8 @@ Graph.prototype.render = function() {
 					seriesName: seriesName,
 					colorList: this.getColorList(),
 					detail: this.detail,
-					hasDetail: this.getCfg().hasDetail
+					hasDetail: this.getCfg().hasDetail,
+					hasContent: this.getCfg().hasContent
 				}).render());
 			} else {
 

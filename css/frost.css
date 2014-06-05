@@ -28,10 +28,10 @@
 .frost_legendRootNode {
 	position: absolute;
 	cursor: pointer;
-	/*max-height: 200px;*/
-	/*overflow-y: scroll;*/
+	max-height: 200px;
+	overflow-y: auto;
 	/*max-width: 180px;*/
-	/*overflow-x: hidden;*/
+	overflow-x: hidden;
 }
 .frost_legendRootNode_focus {
 	opacity: 0.5;

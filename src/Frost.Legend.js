@@ -42,13 +42,14 @@ Legend.prototype.render = function() {
 	var color = d3.scale.ordinal()
     					.range(this.getColorList());
     this._containerSVGNode = this._container.append("svg");
+    var maxHeight = 0;
     var containerNode = this._containerSVGNode.append("g")
     								   .attr("class", "frost_legend");
 	this._legend = containerNode.selectAll(".frost_legend_single")
 			      				.data(this.getSeriesName())
 			    				.enter().append("g")
 			      				.attr("class", "frost_legend_single")
-			      				.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+			      				.attr("transform", function(d, i) { maxHeight= i*20;return "translate(0," + i * 20 + ")"; });
 
 	this._legend.append("rect")
 	      .attr("x", 100 - 18)
@@ -64,11 +65,11 @@ Legend.prototype.render = function() {
 	      .text(function(d) { return d; });
 	var boundingRect = document.querySelector(".frost_legend").getBoundingClientRect();
 	this._containerSVGNode.attr("width", 120)
-				   		.attr("height", boundingRect.height);
+				   		.attr("height", maxHeight+20);
 	this._container.style("top",20 + "px")
 					.style("left",(this.getXSpace() - 100 )+ "px")
 					.style("width", "120px")
-					.style("height", boundingRect.height + "px");
+					.style("height", maxHeight+25 + "px");
 	
 	this._bindUI();
 	return this;

@@ -10,6 +10,7 @@ function Pie(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.detail = cfg.detail;
 	this.hasDetail = cfg.hasDetail || false;
+	this.hasContent = cfg.hasContent || false;
 }
 Pie.prototype.getType = function() {
 	return this.type;
@@ -82,13 +83,15 @@ Pie.prototype.render = function() {
 	        .on("mouseout", function() { that.detail.hide();})
 	        .on("mousemove", mousemove);
 	}
-	g.append("text")
+	if(this.hasContent) {
+		g.append("text")
 	 .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
 	 .attr("dy", ".35em")
 	 .style("text-anchor", "middle")
 	 .text(function(d) { 
 	 	return d.data.name; 
 	 });
+	}
 };
 
 Frost.Pie = Pie;
