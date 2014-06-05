@@ -53,10 +53,11 @@ Pie.prototype.render = function() {
 	var that = this;
 	var width = this.getWidth();
 	var height = this.getHeight();
+	var total = Frost.Util.getTotal([{data:this.getData()}]);
 	function mousemove(d) {
 		var x0 = d3.mouse(this)[0] + width / 2 + (that.getWidth() / 500 -1) * 50;
 		var y0 = d3.mouse(this)[1] + height / 2 + (that.getHeight() / 300 -1) * 10;
-		that.detail.setContent({position: {x: x0, y: y0},contentValue: d.data.name + ": "+d.data.value});
+		that.detail.setContent({position: {x: x0, y: y0},contentValue: d.data.name + ": "+d.data.value + "<br/>" + "    " + ((d.data.value/total)*100).toFixed(2) + "%"});
 	}
 	var radius = Math.min(width, height) / 2;
 	var colorList = this.getColorList();
