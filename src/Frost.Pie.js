@@ -77,11 +77,23 @@ Pie.prototype.render = function() {
 			      				.attr("class", "frost_pie");
 
 	var node = g.append("path").attr("d", arc)
+							.attr("isSelected", 0)
 	      					.style("fill", function(d, i) { return colorList[i]; });
 	if(this.hasDetail) {
 		node.on("mouseover", function() {that.detail.show(); })
 	        .on("mouseout", function() { that.detail.hide();})
-	        .on("mousemove", mousemove);
+	        .on("mousemove", mousemove)
+	        .on("click", function() {
+	        	var isSelected = Number(d3.select(this).attr("isSelected"));
+	        	if(isSelected) {
+	        		g.classed({"pieScalesmall": false});
+	        		d3.select(this).classed({"pieScalebig": false});
+	        	} else {
+	        		d3.select(this).attr("isSelected", 1)
+	        		g.classed({"pieScalesmall": true});
+	        		d3.select(this).classed({"pieScalebig": true});
+	        	}
+	        });
 	}
 	if(this.hasContent) {
 		g.append("text")

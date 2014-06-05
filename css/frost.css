@@ -78,3 +78,11 @@
 .frost_pie path {
   stroke: #fff;
 }
+.pieScalebig {
+  -webkit-transform:scale(1.1);
+  -moz-transform:scale(1.1);
+}
+.pieScalesmall {
+  -webkit-transform:scale(0.9);
+  -moz-transform:scale(0.9);
+}
