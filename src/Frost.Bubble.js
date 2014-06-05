@@ -53,8 +53,8 @@ Bubble.prototype.render = function() {
 	this.getParent().hasYAxis = false;
 	var that = this;
 	function mousemove(d) {
-		var x0 = d3.mouse(this)[0] + d.x + 30;
-		var y0 = d3.mouse(this)[1] + d.y;
+		var x0 = d3.mouse(this)[0] + d.x + (that.getWidth() / 500 -1) * 50;
+		var y0 = d3.mouse(this)[1] + d.y + (that.getHeight() / 300 -1) * 10;
 		that.detail.setContent({position: {x: x0, y: y0},contentValue: d.name + ": "+d.value});
 	}
 	var width = this.getWidth();

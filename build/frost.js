@@ -1,4 +1,4 @@
-/*! Float.js 0.1.2 2014-05-31 */
+/*! Float.js 0.1.2 2014-06-05 */
 /**
  * The Frost Object is the Parent Object of all the sub Object
  * There are three main functions in Frost
@@ -203,8 +203,8 @@ SingleBar.prototype.getGroupContainer = function() {
 SingleBar.prototype.render = function() {
 	var that = this;
 	function mousemove(d) {
-		var x0 = d3.mouse(this)[0];
-		var y0 = d3.mouse(this)[1];
+		var x0 = d3.mouse(this)[0] + (that.getWidth() / 500 -1) * 50;
+		var y0 = d3.mouse(this)[1] + (that.getHeight() / 300 -1) * 10;
 		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.name + ": "+d.value});
 	}
 	var x = this.getParent().getXScale();
@@ -282,8 +282,8 @@ GroupBar.prototype.getSeriesName = function() {
 GroupBar.prototype.render = function() {
 	var that = this;
 	function mousemove(d) {
-		var x0 = d3.mouse(this)[0]+groupNodeMouseX;
-		var y0 = d3.mouse(this)[1];
+		var x0 = d3.mouse(this)[0]+groupNodeMouseX + (that.getWidth() / 500 -1) * 50;
+		var y0 = d3.mouse(this)[1] + (that.getHeight() / 300 -1) * 10;
 		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.name + ": "+d.value});
 	}
 	var groupNodeMouseX = 0;
@@ -483,8 +483,8 @@ StackBar.prototype.getSeriesName = function() {
 StackBar.prototype.render = function() {
 	var that = this;
 	function mousemove(d) {
-		var x0 = x(d.name) + d3.mouse(this)[0];
-		var y0 = d3.mouse(this)[1];
+		var x0 = x(d.name) + d3.mouse(this)[0] +  (that.getWidth() / 500 -1) * 50;
+		var y0 = d3.mouse(this)[1] + (that.getHeight() / 300 -1) * 10;
 		var content = d.name + ": " +d.total +"<br><br>";
 		for(var i = 0; i != d.data.length; i++) {
 			content += d.data[i].name+ ": " + (d.data[i].y1 - d.data[i].y0) + "<br>";
@@ -1037,8 +1037,8 @@ Pie.prototype.render = function() {
 	var width = this.getWidth();
 	var height = this.getHeight();
 	function mousemove(d) {
-		var x0 = d3.mouse(this)[0] + width / 2;
-		var y0 = d3.mouse(this)[1] + height / 2;
+		var x0 = d3.mouse(this)[0] + width / 2 + (that.getWidth() / 500 -1) * 50;
+		var y0 = d3.mouse(this)[1] + height / 2 + (that.getHeight() / 300 -1) * 10;
 		that.detail.setContent({position: {x: x0, y: y0},contentValue: d.data.name + ": "+d.data.value});
 	}
 	var radius = Math.min(width, height) / 2;
@@ -1129,8 +1129,8 @@ Bubble.prototype.render = function() {
 	this.getParent().hasYAxis = false;
 	var that = this;
 	function mousemove(d) {
-		var x0 = d3.mouse(this)[0] + d.x + 30;
-		var y0 = d3.mouse(this)[1] + d.y;
+		var x0 = d3.mouse(this)[0] + d.x + (that.getWidth() / 500 -1) * 50;
+		var y0 = d3.mouse(this)[1] + d.y + (that.getHeight() / 300 -1) * 10;
 		that.detail.setContent({position: {x: x0, y: y0},contentValue: d.name + ": "+d.value});
 	}
 	var width = this.getWidth();
@@ -1229,8 +1229,8 @@ Arc.prototype.render = function() {
 	var width = this.getWidth();
 	var height = this.getHeight();
 	function mousemove(d) {
-		var x0 = d3.mouse(this)[0] + width / 2;
-		var y0 = d3.mouse(this)[1] + height / 2;
+		var x0 = d3.mouse(this)[0] + width / 2 + (that.getWidth() / 500 -1) * 50;
+		var y0 = d3.mouse(this)[1] + height / 2 + (that.getHeight() / 300 -1) * 10;
 		that.detail.setContent({position: {x: x0, y: y0},contentValue: d.data.name + ": "+d.data.value});
 	}
 	var radius = Math.min(width, height) / 2;
@@ -1320,8 +1320,8 @@ Scatter.prototype.getSeriesName = function() {
 Scatter.prototype.render = function() {
 	var that = this;
 	function mousemove(d) {
-		var x0 = d3.mouse(this)[0] + 50;
-		var y0 = d3.mouse(this)[1];
+		var x0 = d3.mouse(this)[0] +  (that.getWidth() / 500 -1) * 50;
+		var y0 = d3.mouse(this)[1] + (that.getHeight() / 300 -1) * 10;
 		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.package + ": "+d.value});
 		// d.style("stroke", "#123456");
 	}
@@ -1408,8 +1408,8 @@ Force.prototype.render = function() {
 	this.getParent().hasYAxis = false;
 	var that = this;
 	function mousemove(d) {
-		var x0 = d3.mouse(this)[0];
-		var y0 = d3.mouse(this)[1];
+		var x0 = d3.mouse(this)[0] + (that.getWidth() / 500 -1) * 50;
+		var y0 = d3.mouse(this)[1] + (that.getHeight() / 300 -1) * 10;
 		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.package + "->" + d.name +": "+d.value});
 	}
 	function tick(e) {

@@ -56,8 +56,8 @@ Force.prototype.render = function() {
 	this.getParent().hasYAxis = false;
 	var that = this;
 	function mousemove(d) {
-		var x0 = d3.mouse(this)[0];
-		var y0 = d3.mouse(this)[1];
+		var x0 = d3.mouse(this)[0] + (that.getWidth() / 500 -1) * 50;
+		var y0 = d3.mouse(this)[1] + (that.getHeight() / 300 -1) * 10;
 		that.detail.setContent({position: {x: x0, y:y0},contentValue: d.package + "->" + d.name +": "+d.value});
 	}
 	function tick(e) {
