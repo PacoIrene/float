@@ -10,6 +10,7 @@ function Bubble(cfg) {
 	this._seriesName = cfg.seriesName;
 	this.detail = cfg.detail;
 	this.hasDetail = cfg.hasDetail || false;
+	this.hasContent = cfg.hasContent || false;
 }
 Bubble.prototype.getType = function() {
 	return this.type;
@@ -79,11 +80,12 @@ Bubble.prototype.render = function() {
   	node.append("circle")
       	.attr("r", function(d) { return d.r; })
       	.style("fill", function(d, i) { legendColor.push(colorList[d.package]); return colorList[d.package]; });
-
-  	node.append("text")
-      	.attr("dy", ".3em")
-      	.style("text-anchor", "middle")
-      	.text(function(d) { return d.name.substring(0, d.r / 3);});
+    if(this.hasContent) {
+    	node.append("text")
+	      	.attr("dy", ".3em")
+	      	.style("text-anchor", "middle")
+	      	.text(function(d) { return d.name.substring(0, d.r / 3);});
+	      }
     this.getParent().setColorList(Frost.Util.filterSome(legendColor));
     if(this.hasDetail) {
 		node.on("mouseover", function() {that.detail.show(); })
