@@ -55,8 +55,8 @@ Arc.prototype.render = function() {
 	var width = this.getWidth();
 	var height = this.getHeight();
 	function mousemove(d) {
-		var x0 = d3.mouse(this)[0] + width / 2;
-		var y0 = d3.mouse(this)[1] + height / 2;
+		var x0 = d3.mouse(this)[0] + 500 / 2 * width /500;
+		var y0 = d3.mouse(this)[1] + 300 / 2 * height /300;
 		that.detail.setContent({position: {x: x0, y: y0},contentValue: d.data.name + ": "+d.data.value});
 	}
 	var radius = Math.min(width, height) / 2;
