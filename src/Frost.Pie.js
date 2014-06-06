@@ -82,18 +82,18 @@ Pie.prototype.render = function() {
 	if(this.hasDetail) {
 		node.on("mouseover", function() {that.detail.show(); })
 	        .on("mouseout", function() { that.detail.hide();})
-	        .on("mousemove", mousemove)
-	        .on("click", function() {
-	        	var isSelected = Number(d3.select(this).attr("isSelected"));
-	        	if(isSelected) {
-	        		g.classed({"pieScalesmall": false});
-	        		d3.select(this).classed({"pieScalebig": false});
-	        	} else {
-	        		d3.select(this).attr("isSelected", 1)
-	        		g.classed({"pieScalesmall": true});
-	        		d3.select(this).classed({"pieScalebig": true});
-	        	}
-	        });
+	        .on("mousemove", mousemove);
+	        // .on("click", function() {
+	        // 	var isSelected = Number(d3.select(this).attr("isSelected"));
+	        // 	if(isSelected) {
+	        // 		g.classed({"pieScalesmall": false});
+	        // 		d3.select(this).classed({"pieScalebig": false});
+	        // 	} else {
+	        // 		d3.select(this).attr("isSelected", 1)
+	        // 		g.classed({"pieScalesmall": true});
+	        // 		d3.select(this).classed({"pieScalebig": true});
+	        // 	}
+	        // });
 	}
 	if(this.hasContent) {
 		g.append("text")

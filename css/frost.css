@@ -77,7 +77,7 @@
 }
 .frost_pie path {
   stroke: #fff;
-  cursor: move;
+  /*cursor: move;*/
 }
 .pieScalebig {
   -webkit-transform:scale(1.1);
@@ -86,4 +86,11 @@
 .pieScalesmall {
   -webkit-transform:scale(0.9);
   -moz-transform:scale(0.9);
+}
+.frost_force circle {
+  cursor: move;
+}
+.frost_text {
+  fill: #fff;
+  font-size: 12px;
 }

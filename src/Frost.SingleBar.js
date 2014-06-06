@@ -8,6 +8,7 @@ function SingleBar (cfg) {
 	this.width = cfg.width;
 	this.detail = cfg.detail;
 	this.hasDetail = cfg.hasDetail || false;
+	this.hasContent = cfg.hasContent || false;
 }
 
 SingleBar.prototype.getHeight = function() {
@@ -68,6 +69,17 @@ SingleBar.prototype.render = function() {
 		node.on("mouseover", function() {that.detail.show(); })
 	        .on("mouseout", function() { that.detail.hide();})
 	        .on("mousemove", mousemove);
+	}
+	if(this.hasContent) {
+		this._groupContainer.selectAll(".frost_text")
+			      					.data(this.getData())
+			    					.enter().append("text")
+			    					.attr("class", "frost_text")
+								    .attr("dy", ".75em")
+								    .attr("y", function(d) { return y(d.value)+6;})
+								    .attr("x", function(d) {return x(d.name)+x.rangeBand()/2; })
+								    .attr("text-anchor", "middle")
+								    .text(function(d) { return d.value; });
 	}
     return this;
 

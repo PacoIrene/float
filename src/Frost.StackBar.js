@@ -55,7 +55,7 @@ StackBar.prototype.render = function() {
 		var y0 = d3.mouse(this)[1] + (that.getHeight() / 300 -1) * 10;
 		var content = d.name + ": " +d.total +"<br><br>";
 		for(var i = 0; i != d.data.length; i++) {
-			content += d.data[i].name+ ": " + (d.data[i].y1 - d.data[i].y0) + "<br>";
+			content += d.data[i].name+ ": " + (d.data[i].y1 - d.data[i].y0) + "  "+ ((((d.data[i].y1 - d.data[i].y0)/d.total).toFixed(4))*100).toFixed(2)+"%"+"<br>";
 		}
 		that.detail.setContent({position: {x: x0, y:y0},contentValue: content});
 	}

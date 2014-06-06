@@ -1,4 +1,4 @@
-/*! Float.js 0.1.2 2014-06-05 */
+/*! Float.js 0.1.2 2014-06-06 */
 /**
  * The Frost Object is the Parent Object of all the sub Object
  * There are three main functions in Frost
@@ -183,6 +183,7 @@ function SingleBar (cfg) {
 	this.width = cfg.width;
 	this.detail = cfg.detail;
 	this.hasDetail = cfg.hasDetail || false;
+	this.hasContent = cfg.hasContent || false;
 }
 
 SingleBar.prototype.getHeight = function() {
@@ -243,6 +244,17 @@ SingleBar.prototype.render = function() {
 		node.on("mouseover", function() {that.detail.show(); })
 	        .on("mouseout", function() { that.detail.hide();})
 	        .on("mousemove", mousemove);
+	}
+	if(this.hasContent) {
+		this._groupContainer.selectAll(".frost_text")
+			      					.data(this.getData())
+			    					.enter().append("text")
+			    					.attr("class", "frost_text")
+								    .attr("dy", ".75em")
+								    .attr("y", function(d) { return y(d.value)+6;})
+								    .attr("x", function(d) {return x(d.name)+x.rangeBand()/2; })
+								    .attr("text-anchor", "middle")
+								    .text(function(d) { return d.value; });
 	}
     return this;
 
@@ -507,7 +519,7 @@ StackBar.prototype.render = function() {
 		var y0 = d3.mouse(this)[1] + (that.getHeight() / 300 -1) * 10;
 		var content = d.name + ": " +d.total +"<br><br>";
 		for(var i = 0; i != d.data.length; i++) {
-			content += d.data[i].name+ ": " + (d.data[i].y1 - d.data[i].y0) + "<br>";
+			content += d.data[i].name+ ": " + (d.data[i].y1 - d.data[i].y0) + "  "+ ((((d.data[i].y1 - d.data[i].y0)/d.total).toFixed(4))*100).toFixed(2)+"%"+"<br>";
 		}
 		that.detail.setContent({position: {x: x0, y:y0},contentValue: content});
 	}
@@ -1085,18 +1097,18 @@ Pie.prototype.render = function() {
 	if(this.hasDetail) {
 		node.on("mouseover", function() {that.detail.show(); })
 	        .on("mouseout", function() { that.detail.hide();})
-	        .on("mousemove", mousemove)
-	        .on("click", function() {
-	        	var isSelected = Number(d3.select(this).attr("isSelected"));
-	        	if(isSelected) {
-	        		g.classed({"pieScalesmall": false});
-	        		d3.select(this).classed({"pieScalebig": false});
-	        	} else {
-	        		d3.select(this).attr("isSelected", 1)
-	        		g.classed({"pieScalesmall": true});
-	        		d3.select(this).classed({"pieScalebig": true});
-	        	}
-	        });
+	        .on("mousemove", mousemove);
+	        // .on("click", function() {
+	        // 	var isSelected = Number(d3.select(this).attr("isSelected"));
+	        // 	if(isSelected) {
+	        // 		g.classed({"pieScalesmall": false});
+	        // 		d3.select(this).classed({"pieScalebig": false});
+	        // 	} else {
+	        // 		d3.select(this).attr("isSelected", 1)
+	        // 		g.classed({"pieScalesmall": true});
+	        // 		d3.select(this).classed({"pieScalebig": true});
+	        // 	}
+	        // });
 	}
 	if(this.hasContent) {
 		g.append("text")
@@ -2119,7 +2131,8 @@ Graph.prototype.render = function() {
 					parent: this,
 					color: this.getColorList()[0],
 					detail: this.detail,
-					hasDetail: this.getCfg().hasDetail
+					hasDetail: this.getCfg().hasDetail,
+					hasContent: this.getCfg().hasContent
 				}).render());
 			} else if (this.getSeries().length > 1) {
 				if(!this.IsStack()) {

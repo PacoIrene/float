@@ -192,7 +192,8 @@ Graph.prototype.render = function() {
 					parent: this,
 					color: this.getColorList()[0],
 					detail: this.detail,
-					hasDetail: this.getCfg().hasDetail
+					hasDetail: this.getCfg().hasDetail,
+					hasContent: this.getCfg().hasContent
 				}).render());
 			} else if (this.getSeries().length > 1) {
 				if(!this.IsStack()) {
