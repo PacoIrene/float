@@ -1,6 +1,6 @@
 {
-	"name": "Float.js",
-	"version": "0.1.2",
+	"name": "Frost.js",
+	"version": "0.1.4",
 	"private": true,
 	"dependencies": {
     "grunt": "*",
