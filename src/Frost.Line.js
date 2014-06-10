@@ -11,6 +11,7 @@ function Line(cfg) {
 	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
 	this.detail = cfg.detail;
+	this.timeXAxis = cfg.timeXAxis || false;
 }
 Line.prototype.getHeight = function() {
 	return this.height;
@@ -53,7 +54,7 @@ Line.prototype.getSeriesName = function() {
 Line.prototype.render = function() {
 	var x = this.getParent().getParent().getXScale();
 	var y = this.getParent().getParent().getYScale();
-	if(this.isXLinear == true) {
+	if(!this.timeXAxis && this.isXLinear == true) {
 		x = d3.scale.linear().range([0, this.getWidth()])
 	    x.domain([0,this.getParent().getParent().getNameDomain().length - 1]);
 	    this.getParent().getParent().setXScale(x);
@@ -64,6 +65,12 @@ Line.prototype.render = function() {
 		var line = d3.svg.line()
 			     .x(function(d, i) { 
 			     	return x(d.name) + x.rangeBand() / 2; })
+			     .y(function(d) { return y(d.value); });
+	}
+	if(this.timeXAxis) {
+		var line = d3.svg.line()
+			     .x(function(d, i) { 
+			     	return x(d.name)})
 			     .y(function(d) { return y(d.value); });
 	}
 	line.interpolate(this.lineType);

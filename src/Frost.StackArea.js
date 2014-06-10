@@ -11,6 +11,7 @@ function StackArea(cfg) {
 	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
 	this.detail = cfg.detail;
+	this.timeXAxis = cfg.timeXAxis || false;
 }
 StackArea.prototype.getType = function() {
 	return this.type;
@@ -52,7 +53,7 @@ StackArea.prototype.render = function() {
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
 	this._groupContainer = this._container.append("g");
-	if(this.isXLinear == true) {
+	if(!this.timeXAxis && this.isXLinear == true) {
 		x = d3.scale.linear().range([0, this.getWidth()])
 	    x.domain([0,this.getParent().getNameDomain().length - 1]);
 	    this.getParent().setXScale(x);
@@ -63,6 +64,12 @@ StackArea.prototype.render = function() {
 	} else {
 		var area = d3.svg.area()
 	    .x(function(d) { return x(d.name) + x.rangeBand() / 2 })
+	    .y0(function(d) { return y(d.y0); })
+	    .y1(function(d) { return y(d.y0 + d.y); });
+	}
+	if(this.timeXAxis) {
+		var area = d3.svg.area()
+	    .x(function(d) { return x(d.name); })
 	    .y0(function(d) { return y(d.y0); })
 	    .y1(function(d) { return y(d.y0 + d.y); });
 	}

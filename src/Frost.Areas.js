@@ -12,6 +12,7 @@ function Areas(cfg) {
 	this.lineType = cfg.lineType || "linear";
 	this._areaList = [];
 	this.detail = cfg.detail;
+	this.timeXAxis = cfg.timeXAxis || false;
 }
 Areas.prototype.getType = function() {
 	return this.type;
@@ -69,7 +70,8 @@ Areas.prototype.render = function() {
 					seriesName: this.getSeriesName(),
 					isXLinear: this.isXLinear,
 					lineType: this.lineType,
-					detail: this.detail
+					detail: this.detail,
+					timeXAxis: this.timeXAxis
 				}).render());
 	}
 	return this;

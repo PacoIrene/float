@@ -1,4 +1,4 @@
-/*! Frost.js 0.1.4 2014-06-06 */
+/*! Frost.js 0.1.4 2014-06-10 */
 /**
  * The Frost Object is the Parent Object of all the sub Object
  * There are three main functions in Frost
@@ -578,6 +578,7 @@ function Area(cfg) {
 	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
 	this.detail = cfg.detail;
+	this.timeXAxis = cfg.timeXAxis || false;
 }
 Area.prototype.getHeight = function() {
 	return this.height;
@@ -621,7 +622,7 @@ Area.prototype.render = function() {
 	var y = this.getParent().getParent().getYScale();
 	var height = this.getHeight();
 	this._groupContainer = this._container.append("g");
-	if(this.isXLinear == true) {
+	if(!this.timeXAxis && this.isXLinear == true) {
 		x = d3.scale.linear().range([0, this.getWidth()])
 	    x.domain([0,this.getParent().getParent().getNameDomain().length - 1]);
 	    this.getParent().getParent().setXScale(x);
@@ -636,6 +637,12 @@ Area.prototype.render = function() {
 	 //    this.getParent().setXScale(x);
 		var area = d3.svg.area()
 			     .x(function(d, i) { return x(d.name) + x.rangeBand() / 2;})
+			     .y0(height)
+			     .y1(function(d) { return y(d.value); });
+	}
+	if(this.timeXAxis) {
+		var area = d3.svg.area()
+			     .x(function(d, i) { return x(d.name);})
 			     .y0(height)
 			     .y1(function(d) { return y(d.value); });
 	}
@@ -700,6 +707,7 @@ function Areas(cfg) {
 	this.lineType = cfg.lineType || "linear";
 	this._areaList = [];
 	this.detail = cfg.detail;
+	this.timeXAxis = cfg.timeXAxis || false;
 }
 Areas.prototype.getType = function() {
 	return this.type;
@@ -757,7 +765,8 @@ Areas.prototype.render = function() {
 					seriesName: this.getSeriesName(),
 					isXLinear: this.isXLinear,
 					lineType: this.lineType,
-					detail: this.detail
+					detail: this.detail,
+					timeXAxis: this.timeXAxis
 				}).render());
 	}
 	return this;
@@ -777,6 +786,7 @@ function StackArea(cfg) {
 	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
 	this.detail = cfg.detail;
+	this.timeXAxis = cfg.timeXAxis || false;
 }
 StackArea.prototype.getType = function() {
 	return this.type;
@@ -818,7 +828,7 @@ StackArea.prototype.render = function() {
 	var x = this.getParent().getXScale();
 	var y = this.getParent().getYScale();
 	this._groupContainer = this._container.append("g");
-	if(this.isXLinear == true) {
+	if(!this.timeXAxis && this.isXLinear == true) {
 		x = d3.scale.linear().range([0, this.getWidth()])
 	    x.domain([0,this.getParent().getNameDomain().length - 1]);
 	    this.getParent().setXScale(x);
@@ -829,6 +839,12 @@ StackArea.prototype.render = function() {
 	} else {
 		var area = d3.svg.area()
 	    .x(function(d) { return x(d.name) + x.rangeBand() / 2 })
+	    .y0(function(d) { return y(d.y0); })
+	    .y1(function(d) { return y(d.y0 + d.y); });
+	}
+	if(this.timeXAxis) {
+		var area = d3.svg.area()
+	    .x(function(d) { return x(d.name); })
 	    .y0(function(d) { return y(d.y0); })
 	    .y1(function(d) { return y(d.y0 + d.y); });
 	}
@@ -870,6 +886,7 @@ function Line(cfg) {
 	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
 	this.detail = cfg.detail;
+	this.timeXAxis = cfg.timeXAxis || false;
 }
 Line.prototype.getHeight = function() {
 	return this.height;
@@ -912,7 +929,7 @@ Line.prototype.getSeriesName = function() {
 Line.prototype.render = function() {
 	var x = this.getParent().getParent().getXScale();
 	var y = this.getParent().getParent().getYScale();
-	if(this.isXLinear == true) {
+	if(!this.timeXAxis && this.isXLinear == true) {
 		x = d3.scale.linear().range([0, this.getWidth()])
 	    x.domain([0,this.getParent().getParent().getNameDomain().length - 1]);
 	    this.getParent().getParent().setXScale(x);
@@ -923,6 +940,12 @@ Line.prototype.render = function() {
 		var line = d3.svg.line()
 			     .x(function(d, i) { 
 			     	return x(d.name) + x.rangeBand() / 2; })
+			     .y(function(d) { return y(d.value); });
+	}
+	if(this.timeXAxis) {
+		var line = d3.svg.line()
+			     .x(function(d, i) { 
+			     	return x(d.name)})
 			     .y(function(d) { return y(d.value); });
 	}
 	line.interpolate(this.lineType);
@@ -949,6 +972,7 @@ function Lines(cfg) {
 	this.lineType = cfg.lineType || "linear";
 	this._lineList = [];
 	this.detail = cfg.detail;
+	this.timeXAxis = cfg.timeXAxis || false;
 }
 Lines.prototype.getType = function() {
 	return this.type;
@@ -1006,7 +1030,8 @@ Lines.prototype.render = function() {
 					seriesName: this.getSeriesName(),
 					isXLinear: this.isXLinear,
 					lineType: this.lineType,
-					detail: this.detail
+					detail: this.detail,
+					timeXAxis: this.timeXAxis
 				}).render());
 	}
 	return this;
@@ -1621,6 +1646,7 @@ function XAxis(cfg) {
 	this.ySpace = cfg.ySpace || 0;
 	this._container = cfg.container;
 	this.hasStandard = cfg.hasStandard || false;
+	this.timeXAxis = cfg.timeXAxis || false;
 }
 XAxis.prototype.getWidth = function() {
 	return this.width;
@@ -1654,6 +1680,9 @@ XAxis.prototype.render = function() {
 		this.xAxisNode.attr("class", "frost_axis frost_xAxis frost_xAxis_withStandard");
 	} else {
 		xAxis.tickSize(1);
+	}
+	if(this.timeXAxis) {
+		
 	}
 	this.xAxisNode.call(xAxis)
 	.append("text")
@@ -1878,6 +1907,31 @@ Util.getTotal = function(series) {
 		}
 	}
 	return number;
+};
+Util.getDateRange = function(series) {
+	var parseDate = d3.time.format("%Y-%m-%d").parse;
+	var min = parseDate(series[0].data[0].name);
+	var max = parseDate(series[0].data[series[0].data.length - 1].name);
+	for(var i = 0; i != series.length; i++) {
+		for(var j = 0; j != series[i].data.length; j++) {
+			if(parseDate(series[i].data[j].name) < min) {
+				min = parseDate(series[i].data[j].name);
+			}
+			if(parseDate(series[i].data[j].name) > min) {
+				max = parseDate(series[i].data[j].name);
+			}
+		}
+	}
+	return {"min": min, "max": max};
+};
+Util.formatDataForDate = function(series) {
+	var parseDate = d3.time.format("%Y-%m-%d").parse;
+	for(var i = 0; i != series.length; i++) {
+		for(var j = 0; j != series[i].data.length; j++) {
+			series[i].data[j].name = parseDate(series[i].data[j].name);
+		}
+	}
+	return series;
 };
 
 Frost.Util = Util;
@@ -2120,6 +2174,14 @@ Graph.prototype.render = function() {
     this.yScaleMaxValue = Frost.Util.getMaxValue(this.getSeries());
     this.xScale.domain(this.nameDomain);
     this.yScale.domain([0, this.yScaleMaxValue]);
+    if(this.getCfg().timeXAxis) {
+    	var data = Frost.Util.getDateRange(this.getSeries());
+    	this.xScale = d3.time.scale()
+   				 .range([0, actaulWidth]);
+   		this.xScale.domain([data.min, data.max]);
+   		console.log(data);
+   		this.setSeries(Frost.Util.formatDataForDate(this.getSeries()));
+    }
 	switch(this.getType().toLowerCase()) {
 		case "bar":
 			if(this.getSeries().length == 1) {
@@ -2177,7 +2239,8 @@ Graph.prototype.render = function() {
 					seriesName: seriesName,
 					isXLinear: this.getCfg().isXLinear,
 					lineType: this.getCfg().lineType,
-					detail: this.detail
+					detail: this.detail,
+					timeXAxis: this.getCfg().timeXAxis
 				}).render());
 			} else {
 				this.chartObject.push(new Frost.StackArea({
@@ -2190,7 +2253,8 @@ Graph.prototype.render = function() {
 						colorList: this.getColorList(),
 						isXLinear: this.getCfg().isXLinear,
 						lineType: this.getCfg().lineType,
-						detail: this.detail
+						detail: this.detail,
+						timeXAxis: this.getCfg().timeXAxis
 					}).render());
 			}
 			break;
@@ -2205,7 +2269,8 @@ Graph.prototype.render = function() {
 				seriesName: seriesName,
 				isXLinear: this.getCfg().isXLinear,
 				lineType: this.getCfg().lineType,
-				detail: this.detail
+				detail: this.detail,
+				timeXAxis: this.getCfg().timeXAxis
 			}).render());
 			break;
 		case "pie":
@@ -2304,7 +2369,8 @@ Graph.prototype.render = function() {
 			xSpace: 0,
 			width: actaulWidth,
 			ySpace: this.getHeight()-this.getBottomGap() - this.topGap,
-			hasStandard: this.getCfg().hasStandard
+			hasStandard: this.getCfg().hasStandard,
+			timeXAxis: this.getCfg().timeXAxis
 		});
     }
     if(this.IsHasYAxis()) {
@@ -2347,7 +2413,8 @@ Graph.prototype.xAxisRender = function(cfg) {
 		xSpace: cfg.xSpace,
 		ySpace: cfg.ySpace,
 		width: cfg.width,
-		hasStandard: cfg.hasStandard
+		hasStandard: cfg.hasStandard,
+		timeXAxis: cfg.timeXAxis
 	}).render();
 };
 Graph.prototype.yAxisRender = function(cfg) {

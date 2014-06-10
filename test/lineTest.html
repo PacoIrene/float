@@ -7,307 +7,44 @@
 	</head>
 	<body>
 		<div id="node1"></div>
-		<div id="node2"></div>
-		<div id="node3"></div>
-		<div id="node4"></div>
-		<div id="node5"></div>
-		<div id="node6"></div>
-		<div id="node7"></div>
-		<div id="node8"></div>
-		<div id="node9"></div>
-		<div id="node10"></div>
-		<div id="node11"></div>
 		<script type="text/javascript" src="../lib/d3.v3.min.js"></script>
 		<script type="text/javascript" src="../build/frost.js" charset="utf-8"></script>
 		<script type="text/javascript">
-		
+			var data = [];
+			for(var i = 0;i!=10;i++) {
+				var obj = {};
+				obj.name = i;
+				obj.value = i;
+				data.push(obj);
+			}
 			var frost1 = new Frost.Graph({
 				element: "#node1",
 				width: 500,
 				height: 300,
 				type: "line",
 				lineType: "linear",
-				isXLinear: false,
+				isXLinear: true,
 				series: [
 				{
 					color: "steelblue",
 					data: [
-						{x: 0, value: 10,name: "一月"},
-						{x: 1, value: 13,name: "二月"}, 
-						{x: 2, value: 18,name: "三月"},
-	 					{x: 3, value: 24,name: "四月"},
-						{x: 4, value: 30,name: "五月"},
+						{value: 10,name: "2012-03-15"},
+						{value: 13,name: "2013-03-19"}, 
+						{value: 18,name: "2014-03-22"},
+	 					{value: 24,name: "2014-04-1"},
+						{value: 30,name: "2014-04-10"},
 					],
+					// data: data,
 					name: "Country"
-				},
-				{
-					color: "lightblue",
-					data: [
-						{x: 0, value: 8,name: "一月"},
-						{x: 1, value: 12,name: "二月"}, 
-						{x: 2, value: 18,name: "三月"},
-	 					{x: 3, value: 27,name: "四月"},
-						{x: 4, value: 38,name: "五月"},
-					],
-					name: "Village"
 				}
 				],
-				xAxis: false,
-				yAxis: false,
+				xAxis: true,
+				yAxis: true,
 				legend: false,
 				hasStandard: false,
+				timeXAxis: true
 			});
-			// var frost2 = new Frost.Graph({
-			// 	element: "#node2",
-			// 	width: 200,
-			// 	height: 100,
-			// 	type: "line",
-			// 	lineType: "step-before",
-			// 	isXLinear: false,
-			// 	series: [
-			// 	{
-			// 		color: "steelblue",
-			// 		data: [
-			// 			{x: 0, value: 10,name: "王伟"},
-			// 			{x: 1, value: 13,name: "李卫"}, 
-			// 			{x: 2, value: 10,name: "孙伟"},
-	 	// 				{x: 3, value: 30,name: "张伟"},
-			// 			{x: 4, value: 13,name: "李麻痹"},
-			// 		],
-			// 		name: "Country"
-			// 	}
-			// 	],
-			// 	xAxis: false,
-			// 	yAxis: false,
-			// 	legend: false
-			// });
-			// var frost3 = new Frost.Graph({
-			// 	element: "#node3",
-			// 	width: 200,
-			// 	height: 100,
-			// 	type: "line",
-			// 	lineType: "step-after",
-			// 	isXLinear: false,
-			// 	series: [
-			// 	{
-			// 		color: "steelblue",
-			// 		data: [
-			// 			{x: 0, value: 10,name: "王伟"},
-			// 			{x: 1, value: 13,name: "李卫"}, 
-			// 			{x: 2, value: 10,name: "孙伟"},
-	 	// 				{x: 3, value: 30,name: "张伟"},
-			// 			{x: 4, value: 13,name: "李麻痹"},
-			// 		],
-			// 		name: "Country"
-			// 	}
-			// 	],
-			// 	xAxis: false,
-			// 	yAxis: false,
-			// 	legend: false
-			// });
-			// var frost4 = new Frost.Graph({
-			// 	element: "#node4",
-			// 	width: 200,
-			// 	height: 100,
-			// 	type: "line",
-			// 	lineType: "basis",
-			// 	isXLinear: false,
-			// 	series: [
-			// 	{
-			// 		color: "steelblue",
-			// 		data: [
-			// 			{x: 0, value: 10,name: "王伟"},
-			// 			{x: 1, value: 13,name: "李卫"}, 
-			// 			{x: 2, value: 10,name: "孙伟"},
-	 	// 				{x: 3, value: 30,name: "张伟"},
-			// 			{x: 4, value: 13,name: "李麻痹"},
-			// 		],
-			// 		name: "Country"
-			// 	}
-			// 	],
-			// 	xAxis: false,
-			// 	yAxis: false,
-			// 	legend: false
-			// });
-			// var frost5 = new Frost.Graph({
-			// 	element: "#node5",
-			// 	width: 200,
-			// 	height: 100,
-			// 	type: "line",
-			// 	lineType: "basis-open",
-			// 	isXLinear: false,
-			// 	series: [
-			// 	{
-			// 		color: "steelblue",
-			// 		data: [
-			// 			{x: 0, value: 10,name: "王伟"},
-			// 			{x: 1, value: 13,name: "李卫"}, 
-			// 			{x: 2, value: 10,name: "孙伟"},
-	 	// 				{x: 3, value: 30,name: "张伟"},
-			// 			{x: 4, value: 13,name: "李麻痹"},
-			// 		],
-			// 		name: "Country"
-			// 	}
-			// 	],
-			// 	xAxis: false,
-			// 	yAxis: false,
-			// 	legend: false
-			// });
-			// var frost6 = new Frost.Graph({
-			// 	element: "#node6",
-			// 	width: 200,
-			// 	height: 100,
-			// 	type: "line",
-			// 	lineType: "basis-closed",
-			// 	isXLinear: false,
-			// 	series: [
-			// 	{
-			// 		color: "steelblue",
-			// 		data: [
-			// 			{x: 0, value: 10,name: "王伟"},
-			// 			{x: 1, value: 13,name: "李卫"}, 
-			// 			{x: 2, value: 10,name: "孙伟"},
-	 	// 				{x: 3, value: 30,name: "张伟"},
-			// 			{x: 4, value: 13,name: "李麻痹"},
-			// 		],
-			// 		name: "Country"
-			// 	}
-			// 	],
-			// 	xAxis: false,
-			// 	yAxis: false,
-			// 	legend: false
-			// });
-			// var frost7 = new Frost.Graph({
-			// 	element: "#node7",
-			// 	width: 200,
-			// 	height: 100,
-			// 	type: "line",
-			// 	lineType: "bundle",
-			// 	isXLinear: false,
-			// 	series: [
-			// 	{
-			// 		color: "steelblue",
-			// 		data: [
-			// 			{x: 0, value: 10,name: "王伟"},
-			// 			{x: 1, value: 13,name: "李卫"}, 
-			// 			{x: 2, value: 10,name: "孙伟"},
-	 	// 				{x: 3, value: 30,name: "张伟"},
-			// 			{x: 4, value: 13,name: "李麻痹"},
-			// 		],
-			// 		name: "Country"
-			// 	}
-			// 	],
-			// 	xAxis: false,
-			// 	yAxis: false,
-			// 	legend: false
-			// });
-			// var frost8 = new Frost.Graph({
-			// 	element: "#node8",
-			// 	width: 200,
-			// 	height: 100,
-			// 	type: "line",
-			// 	lineType: "cardinal",
-			// 	isXLinear: false,
-			// 	series: [
-			// 	{
-			// 		color: "steelblue",
-			// 		data: [
-			// 			{x: 0, value: 10,name: "王伟"},
-			// 			{x: 1, value: 13,name: "李卫"}, 
-			// 			{x: 2, value: 10,name: "孙伟"},
-	 	// 				{x: 3, value: 30,name: "张伟"},
-			// 			{x: 4, value: 13,name: "李麻痹"},
-			// 		],
-			// 		name: "Country"
-			// 	}
-			// 	],
-			// 	xAxis: false,
-			// 	yAxis: false,
-			// 	legend: false
-			// });
-			// var frost9 = new Frost.Graph({
-			// 	element: "#node9",
-			// 	width: 200,
-			// 	height: 100,
-			// 	type: "line",
-			// 	lineType: "cardinal-open",
-			// 	isXLinear: false,
-			// 	series: [
-			// 	{
-			// 		color: "steelblue",
-			// 		data: [
-			// 			{x: 0, value: 10,name: "王伟"},
-			// 			{x: 1, value: 13,name: "李卫"}, 
-			// 			{x: 2, value: 10,name: "孙伟"},
-	 	// 				{x: 3, value: 30,name: "张伟"},
-			// 			{x: 4, value: 13,name: "李麻痹"},
-			// 		],
-			// 		name: "Country"
-			// 	}
-			// 	],
-			// 	xAxis: false,
-			// 	yAxis: false,
-			// 	legend: false
-			// });
-			// var frost10 = new Frost.Graph({
-			// 	element: "#node10",
-			// 	width: 200,
-			// 	height: 100,
-			// 	type: "line",
-			// 	lineType: "cardinal-closed",
-			// 	isXLinear: false,
-			// 	series: [
-			// 	{
-			// 		color: "steelblue",
-			// 		data: [
-			// 			{x: 0, value: 10,name: "王伟"},
-			// 			{x: 1, value: 13,name: "李卫"}, 
-			// 			{x: 2, value: 10,name: "孙伟"},
-	 	// 				{x: 3, value: 30,name: "张伟"},
-			// 			{x: 4, value: 13,name: "李麻痹"},
-			// 		],
-			// 		name: "Country"
-			// 	}
-			// 	],
-			// 	xAxis: false,
-			// 	yAxis: false,
-			// 	legend: false
-			// });
-			// var frost11 = new Frost.Graph({
-			// 	element: "#node11",
-			// 	width: 200,
-			// 	height: 100,
-			// 	type: "line",
-			// 	lineType: "monotone",
-			// 	isXLinear: false,
-			// 	series: [
-			// 	{
-			// 		color: "steelblue",
-			// 		data: [
-			// 			{x: 0, value: 10,name: "王伟"},
-			// 			{x: 1, value: 13,name: "李卫"}, 
-			// 			{x: 2, value: 10,name: "孙伟"},
-	 	// 				{x: 3, value: 30,name: "张伟"},
-			// 			{x: 4, value: 13,name: "李麻痹"},
-			// 		],
-			// 		name: "Country"
-			// 	}
-			// 	],
-			// 	xAxis: false,
-			// 	yAxis: false,
-			// 	legend: false
-			// });
 			frost1.render();
-			// frost2.render();
-			// frost3.render();
-			// frost4.render();
-			// frost5.render();
-			// frost6.render();
-			// frost7.render();
-			// frost8.render();
-			// frost9.render();
-			// frost10.render();
-			// frost11.render();
 		</script>
 	</body>
 </html>

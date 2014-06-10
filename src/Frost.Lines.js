@@ -12,6 +12,7 @@ function Lines(cfg) {
 	this.lineType = cfg.lineType || "linear";
 	this._lineList = [];
 	this.detail = cfg.detail;
+	this.timeXAxis = cfg.timeXAxis || false;
 }
 Lines.prototype.getType = function() {
 	return this.type;
@@ -69,7 +70,8 @@ Lines.prototype.render = function() {
 					seriesName: this.getSeriesName(),
 					isXLinear: this.isXLinear,
 					lineType: this.lineType,
-					detail: this.detail
+					detail: this.detail,
+					timeXAxis: this.timeXAxis
 				}).render());
 	}
 	return this;

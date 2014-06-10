@@ -181,6 +181,14 @@ Graph.prototype.render = function() {
     this.yScaleMaxValue = Frost.Util.getMaxValue(this.getSeries());
     this.xScale.domain(this.nameDomain);
     this.yScale.domain([0, this.yScaleMaxValue]);
+    if(this.getCfg().timeXAxis) {
+    	var data = Frost.Util.getDateRange(this.getSeries());
+    	this.xScale = d3.time.scale()
+   				 .range([0, actaulWidth]);
+   		this.xScale.domain([data.min, data.max]);
+   		console.log(data);
+   		this.setSeries(Frost.Util.formatDataForDate(this.getSeries()));
+    }
 	switch(this.getType().toLowerCase()) {
 		case "bar":
 			if(this.getSeries().length == 1) {
@@ -238,7 +246,8 @@ Graph.prototype.render = function() {
 					seriesName: seriesName,
 					isXLinear: this.getCfg().isXLinear,
 					lineType: this.getCfg().lineType,
-					detail: this.detail
+					detail: this.detail,
+					timeXAxis: this.getCfg().timeXAxis
 				}).render());
 			} else {
 				this.chartObject.push(new Frost.StackArea({
@@ -251,7 +260,8 @@ Graph.prototype.render = function() {
 						colorList: this.getColorList(),
 						isXLinear: this.getCfg().isXLinear,
 						lineType: this.getCfg().lineType,
-						detail: this.detail
+						detail: this.detail,
+						timeXAxis: this.getCfg().timeXAxis
 					}).render());
 			}
 			break;
@@ -266,7 +276,8 @@ Graph.prototype.render = function() {
 				seriesName: seriesName,
 				isXLinear: this.getCfg().isXLinear,
 				lineType: this.getCfg().lineType,
-				detail: this.detail
+				detail: this.detail,
+				timeXAxis: this.getCfg().timeXAxis
 			}).render());
 			break;
 		case "pie":
@@ -365,7 +376,8 @@ Graph.prototype.render = function() {
 			xSpace: 0,
 			width: actaulWidth,
 			ySpace: this.getHeight()-this.getBottomGap() - this.topGap,
-			hasStandard: this.getCfg().hasStandard
+			hasStandard: this.getCfg().hasStandard,
+			timeXAxis: this.getCfg().timeXAxis
 		});
     }
     if(this.IsHasYAxis()) {
@@ -408,7 +420,8 @@ Graph.prototype.xAxisRender = function(cfg) {
 		xSpace: cfg.xSpace,
 		ySpace: cfg.ySpace,
 		width: cfg.width,
-		hasStandard: cfg.hasStandard
+		hasStandard: cfg.hasStandard,
+		timeXAxis: cfg.timeXAxis
 	}).render();
 };
 Graph.prototype.yAxisRender = function(cfg) {

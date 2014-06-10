@@ -11,6 +11,7 @@ function Area(cfg) {
 	this.isXLinear = cfg.isXLinear || false;
 	this.lineType = cfg.lineType || "linear";
 	this.detail = cfg.detail;
+	this.timeXAxis = cfg.timeXAxis || false;
 }
 Area.prototype.getHeight = function() {
 	return this.height;
@@ -54,7 +55,7 @@ Area.prototype.render = function() {
 	var y = this.getParent().getParent().getYScale();
 	var height = this.getHeight();
 	this._groupContainer = this._container.append("g");
-	if(this.isXLinear == true) {
+	if(!this.timeXAxis && this.isXLinear == true) {
 		x = d3.scale.linear().range([0, this.getWidth()])
 	    x.domain([0,this.getParent().getParent().getNameDomain().length - 1]);
 	    this.getParent().getParent().setXScale(x);
@@ -69,6 +70,12 @@ Area.prototype.render = function() {
 	 //    this.getParent().setXScale(x);
 		var area = d3.svg.area()
 			     .x(function(d, i) { return x(d.name) + x.rangeBand() / 2;})
+			     .y0(height)
+			     .y1(function(d) { return y(d.value); });
+	}
+	if(this.timeXAxis) {
+		var area = d3.svg.area()
+			     .x(function(d, i) { return x(d.name);})
 			     .y0(height)
 			     .y1(function(d) { return y(d.value); });
 	}

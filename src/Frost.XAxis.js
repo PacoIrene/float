@@ -9,6 +9,7 @@ function XAxis(cfg) {
 	this.ySpace = cfg.ySpace || 0;
 	this._container = cfg.container;
 	this.hasStandard = cfg.hasStandard || false;
+	this.timeXAxis = cfg.timeXAxis || false;
 }
 XAxis.prototype.getWidth = function() {
 	return this.width;
@@ -42,6 +43,9 @@ XAxis.prototype.render = function() {
 		this.xAxisNode.attr("class", "frost_axis frost_xAxis frost_xAxis_withStandard");
 	} else {
 		xAxis.tickSize(1);
+	}
+	if(this.timeXAxis) {
+		
 	}
 	this.xAxisNode.call(xAxis)
 	.append("text")

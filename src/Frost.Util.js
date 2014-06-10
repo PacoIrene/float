@@ -211,5 +211,30 @@ Util.getTotal = function(series) {
 	}
 	return number;
 };
+Util.getDateRange = function(series) {
+	var parseDate = d3.time.format("%Y-%m-%d").parse;
+	var min = parseDate(series[0].data[0].name);
+	var max = parseDate(series[0].data[series[0].data.length - 1].name);
+	for(var i = 0; i != series.length; i++) {
+		for(var j = 0; j != series[i].data.length; j++) {
+			if(parseDate(series[i].data[j].name) < min) {
+				min = parseDate(series[i].data[j].name);
+			}
+			if(parseDate(series[i].data[j].name) > min) {
+				max = parseDate(series[i].data[j].name);
+			}
+		}
+	}
+	return {"min": min, "max": max};
+};
+Util.formatDataForDate = function(series) {
+	var parseDate = d3.time.format("%Y-%m-%d").parse;
+	for(var i = 0; i != series.length; i++) {
+		for(var j = 0; j != series[i].data.length; j++) {
+			series[i].data[j].name = parseDate(series[i].data[j].name);
+		}
+	}
+	return series;
+};
 
 Frost.Util = Util;
