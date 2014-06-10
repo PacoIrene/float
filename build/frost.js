@@ -1,4 +1,4 @@
-/*! Frost.js 0.1.4 2014-06-10 */
+/*! Frost.js 0.1.5 2014-06-10 */
 /**
  * The Frost Object is the Parent Object of all the sub Object
  * There are three main functions in Frost
@@ -1719,7 +1719,7 @@ Util.getMaxValue = function(series) {
 			max = tempMax;
 		}
 	}
-	return max;
+	return max / 0.8;
 };
 Util.getSeriesName = function(series) {
 	var list = [];

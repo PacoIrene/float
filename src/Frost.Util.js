@@ -22,7 +22,7 @@ Util.getMaxValue = function(series) {
 			max = tempMax;
 		}
 	}
-	return max;
+	return max / 0.8;
 };
 Util.getSeriesName = function(series) {
 	var list = [];
